@@ -2,6 +2,9 @@ language: go
 
 go: 1.9.x
 go_import_path: github.com/kubevirt/device-plugin-manager
-script: 
- - make
- - make test
+
+before_install:
+  - go get github.com/onsi/gomega
+  - go get github.com/onsi/ginkgo/ginkgo
+
+script: make build test
