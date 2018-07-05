@@ -1,7 +1,7 @@
 language: go
 
 go: 1.9.x
-go_import_path: github.com/kubevirt/device-plugin-manager
+go_import_path: kubevirt.io/kubevirt/device-plugin-manager
 
 before_install:
   - go get github.com/onsi/gomega
