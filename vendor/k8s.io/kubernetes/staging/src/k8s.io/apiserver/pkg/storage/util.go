@@ -18,7 +18,6 @@ package storage
 
 import (
 	"fmt"
-	"strings"
 	"sync/atomic"
 
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -38,14 +37,6 @@ func SimpleUpdate(fn SimpleUpdateFunc) UpdateFunc {
 
 func EverythingFunc(runtime.Object) bool {
 	return true
-}
-
-func NoTriggerFunc() []MatchValue {
-	return nil
-}
-
-func NoTriggerPublisher(runtime.Object) []MatchValue {
-	return nil
 }
 
 func NamespaceKeyFunc(prefix string, obj runtime.Object) (string, error) {
@@ -70,31 +61,6 @@ func NoNamespaceKeyFunc(prefix string, obj runtime.Object) (string, error) {
 		return "", fmt.Errorf("invalid name: %v", msgs)
 	}
 	return prefix + "/" + name, nil
-}
-
-// hasPathPrefix returns true if the string matches pathPrefix exactly, or if is prefixed with pathPrefix at a path segment boundary
-func hasPathPrefix(s, pathPrefix string) bool {
-	// Short circuit if s doesn't contain the prefix at all
-	if !strings.HasPrefix(s, pathPrefix) {
-		return false
-	}
-
-	pathPrefixLength := len(pathPrefix)
-
-	if len(s) == pathPrefixLength {
-		// Exact match
-		return true
-	}
-	if strings.HasSuffix(pathPrefix, "/") {
-		// pathPrefix already ensured a path segment boundary
-		return true
-	}
-	if s[pathPrefixLength:pathPrefixLength+1] == "/" {
-		// The next character in s is a path segment boundary
-		// Check this instead of normalizing pathPrefix to avoid allocating on every call
-		return true
-	}
-	return false
 }
 
 // HighWaterMark is a thread-safe object for tracking the maximum value seen

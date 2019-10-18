@@ -3,23 +3,31 @@
 
 package firestore
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import _ "google.golang.org/genproto/googleapis/api/annotations"
-import google_protobuf4 "github.com/golang/protobuf/ptypes/empty"
-import google_protobuf1 "github.com/golang/protobuf/ptypes/timestamp"
-import google_rpc "google.golang.org/genproto/googleapis/rpc/status"
-
 import (
-	context "golang.org/x/net/context"
+	context "context"
+	fmt "fmt"
+	math "math"
+
+	proto "github.com/golang/protobuf/proto"
+	empty "github.com/golang/protobuf/ptypes/empty"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
+	status "google.golang.org/genproto/googleapis/rpc/status"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status1 "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the proto package it is being compiled against.
+// A compilation error at this line likely means your copy of the
+// proto package needs to be updated.
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // The type of change.
 type TargetChange_TargetChangeType int32
@@ -55,6 +63,7 @@ var TargetChange_TargetChangeType_name = map[int32]string{
 	3: "CURRENT",
 	4: "RESET",
 }
+
 var TargetChange_TargetChangeType_value = map[string]int32{
 	"NO_CHANGE": 0,
 	"ADD":       1,
@@ -66,54 +75,57 @@ var TargetChange_TargetChangeType_value = map[string]int32{
 func (x TargetChange_TargetChangeType) String() string {
 	return proto.EnumName(TargetChange_TargetChangeType_name, int32(x))
 }
+
 func (TargetChange_TargetChangeType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor2, []int{20, 0}
+	return fileDescriptor_9bc8b30a28454f4b, []int{20, 0}
 }
 
 // The request for [Firestore.GetDocument][google.firestore.v1beta1.Firestore.GetDocument].
 type GetDocumentRequest struct {
 	// The resource name of the Document to get. In the format:
 	// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
-	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The fields to return. If not set, returns all fields.
 	//
 	// If the document has a field that is not present in this mask, that field
 	// will not be returned in the response.
-	Mask *DocumentMask `protobuf:"bytes,2,opt,name=mask" json:"mask,omitempty"`
+	Mask *DocumentMask `protobuf:"bytes,2,opt,name=mask,proto3" json:"mask,omitempty"`
 	// The consistency mode for this transaction.
 	// If not set, defaults to strong consistency.
 	//
 	// Types that are valid to be assigned to ConsistencySelector:
 	//	*GetDocumentRequest_Transaction
 	//	*GetDocumentRequest_ReadTime
-	ConsistencySelector isGetDocumentRequest_ConsistencySelector `protobuf_oneof:"consistency_selector"`
+	ConsistencySelector  isGetDocumentRequest_ConsistencySelector `protobuf_oneof:"consistency_selector"`
+	XXX_NoUnkeyedLiteral struct{}                                 `json:"-"`
+	XXX_unrecognized     []byte                                   `json:"-"`
+	XXX_sizecache        int32                                    `json:"-"`
 }
 
-func (m *GetDocumentRequest) Reset()                    { *m = GetDocumentRequest{} }
-func (m *GetDocumentRequest) String() string            { return proto.CompactTextString(m) }
-func (*GetDocumentRequest) ProtoMessage()               {}
-func (*GetDocumentRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{0} }
-
-type isGetDocumentRequest_ConsistencySelector interface {
-	isGetDocumentRequest_ConsistencySelector()
+func (m *GetDocumentRequest) Reset()         { *m = GetDocumentRequest{} }
+func (m *GetDocumentRequest) String() string { return proto.CompactTextString(m) }
+func (*GetDocumentRequest) ProtoMessage()    {}
+func (*GetDocumentRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{0}
 }
 
-type GetDocumentRequest_Transaction struct {
-	Transaction []byte `protobuf:"bytes,3,opt,name=transaction,proto3,oneof"`
+func (m *GetDocumentRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetDocumentRequest.Unmarshal(m, b)
 }
-type GetDocumentRequest_ReadTime struct {
-	ReadTime *google_protobuf1.Timestamp `protobuf:"bytes,5,opt,name=read_time,json=readTime,oneof"`
+func (m *GetDocumentRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetDocumentRequest.Marshal(b, m, deterministic)
+}
+func (m *GetDocumentRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDocumentRequest.Merge(m, src)
+}
+func (m *GetDocumentRequest) XXX_Size() int {
+	return xxx_messageInfo_GetDocumentRequest.Size(m)
+}
+func (m *GetDocumentRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDocumentRequest.DiscardUnknown(m)
 }
 
-func (*GetDocumentRequest_Transaction) isGetDocumentRequest_ConsistencySelector() {}
-func (*GetDocumentRequest_ReadTime) isGetDocumentRequest_ConsistencySelector()    {}
-
-func (m *GetDocumentRequest) GetConsistencySelector() isGetDocumentRequest_ConsistencySelector {
-	if m != nil {
-		return m.ConsistencySelector
-	}
-	return nil
-}
+var xxx_messageInfo_GetDocumentRequest proto.InternalMessageInfo
 
 func (m *GetDocumentRequest) GetName() string {
 	if m != nil {
@@ -129,6 +141,29 @@ func (m *GetDocumentRequest) GetMask() *DocumentMask {
 	return nil
 }
 
+type isGetDocumentRequest_ConsistencySelector interface {
+	isGetDocumentRequest_ConsistencySelector()
+}
+
+type GetDocumentRequest_Transaction struct {
+	Transaction []byte `protobuf:"bytes,3,opt,name=transaction,proto3,oneof"`
+}
+
+type GetDocumentRequest_ReadTime struct {
+	ReadTime *timestamp.Timestamp `protobuf:"bytes,5,opt,name=read_time,json=readTime,proto3,oneof"`
+}
+
+func (*GetDocumentRequest_Transaction) isGetDocumentRequest_ConsistencySelector() {}
+
+func (*GetDocumentRequest_ReadTime) isGetDocumentRequest_ConsistencySelector() {}
+
+func (m *GetDocumentRequest) GetConsistencySelector() isGetDocumentRequest_ConsistencySelector {
+	if m != nil {
+		return m.ConsistencySelector
+	}
+	return nil
+}
+
 func (m *GetDocumentRequest) GetTransaction() []byte {
 	if x, ok := m.GetConsistencySelector().(*GetDocumentRequest_Transaction); ok {
 		return x.Transaction
@@ -136,81 +171,19 @@ func (m *GetDocumentRequest) GetTransaction() []byte {
 	return nil
 }
 
-func (m *GetDocumentRequest) GetReadTime() *google_protobuf1.Timestamp {
+func (m *GetDocumentRequest) GetReadTime() *timestamp.Timestamp {
 	if x, ok := m.GetConsistencySelector().(*GetDocumentRequest_ReadTime); ok {
 		return x.ReadTime
 	}
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*GetDocumentRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _GetDocumentRequest_OneofMarshaler, _GetDocumentRequest_OneofUnmarshaler, _GetDocumentRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*GetDocumentRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*GetDocumentRequest_Transaction)(nil),
 		(*GetDocumentRequest_ReadTime)(nil),
 	}
-}
-
-func _GetDocumentRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*GetDocumentRequest)
-	// consistency_selector
-	switch x := m.ConsistencySelector.(type) {
-	case *GetDocumentRequest_Transaction:
-		b.EncodeVarint(3<<3 | proto.WireBytes)
-		b.EncodeRawBytes(x.Transaction)
-	case *GetDocumentRequest_ReadTime:
-		b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ReadTime); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("GetDocumentRequest.ConsistencySelector has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _GetDocumentRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*GetDocumentRequest)
-	switch tag {
-	case 3: // consistency_selector.transaction
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeRawBytes(true)
-		m.ConsistencySelector = &GetDocumentRequest_Transaction{x}
-		return true, err
-	case 5: // consistency_selector.read_time
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(google_protobuf1.Timestamp)
-		err := b.DecodeMessage(msg)
-		m.ConsistencySelector = &GetDocumentRequest_ReadTime{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _GetDocumentRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*GetDocumentRequest)
-	// consistency_selector
-	switch x := m.ConsistencySelector.(type) {
-	case *GetDocumentRequest_Transaction:
-		n += proto.SizeVarint(3<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.Transaction)))
-		n += len(x.Transaction)
-	case *GetDocumentRequest_ReadTime:
-		s := proto.Size(x.ReadTime)
-		n += proto.SizeVarint(5<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // The request for [Firestore.ListDocuments][google.firestore.v1beta1.Firestore.ListDocuments].
@@ -221,21 +194,21 @@ type ListDocumentsRequest struct {
 	// For example:
 	// `projects/my-project/databases/my-database/documents` or
 	// `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
-	Parent string `protobuf:"bytes,1,opt,name=parent" json:"parent,omitempty"`
+	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// The collection ID, relative to `parent`, to list. For example: `chatrooms`
 	// or `messages`.
-	CollectionId string `protobuf:"bytes,2,opt,name=collection_id,json=collectionId" json:"collection_id,omitempty"`
+	CollectionId string `protobuf:"bytes,2,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
 	// The maximum number of documents to return.
-	PageSize int32 `protobuf:"varint,3,opt,name=page_size,json=pageSize" json:"page_size,omitempty"`
+	PageSize int32 `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// The `next_page_token` value returned from a previous List request, if any.
-	PageToken string `protobuf:"bytes,4,opt,name=page_token,json=pageToken" json:"page_token,omitempty"`
+	PageToken string `protobuf:"bytes,4,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// The order to sort results by. For example: `priority desc, name`.
-	OrderBy string `protobuf:"bytes,6,opt,name=order_by,json=orderBy" json:"order_by,omitempty"`
+	OrderBy string `protobuf:"bytes,6,opt,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
 	// The fields to return. If not set, returns all fields.
 	//
 	// If a document has a field that is not present in this mask, that field
 	// will not be returned in the response.
-	Mask *DocumentMask `protobuf:"bytes,7,opt,name=mask" json:"mask,omitempty"`
+	Mask *DocumentMask `protobuf:"bytes,7,opt,name=mask,proto3" json:"mask,omitempty"`
 	// The consistency mode for this transaction.
 	// If not set, defaults to strong consistency.
 	//
@@ -250,34 +223,36 @@ type ListDocumentsRequest struct {
 	//
 	// Requests with `show_missing` may not specify `where` or
 	// `order_by`.
-	ShowMissing bool `protobuf:"varint,12,opt,name=show_missing,json=showMissing" json:"show_missing,omitempty"`
+	ShowMissing          bool     `protobuf:"varint,12,opt,name=show_missing,json=showMissing,proto3" json:"show_missing,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ListDocumentsRequest) Reset()                    { *m = ListDocumentsRequest{} }
-func (m *ListDocumentsRequest) String() string            { return proto.CompactTextString(m) }
-func (*ListDocumentsRequest) ProtoMessage()               {}
-func (*ListDocumentsRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{1} }
-
-type isListDocumentsRequest_ConsistencySelector interface {
-	isListDocumentsRequest_ConsistencySelector()
+func (m *ListDocumentsRequest) Reset()         { *m = ListDocumentsRequest{} }
+func (m *ListDocumentsRequest) String() string { return proto.CompactTextString(m) }
+func (*ListDocumentsRequest) ProtoMessage()    {}
+func (*ListDocumentsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{1}
 }
 
-type ListDocumentsRequest_Transaction struct {
-	Transaction []byte `protobuf:"bytes,8,opt,name=transaction,proto3,oneof"`
+func (m *ListDocumentsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListDocumentsRequest.Unmarshal(m, b)
 }
-type ListDocumentsRequest_ReadTime struct {
-	ReadTime *google_protobuf1.Timestamp `protobuf:"bytes,10,opt,name=read_time,json=readTime,oneof"`
+func (m *ListDocumentsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListDocumentsRequest.Marshal(b, m, deterministic)
+}
+func (m *ListDocumentsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListDocumentsRequest.Merge(m, src)
+}
+func (m *ListDocumentsRequest) XXX_Size() int {
+	return xxx_messageInfo_ListDocumentsRequest.Size(m)
+}
+func (m *ListDocumentsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListDocumentsRequest.DiscardUnknown(m)
 }
 
-func (*ListDocumentsRequest_Transaction) isListDocumentsRequest_ConsistencySelector() {}
-func (*ListDocumentsRequest_ReadTime) isListDocumentsRequest_ConsistencySelector()    {}
-
-func (m *ListDocumentsRequest) GetConsistencySelector() isListDocumentsRequest_ConsistencySelector {
-	if m != nil {
-		return m.ConsistencySelector
-	}
-	return nil
-}
+var xxx_messageInfo_ListDocumentsRequest proto.InternalMessageInfo
 
 func (m *ListDocumentsRequest) GetParent() string {
 	if m != nil {
@@ -321,6 +296,29 @@ func (m *ListDocumentsRequest) GetMask() *DocumentMask {
 	return nil
 }
 
+type isListDocumentsRequest_ConsistencySelector interface {
+	isListDocumentsRequest_ConsistencySelector()
+}
+
+type ListDocumentsRequest_Transaction struct {
+	Transaction []byte `protobuf:"bytes,8,opt,name=transaction,proto3,oneof"`
+}
+
+type ListDocumentsRequest_ReadTime struct {
+	ReadTime *timestamp.Timestamp `protobuf:"bytes,10,opt,name=read_time,json=readTime,proto3,oneof"`
+}
+
+func (*ListDocumentsRequest_Transaction) isListDocumentsRequest_ConsistencySelector() {}
+
+func (*ListDocumentsRequest_ReadTime) isListDocumentsRequest_ConsistencySelector() {}
+
+func (m *ListDocumentsRequest) GetConsistencySelector() isListDocumentsRequest_ConsistencySelector {
+	if m != nil {
+		return m.ConsistencySelector
+	}
+	return nil
+}
+
 func (m *ListDocumentsRequest) GetTransaction() []byte {
 	if x, ok := m.GetConsistencySelector().(*ListDocumentsRequest_Transaction); ok {
 		return x.Transaction
@@ -328,7 +326,7 @@ func (m *ListDocumentsRequest) GetTransaction() []byte {
 	return nil
 }
 
-func (m *ListDocumentsRequest) GetReadTime() *google_protobuf1.Timestamp {
+func (m *ListDocumentsRequest) GetReadTime() *timestamp.Timestamp {
 	if x, ok := m.GetConsistencySelector().(*ListDocumentsRequest_ReadTime); ok {
 		return x.ReadTime
 	}
@@ -342,88 +340,49 @@ func (m *ListDocumentsRequest) GetShowMissing() bool {
 	return false
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ListDocumentsRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ListDocumentsRequest_OneofMarshaler, _ListDocumentsRequest_OneofUnmarshaler, _ListDocumentsRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ListDocumentsRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ListDocumentsRequest_Transaction)(nil),
 		(*ListDocumentsRequest_ReadTime)(nil),
 	}
 }
 
-func _ListDocumentsRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ListDocumentsRequest)
-	// consistency_selector
-	switch x := m.ConsistencySelector.(type) {
-	case *ListDocumentsRequest_Transaction:
-		b.EncodeVarint(8<<3 | proto.WireBytes)
-		b.EncodeRawBytes(x.Transaction)
-	case *ListDocumentsRequest_ReadTime:
-		b.EncodeVarint(10<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ReadTime); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("ListDocumentsRequest.ConsistencySelector has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ListDocumentsRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ListDocumentsRequest)
-	switch tag {
-	case 8: // consistency_selector.transaction
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeRawBytes(true)
-		m.ConsistencySelector = &ListDocumentsRequest_Transaction{x}
-		return true, err
-	case 10: // consistency_selector.read_time
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(google_protobuf1.Timestamp)
-		err := b.DecodeMessage(msg)
-		m.ConsistencySelector = &ListDocumentsRequest_ReadTime{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ListDocumentsRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ListDocumentsRequest)
-	// consistency_selector
-	switch x := m.ConsistencySelector.(type) {
-	case *ListDocumentsRequest_Transaction:
-		n += proto.SizeVarint(8<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.Transaction)))
-		n += len(x.Transaction)
-	case *ListDocumentsRequest_ReadTime:
-		s := proto.Size(x.ReadTime)
-		n += proto.SizeVarint(10<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
-}
-
 // The response for [Firestore.ListDocuments][google.firestore.v1beta1.Firestore.ListDocuments].
 type ListDocumentsResponse struct {
 	// The Documents found.
-	Documents []*Document `protobuf:"bytes,1,rep,name=documents" json:"documents,omitempty"`
+	Documents []*Document `protobuf:"bytes,1,rep,name=documents,proto3" json:"documents,omitempty"`
 	// The next page token.
-	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken" json:"next_page_token,omitempty"`
+	NextPageToken        string   `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ListDocumentsResponse) Reset()                    { *m = ListDocumentsResponse{} }
-func (m *ListDocumentsResponse) String() string            { return proto.CompactTextString(m) }
-func (*ListDocumentsResponse) ProtoMessage()               {}
-func (*ListDocumentsResponse) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{2} }
+func (m *ListDocumentsResponse) Reset()         { *m = ListDocumentsResponse{} }
+func (m *ListDocumentsResponse) String() string { return proto.CompactTextString(m) }
+func (*ListDocumentsResponse) ProtoMessage()    {}
+func (*ListDocumentsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{2}
+}
+
+func (m *ListDocumentsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListDocumentsResponse.Unmarshal(m, b)
+}
+func (m *ListDocumentsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListDocumentsResponse.Marshal(b, m, deterministic)
+}
+func (m *ListDocumentsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListDocumentsResponse.Merge(m, src)
+}
+func (m *ListDocumentsResponse) XXX_Size() int {
+	return xxx_messageInfo_ListDocumentsResponse.Size(m)
+}
+func (m *ListDocumentsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListDocumentsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListDocumentsResponse proto.InternalMessageInfo
 
 func (m *ListDocumentsResponse) GetDocuments() []*Document {
 	if m != nil {
@@ -444,26 +403,49 @@ type CreateDocumentRequest struct {
 	// The parent resource. For example:
 	// `projects/{project_id}/databases/{database_id}/documents` or
 	// `projects/{project_id}/databases/{database_id}/documents/chatrooms/{chatroom_id}`
-	Parent string `protobuf:"bytes,1,opt,name=parent" json:"parent,omitempty"`
+	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// The collection ID, relative to `parent`, to list. For example: `chatrooms`.
-	CollectionId string `protobuf:"bytes,2,opt,name=collection_id,json=collectionId" json:"collection_id,omitempty"`
+	CollectionId string `protobuf:"bytes,2,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
 	// The client-assigned document ID to use for this document.
 	//
 	// Optional. If not specified, an ID will be assigned by the service.
-	DocumentId string `protobuf:"bytes,3,opt,name=document_id,json=documentId" json:"document_id,omitempty"`
+	DocumentId string `protobuf:"bytes,3,opt,name=document_id,json=documentId,proto3" json:"document_id,omitempty"`
 	// The document to create. `name` must not be set.
-	Document *Document `protobuf:"bytes,4,opt,name=document" json:"document,omitempty"`
+	Document *Document `protobuf:"bytes,4,opt,name=document,proto3" json:"document,omitempty"`
 	// The fields to return. If not set, returns all fields.
 	//
 	// If the document has a field that is not present in this mask, that field
 	// will not be returned in the response.
-	Mask *DocumentMask `protobuf:"bytes,5,opt,name=mask" json:"mask,omitempty"`
+	Mask                 *DocumentMask `protobuf:"bytes,5,opt,name=mask,proto3" json:"mask,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
-func (m *CreateDocumentRequest) Reset()                    { *m = CreateDocumentRequest{} }
-func (m *CreateDocumentRequest) String() string            { return proto.CompactTextString(m) }
-func (*CreateDocumentRequest) ProtoMessage()               {}
-func (*CreateDocumentRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{3} }
+func (m *CreateDocumentRequest) Reset()         { *m = CreateDocumentRequest{} }
+func (m *CreateDocumentRequest) String() string { return proto.CompactTextString(m) }
+func (*CreateDocumentRequest) ProtoMessage()    {}
+func (*CreateDocumentRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{3}
+}
+
+func (m *CreateDocumentRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateDocumentRequest.Unmarshal(m, b)
+}
+func (m *CreateDocumentRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateDocumentRequest.Marshal(b, m, deterministic)
+}
+func (m *CreateDocumentRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateDocumentRequest.Merge(m, src)
+}
+func (m *CreateDocumentRequest) XXX_Size() int {
+	return xxx_messageInfo_CreateDocumentRequest.Size(m)
+}
+func (m *CreateDocumentRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateDocumentRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateDocumentRequest proto.InternalMessageInfo
 
 func (m *CreateDocumentRequest) GetParent() string {
 	if m != nil {
@@ -504,7 +486,7 @@ func (m *CreateDocumentRequest) GetMask() *DocumentMask {
 type UpdateDocumentRequest struct {
 	// The updated document.
 	// Creates the document if it does not already exist.
-	Document *Document `protobuf:"bytes,1,opt,name=document" json:"document,omitempty"`
+	Document *Document `protobuf:"bytes,1,opt,name=document,proto3" json:"document,omitempty"`
 	// The fields to update.
 	// None of the field paths in the mask may contain a reserved name.
 	//
@@ -512,21 +494,44 @@ type UpdateDocumentRequest struct {
 	// mask, they are left unchanged.
 	// Fields referenced in the mask, but not present in the input document, are
 	// deleted from the document on the server.
-	UpdateMask *DocumentMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask,omitempty"`
+	UpdateMask *DocumentMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	// The fields to return. If not set, returns all fields.
 	//
 	// If the document has a field that is not present in this mask, that field
 	// will not be returned in the response.
-	Mask *DocumentMask `protobuf:"bytes,3,opt,name=mask" json:"mask,omitempty"`
+	Mask *DocumentMask `protobuf:"bytes,3,opt,name=mask,proto3" json:"mask,omitempty"`
 	// An optional precondition on the document.
 	// The request will fail if this is set and not met by the target document.
-	CurrentDocument *Precondition `protobuf:"bytes,4,opt,name=current_document,json=currentDocument" json:"current_document,omitempty"`
+	CurrentDocument      *Precondition `protobuf:"bytes,4,opt,name=current_document,json=currentDocument,proto3" json:"current_document,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
-func (m *UpdateDocumentRequest) Reset()                    { *m = UpdateDocumentRequest{} }
-func (m *UpdateDocumentRequest) String() string            { return proto.CompactTextString(m) }
-func (*UpdateDocumentRequest) ProtoMessage()               {}
-func (*UpdateDocumentRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{4} }
+func (m *UpdateDocumentRequest) Reset()         { *m = UpdateDocumentRequest{} }
+func (m *UpdateDocumentRequest) String() string { return proto.CompactTextString(m) }
+func (*UpdateDocumentRequest) ProtoMessage()    {}
+func (*UpdateDocumentRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{4}
+}
+
+func (m *UpdateDocumentRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateDocumentRequest.Unmarshal(m, b)
+}
+func (m *UpdateDocumentRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateDocumentRequest.Marshal(b, m, deterministic)
+}
+func (m *UpdateDocumentRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateDocumentRequest.Merge(m, src)
+}
+func (m *UpdateDocumentRequest) XXX_Size() int {
+	return xxx_messageInfo_UpdateDocumentRequest.Size(m)
+}
+func (m *UpdateDocumentRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateDocumentRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateDocumentRequest proto.InternalMessageInfo
 
 func (m *UpdateDocumentRequest) GetDocument() *Document {
 	if m != nil {
@@ -560,16 +565,39 @@ func (m *UpdateDocumentRequest) GetCurrentDocument() *Precondition {
 type DeleteDocumentRequest struct {
 	// The resource name of the Document to delete. In the format:
 	// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
-	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// An optional precondition on the document.
 	// The request will fail if this is set and not met by the target document.
-	CurrentDocument *Precondition `protobuf:"bytes,2,opt,name=current_document,json=currentDocument" json:"current_document,omitempty"`
+	CurrentDocument      *Precondition `protobuf:"bytes,2,opt,name=current_document,json=currentDocument,proto3" json:"current_document,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
-func (m *DeleteDocumentRequest) Reset()                    { *m = DeleteDocumentRequest{} }
-func (m *DeleteDocumentRequest) String() string            { return proto.CompactTextString(m) }
-func (*DeleteDocumentRequest) ProtoMessage()               {}
-func (*DeleteDocumentRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{5} }
+func (m *DeleteDocumentRequest) Reset()         { *m = DeleteDocumentRequest{} }
+func (m *DeleteDocumentRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteDocumentRequest) ProtoMessage()    {}
+func (*DeleteDocumentRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{5}
+}
+
+func (m *DeleteDocumentRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteDocumentRequest.Unmarshal(m, b)
+}
+func (m *DeleteDocumentRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteDocumentRequest.Marshal(b, m, deterministic)
+}
+func (m *DeleteDocumentRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteDocumentRequest.Merge(m, src)
+}
+func (m *DeleteDocumentRequest) XXX_Size() int {
+	return xxx_messageInfo_DeleteDocumentRequest.Size(m)
+}
+func (m *DeleteDocumentRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteDocumentRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteDocumentRequest proto.InternalMessageInfo
 
 func (m *DeleteDocumentRequest) GetName() string {
 	if m != nil {
@@ -589,17 +617,17 @@ func (m *DeleteDocumentRequest) GetCurrentDocument() *Precondition {
 type BatchGetDocumentsRequest struct {
 	// The database name. In the format:
 	// `projects/{project_id}/databases/{database_id}`.
-	Database string `protobuf:"bytes,1,opt,name=database" json:"database,omitempty"`
+	Database string `protobuf:"bytes,1,opt,name=database,proto3" json:"database,omitempty"`
 	// The names of the documents to retrieve. In the format:
 	// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
 	// The request will fail if any of the document is not a child resource of the
 	// given `database`. Duplicate names will be elided.
-	Documents []string `protobuf:"bytes,2,rep,name=documents" json:"documents,omitempty"`
+	Documents []string `protobuf:"bytes,2,rep,name=documents,proto3" json:"documents,omitempty"`
 	// The fields to return. If not set, returns all fields.
 	//
 	// If a document has a field that is not present in this mask, that field will
 	// not be returned in the response.
-	Mask *DocumentMask `protobuf:"bytes,3,opt,name=mask" json:"mask,omitempty"`
+	Mask *DocumentMask `protobuf:"bytes,3,opt,name=mask,proto3" json:"mask,omitempty"`
 	// The consistency mode for this transaction.
 	// If not set, defaults to strong consistency.
 	//
@@ -607,38 +635,36 @@ type BatchGetDocumentsRequest struct {
 	//	*BatchGetDocumentsRequest_Transaction
 	//	*BatchGetDocumentsRequest_NewTransaction
 	//	*BatchGetDocumentsRequest_ReadTime
-	ConsistencySelector isBatchGetDocumentsRequest_ConsistencySelector `protobuf_oneof:"consistency_selector"`
+	ConsistencySelector  isBatchGetDocumentsRequest_ConsistencySelector `protobuf_oneof:"consistency_selector"`
+	XXX_NoUnkeyedLiteral struct{}                                       `json:"-"`
+	XXX_unrecognized     []byte                                         `json:"-"`
+	XXX_sizecache        int32                                          `json:"-"`
 }
 
-func (m *BatchGetDocumentsRequest) Reset()                    { *m = BatchGetDocumentsRequest{} }
-func (m *BatchGetDocumentsRequest) String() string            { return proto.CompactTextString(m) }
-func (*BatchGetDocumentsRequest) ProtoMessage()               {}
-func (*BatchGetDocumentsRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{6} }
-
-type isBatchGetDocumentsRequest_ConsistencySelector interface {
-	isBatchGetDocumentsRequest_ConsistencySelector()
+func (m *BatchGetDocumentsRequest) Reset()         { *m = BatchGetDocumentsRequest{} }
+func (m *BatchGetDocumentsRequest) String() string { return proto.CompactTextString(m) }
+func (*BatchGetDocumentsRequest) ProtoMessage()    {}
+func (*BatchGetDocumentsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{6}
 }
 
-type BatchGetDocumentsRequest_Transaction struct {
-	Transaction []byte `protobuf:"bytes,4,opt,name=transaction,proto3,oneof"`
+func (m *BatchGetDocumentsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BatchGetDocumentsRequest.Unmarshal(m, b)
 }
-type BatchGetDocumentsRequest_NewTransaction struct {
-	NewTransaction *TransactionOptions `protobuf:"bytes,5,opt,name=new_transaction,json=newTransaction,oneof"`
+func (m *BatchGetDocumentsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BatchGetDocumentsRequest.Marshal(b, m, deterministic)
 }
-type BatchGetDocumentsRequest_ReadTime struct {
-	ReadTime *google_protobuf1.Timestamp `protobuf:"bytes,7,opt,name=read_time,json=readTime,oneof"`
+func (m *BatchGetDocumentsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BatchGetDocumentsRequest.Merge(m, src)
+}
+func (m *BatchGetDocumentsRequest) XXX_Size() int {
+	return xxx_messageInfo_BatchGetDocumentsRequest.Size(m)
+}
+func (m *BatchGetDocumentsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_BatchGetDocumentsRequest.DiscardUnknown(m)
 }
 
-func (*BatchGetDocumentsRequest_Transaction) isBatchGetDocumentsRequest_ConsistencySelector()    {}
-func (*BatchGetDocumentsRequest_NewTransaction) isBatchGetDocumentsRequest_ConsistencySelector() {}
-func (*BatchGetDocumentsRequest_ReadTime) isBatchGetDocumentsRequest_ConsistencySelector()       {}
-
-func (m *BatchGetDocumentsRequest) GetConsistencySelector() isBatchGetDocumentsRequest_ConsistencySelector {
-	if m != nil {
-		return m.ConsistencySelector
-	}
-	return nil
-}
+var xxx_messageInfo_BatchGetDocumentsRequest proto.InternalMessageInfo
 
 func (m *BatchGetDocumentsRequest) GetDatabase() string {
 	if m != nil {
@@ -661,6 +687,35 @@ func (m *BatchGetDocumentsRequest) GetMask() *DocumentMask {
 	return nil
 }
 
+type isBatchGetDocumentsRequest_ConsistencySelector interface {
+	isBatchGetDocumentsRequest_ConsistencySelector()
+}
+
+type BatchGetDocumentsRequest_Transaction struct {
+	Transaction []byte `protobuf:"bytes,4,opt,name=transaction,proto3,oneof"`
+}
+
+type BatchGetDocumentsRequest_NewTransaction struct {
+	NewTransaction *TransactionOptions `protobuf:"bytes,5,opt,name=new_transaction,json=newTransaction,proto3,oneof"`
+}
+
+type BatchGetDocumentsRequest_ReadTime struct {
+	ReadTime *timestamp.Timestamp `protobuf:"bytes,7,opt,name=read_time,json=readTime,proto3,oneof"`
+}
+
+func (*BatchGetDocumentsRequest_Transaction) isBatchGetDocumentsRequest_ConsistencySelector() {}
+
+func (*BatchGetDocumentsRequest_NewTransaction) isBatchGetDocumentsRequest_ConsistencySelector() {}
+
+func (*BatchGetDocumentsRequest_ReadTime) isBatchGetDocumentsRequest_ConsistencySelector() {}
+
+func (m *BatchGetDocumentsRequest) GetConsistencySelector() isBatchGetDocumentsRequest_ConsistencySelector {
+	if m != nil {
+		return m.ConsistencySelector
+	}
+	return nil
+}
+
 func (m *BatchGetDocumentsRequest) GetTransaction() []byte {
 	if x, ok := m.GetConsistencySelector().(*BatchGetDocumentsRequest_Transaction); ok {
 		return x.Transaction
@@ -675,100 +730,20 @@ func (m *BatchGetDocumentsRequest) GetNewTransaction() *TransactionOptions {
 	return nil
 }
 
-func (m *BatchGetDocumentsRequest) GetReadTime() *google_protobuf1.Timestamp {
+func (m *BatchGetDocumentsRequest) GetReadTime() *timestamp.Timestamp {
 	if x, ok := m.GetConsistencySelector().(*BatchGetDocumentsRequest_ReadTime); ok {
 		return x.ReadTime
 	}
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*BatchGetDocumentsRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _BatchGetDocumentsRequest_OneofMarshaler, _BatchGetDocumentsRequest_OneofUnmarshaler, _BatchGetDocumentsRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*BatchGetDocumentsRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*BatchGetDocumentsRequest_Transaction)(nil),
 		(*BatchGetDocumentsRequest_NewTransaction)(nil),
 		(*BatchGetDocumentsRequest_ReadTime)(nil),
 	}
-}
-
-func _BatchGetDocumentsRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*BatchGetDocumentsRequest)
-	// consistency_selector
-	switch x := m.ConsistencySelector.(type) {
-	case *BatchGetDocumentsRequest_Transaction:
-		b.EncodeVarint(4<<3 | proto.WireBytes)
-		b.EncodeRawBytes(x.Transaction)
-	case *BatchGetDocumentsRequest_NewTransaction:
-		b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.NewTransaction); err != nil {
-			return err
-		}
-	case *BatchGetDocumentsRequest_ReadTime:
-		b.EncodeVarint(7<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ReadTime); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("BatchGetDocumentsRequest.ConsistencySelector has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _BatchGetDocumentsRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*BatchGetDocumentsRequest)
-	switch tag {
-	case 4: // consistency_selector.transaction
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeRawBytes(true)
-		m.ConsistencySelector = &BatchGetDocumentsRequest_Transaction{x}
-		return true, err
-	case 5: // consistency_selector.new_transaction
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TransactionOptions)
-		err := b.DecodeMessage(msg)
-		m.ConsistencySelector = &BatchGetDocumentsRequest_NewTransaction{msg}
-		return true, err
-	case 7: // consistency_selector.read_time
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(google_protobuf1.Timestamp)
-		err := b.DecodeMessage(msg)
-		m.ConsistencySelector = &BatchGetDocumentsRequest_ReadTime{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _BatchGetDocumentsRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*BatchGetDocumentsRequest)
-	// consistency_selector
-	switch x := m.ConsistencySelector.(type) {
-	case *BatchGetDocumentsRequest_Transaction:
-		n += proto.SizeVarint(4<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.Transaction)))
-		n += len(x.Transaction)
-	case *BatchGetDocumentsRequest_NewTransaction:
-		s := proto.Size(x.NewTransaction)
-		n += proto.SizeVarint(5<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *BatchGetDocumentsRequest_ReadTime:
-		s := proto.Size(x.ReadTime)
-		n += proto.SizeVarint(7<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // The streamed response for [Firestore.BatchGetDocuments][google.firestore.v1beta1.Firestore.BatchGetDocuments].
@@ -788,26 +763,51 @@ type BatchGetDocumentsResponse struct {
 	// This may be monotically increasing, in this case the previous documents in
 	// the result stream are guaranteed not to have changed between their
 	// read_time and this one.
-	ReadTime *google_protobuf1.Timestamp `protobuf:"bytes,4,opt,name=read_time,json=readTime" json:"read_time,omitempty"`
+	ReadTime             *timestamp.Timestamp `protobuf:"bytes,4,opt,name=read_time,json=readTime,proto3" json:"read_time,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
 }
 
-func (m *BatchGetDocumentsResponse) Reset()                    { *m = BatchGetDocumentsResponse{} }
-func (m *BatchGetDocumentsResponse) String() string            { return proto.CompactTextString(m) }
-func (*BatchGetDocumentsResponse) ProtoMessage()               {}
-func (*BatchGetDocumentsResponse) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{7} }
+func (m *BatchGetDocumentsResponse) Reset()         { *m = BatchGetDocumentsResponse{} }
+func (m *BatchGetDocumentsResponse) String() string { return proto.CompactTextString(m) }
+func (*BatchGetDocumentsResponse) ProtoMessage()    {}
+func (*BatchGetDocumentsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{7}
+}
+
+func (m *BatchGetDocumentsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BatchGetDocumentsResponse.Unmarshal(m, b)
+}
+func (m *BatchGetDocumentsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BatchGetDocumentsResponse.Marshal(b, m, deterministic)
+}
+func (m *BatchGetDocumentsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BatchGetDocumentsResponse.Merge(m, src)
+}
+func (m *BatchGetDocumentsResponse) XXX_Size() int {
+	return xxx_messageInfo_BatchGetDocumentsResponse.Size(m)
+}
+func (m *BatchGetDocumentsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_BatchGetDocumentsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BatchGetDocumentsResponse proto.InternalMessageInfo
 
 type isBatchGetDocumentsResponse_Result interface {
 	isBatchGetDocumentsResponse_Result()
 }
 
 type BatchGetDocumentsResponse_Found struct {
-	Found *Document `protobuf:"bytes,1,opt,name=found,oneof"`
-}
-type BatchGetDocumentsResponse_Missing struct {
-	Missing string `protobuf:"bytes,2,opt,name=missing,oneof"`
+	Found *Document `protobuf:"bytes,1,opt,name=found,proto3,oneof"`
 }
 
-func (*BatchGetDocumentsResponse_Found) isBatchGetDocumentsResponse_Result()   {}
+type BatchGetDocumentsResponse_Missing struct {
+	Missing string `protobuf:"bytes,2,opt,name=missing,proto3,oneof"`
+}
+
+func (*BatchGetDocumentsResponse_Found) isBatchGetDocumentsResponse_Result() {}
+
 func (*BatchGetDocumentsResponse_Missing) isBatchGetDocumentsResponse_Result() {}
 
 func (m *BatchGetDocumentsResponse) GetResult() isBatchGetDocumentsResponse_Result {
@@ -838,97 +838,58 @@ func (m *BatchGetDocumentsResponse) GetTransaction() []byte {
 	return nil
 }
 
-func (m *BatchGetDocumentsResponse) GetReadTime() *google_protobuf1.Timestamp {
+func (m *BatchGetDocumentsResponse) GetReadTime() *timestamp.Timestamp {
 	if m != nil {
 		return m.ReadTime
 	}
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*BatchGetDocumentsResponse) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _BatchGetDocumentsResponse_OneofMarshaler, _BatchGetDocumentsResponse_OneofUnmarshaler, _BatchGetDocumentsResponse_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*BatchGetDocumentsResponse) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*BatchGetDocumentsResponse_Found)(nil),
 		(*BatchGetDocumentsResponse_Missing)(nil),
 	}
-}
-
-func _BatchGetDocumentsResponse_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*BatchGetDocumentsResponse)
-	// result
-	switch x := m.Result.(type) {
-	case *BatchGetDocumentsResponse_Found:
-		b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Found); err != nil {
-			return err
-		}
-	case *BatchGetDocumentsResponse_Missing:
-		b.EncodeVarint(2<<3 | proto.WireBytes)
-		b.EncodeStringBytes(x.Missing)
-	case nil:
-	default:
-		return fmt.Errorf("BatchGetDocumentsResponse.Result has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _BatchGetDocumentsResponse_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*BatchGetDocumentsResponse)
-	switch tag {
-	case 1: // result.found
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(Document)
-		err := b.DecodeMessage(msg)
-		m.Result = &BatchGetDocumentsResponse_Found{msg}
-		return true, err
-	case 2: // result.missing
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeStringBytes()
-		m.Result = &BatchGetDocumentsResponse_Missing{x}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _BatchGetDocumentsResponse_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*BatchGetDocumentsResponse)
-	// result
-	switch x := m.Result.(type) {
-	case *BatchGetDocumentsResponse_Found:
-		s := proto.Size(x.Found)
-		n += proto.SizeVarint(1<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *BatchGetDocumentsResponse_Missing:
-		n += proto.SizeVarint(2<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.Missing)))
-		n += len(x.Missing)
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // The request for [Firestore.BeginTransaction][google.firestore.v1beta1.Firestore.BeginTransaction].
 type BeginTransactionRequest struct {
 	// The database name. In the format:
 	// `projects/{project_id}/databases/{database_id}`.
-	Database string `protobuf:"bytes,1,opt,name=database" json:"database,omitempty"`
+	Database string `protobuf:"bytes,1,opt,name=database,proto3" json:"database,omitempty"`
 	// The options for the transaction.
 	// Defaults to a read-write transaction.
-	Options *TransactionOptions `protobuf:"bytes,2,opt,name=options" json:"options,omitempty"`
+	Options              *TransactionOptions `protobuf:"bytes,2,opt,name=options,proto3" json:"options,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
+	XXX_unrecognized     []byte              `json:"-"`
+	XXX_sizecache        int32               `json:"-"`
 }
 
-func (m *BeginTransactionRequest) Reset()                    { *m = BeginTransactionRequest{} }
-func (m *BeginTransactionRequest) String() string            { return proto.CompactTextString(m) }
-func (*BeginTransactionRequest) ProtoMessage()               {}
-func (*BeginTransactionRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{8} }
+func (m *BeginTransactionRequest) Reset()         { *m = BeginTransactionRequest{} }
+func (m *BeginTransactionRequest) String() string { return proto.CompactTextString(m) }
+func (*BeginTransactionRequest) ProtoMessage()    {}
+func (*BeginTransactionRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{8}
+}
+
+func (m *BeginTransactionRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BeginTransactionRequest.Unmarshal(m, b)
+}
+func (m *BeginTransactionRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BeginTransactionRequest.Marshal(b, m, deterministic)
+}
+func (m *BeginTransactionRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BeginTransactionRequest.Merge(m, src)
+}
+func (m *BeginTransactionRequest) XXX_Size() int {
+	return xxx_messageInfo_BeginTransactionRequest.Size(m)
+}
+func (m *BeginTransactionRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_BeginTransactionRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BeginTransactionRequest proto.InternalMessageInfo
 
 func (m *BeginTransactionRequest) GetDatabase() string {
 	if m != nil {
@@ -947,13 +908,36 @@ func (m *BeginTransactionRequest) GetOptions() *TransactionOptions {
 // The response for [Firestore.BeginTransaction][google.firestore.v1beta1.Firestore.BeginTransaction].
 type BeginTransactionResponse struct {
 	// The transaction that was started.
-	Transaction []byte `protobuf:"bytes,1,opt,name=transaction,proto3" json:"transaction,omitempty"`
+	Transaction          []byte   `protobuf:"bytes,1,opt,name=transaction,proto3" json:"transaction,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *BeginTransactionResponse) Reset()                    { *m = BeginTransactionResponse{} }
-func (m *BeginTransactionResponse) String() string            { return proto.CompactTextString(m) }
-func (*BeginTransactionResponse) ProtoMessage()               {}
-func (*BeginTransactionResponse) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{9} }
+func (m *BeginTransactionResponse) Reset()         { *m = BeginTransactionResponse{} }
+func (m *BeginTransactionResponse) String() string { return proto.CompactTextString(m) }
+func (*BeginTransactionResponse) ProtoMessage()    {}
+func (*BeginTransactionResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{9}
+}
+
+func (m *BeginTransactionResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BeginTransactionResponse.Unmarshal(m, b)
+}
+func (m *BeginTransactionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BeginTransactionResponse.Marshal(b, m, deterministic)
+}
+func (m *BeginTransactionResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BeginTransactionResponse.Merge(m, src)
+}
+func (m *BeginTransactionResponse) XXX_Size() int {
+	return xxx_messageInfo_BeginTransactionResponse.Size(m)
+}
+func (m *BeginTransactionResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_BeginTransactionResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BeginTransactionResponse proto.InternalMessageInfo
 
 func (m *BeginTransactionResponse) GetTransaction() []byte {
 	if m != nil {
@@ -966,19 +950,42 @@ func (m *BeginTransactionResponse) GetTransaction() []byte {
 type CommitRequest struct {
 	// The database name. In the format:
 	// `projects/{project_id}/databases/{database_id}`.
-	Database string `protobuf:"bytes,1,opt,name=database" json:"database,omitempty"`
+	Database string `protobuf:"bytes,1,opt,name=database,proto3" json:"database,omitempty"`
 	// The writes to apply.
 	//
 	// Always executed atomically and in order.
-	Writes []*Write `protobuf:"bytes,2,rep,name=writes" json:"writes,omitempty"`
+	Writes []*Write `protobuf:"bytes,2,rep,name=writes,proto3" json:"writes,omitempty"`
 	// If set, applies all writes in this transaction, and commits it.
-	Transaction []byte `protobuf:"bytes,3,opt,name=transaction,proto3" json:"transaction,omitempty"`
+	Transaction          []byte   `protobuf:"bytes,3,opt,name=transaction,proto3" json:"transaction,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *CommitRequest) Reset()                    { *m = CommitRequest{} }
-func (m *CommitRequest) String() string            { return proto.CompactTextString(m) }
-func (*CommitRequest) ProtoMessage()               {}
-func (*CommitRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{10} }
+func (m *CommitRequest) Reset()         { *m = CommitRequest{} }
+func (m *CommitRequest) String() string { return proto.CompactTextString(m) }
+func (*CommitRequest) ProtoMessage()    {}
+func (*CommitRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{10}
+}
+
+func (m *CommitRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CommitRequest.Unmarshal(m, b)
+}
+func (m *CommitRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CommitRequest.Marshal(b, m, deterministic)
+}
+func (m *CommitRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CommitRequest.Merge(m, src)
+}
+func (m *CommitRequest) XXX_Size() int {
+	return xxx_messageInfo_CommitRequest.Size(m)
+}
+func (m *CommitRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CommitRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CommitRequest proto.InternalMessageInfo
 
 func (m *CommitRequest) GetDatabase() string {
 	if m != nil {
@@ -1007,15 +1014,38 @@ type CommitResponse struct {
 	//
 	// This i-th write result corresponds to the i-th write in the
 	// request.
-	WriteResults []*WriteResult `protobuf:"bytes,1,rep,name=write_results,json=writeResults" json:"write_results,omitempty"`
+	WriteResults []*WriteResult `protobuf:"bytes,1,rep,name=write_results,json=writeResults,proto3" json:"write_results,omitempty"`
 	// The time at which the commit occurred.
-	CommitTime *google_protobuf1.Timestamp `protobuf:"bytes,2,opt,name=commit_time,json=commitTime" json:"commit_time,omitempty"`
+	CommitTime           *timestamp.Timestamp `protobuf:"bytes,2,opt,name=commit_time,json=commitTime,proto3" json:"commit_time,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
 }
 
-func (m *CommitResponse) Reset()                    { *m = CommitResponse{} }
-func (m *CommitResponse) String() string            { return proto.CompactTextString(m) }
-func (*CommitResponse) ProtoMessage()               {}
-func (*CommitResponse) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{11} }
+func (m *CommitResponse) Reset()         { *m = CommitResponse{} }
+func (m *CommitResponse) String() string { return proto.CompactTextString(m) }
+func (*CommitResponse) ProtoMessage()    {}
+func (*CommitResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{11}
+}
+
+func (m *CommitResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CommitResponse.Unmarshal(m, b)
+}
+func (m *CommitResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CommitResponse.Marshal(b, m, deterministic)
+}
+func (m *CommitResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CommitResponse.Merge(m, src)
+}
+func (m *CommitResponse) XXX_Size() int {
+	return xxx_messageInfo_CommitResponse.Size(m)
+}
+func (m *CommitResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CommitResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CommitResponse proto.InternalMessageInfo
 
 func (m *CommitResponse) GetWriteResults() []*WriteResult {
 	if m != nil {
@@ -1024,7 +1054,7 @@ func (m *CommitResponse) GetWriteResults() []*WriteResult {
 	return nil
 }
 
-func (m *CommitResponse) GetCommitTime() *google_protobuf1.Timestamp {
+func (m *CommitResponse) GetCommitTime() *timestamp.Timestamp {
 	if m != nil {
 		return m.CommitTime
 	}
@@ -1035,15 +1065,38 @@ func (m *CommitResponse) GetCommitTime() *google_protobuf1.Timestamp {
 type RollbackRequest struct {
 	// The database name. In the format:
 	// `projects/{project_id}/databases/{database_id}`.
-	Database string `protobuf:"bytes,1,opt,name=database" json:"database,omitempty"`
+	Database string `protobuf:"bytes,1,opt,name=database,proto3" json:"database,omitempty"`
 	// The transaction to roll back.
-	Transaction []byte `protobuf:"bytes,2,opt,name=transaction,proto3" json:"transaction,omitempty"`
+	Transaction          []byte   `protobuf:"bytes,2,opt,name=transaction,proto3" json:"transaction,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *RollbackRequest) Reset()                    { *m = RollbackRequest{} }
-func (m *RollbackRequest) String() string            { return proto.CompactTextString(m) }
-func (*RollbackRequest) ProtoMessage()               {}
-func (*RollbackRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{12} }
+func (m *RollbackRequest) Reset()         { *m = RollbackRequest{} }
+func (m *RollbackRequest) String() string { return proto.CompactTextString(m) }
+func (*RollbackRequest) ProtoMessage()    {}
+func (*RollbackRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{12}
+}
+
+func (m *RollbackRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RollbackRequest.Unmarshal(m, b)
+}
+func (m *RollbackRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RollbackRequest.Marshal(b, m, deterministic)
+}
+func (m *RollbackRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RollbackRequest.Merge(m, src)
+}
+func (m *RollbackRequest) XXX_Size() int {
+	return xxx_messageInfo_RollbackRequest.Size(m)
+}
+func (m *RollbackRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_RollbackRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RollbackRequest proto.InternalMessageInfo
 
 func (m *RollbackRequest) GetDatabase() string {
 	if m != nil {
@@ -1067,7 +1120,7 @@ type RunQueryRequest struct {
 	// For example:
 	// `projects/my-project/databases/my-database/documents` or
 	// `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
-	Parent string `protobuf:"bytes,1,opt,name=parent" json:"parent,omitempty"`
+	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// The query to run.
 	//
 	// Types that are valid to be assigned to QueryType:
@@ -1080,51 +1133,36 @@ type RunQueryRequest struct {
 	//	*RunQueryRequest_Transaction
 	//	*RunQueryRequest_NewTransaction
 	//	*RunQueryRequest_ReadTime
-	ConsistencySelector isRunQueryRequest_ConsistencySelector `protobuf_oneof:"consistency_selector"`
+	ConsistencySelector  isRunQueryRequest_ConsistencySelector `protobuf_oneof:"consistency_selector"`
+	XXX_NoUnkeyedLiteral struct{}                              `json:"-"`
+	XXX_unrecognized     []byte                                `json:"-"`
+	XXX_sizecache        int32                                 `json:"-"`
 }
 
-func (m *RunQueryRequest) Reset()                    { *m = RunQueryRequest{} }
-func (m *RunQueryRequest) String() string            { return proto.CompactTextString(m) }
-func (*RunQueryRequest) ProtoMessage()               {}
-func (*RunQueryRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{13} }
-
-type isRunQueryRequest_QueryType interface {
-	isRunQueryRequest_QueryType()
-}
-type isRunQueryRequest_ConsistencySelector interface {
-	isRunQueryRequest_ConsistencySelector()
+func (m *RunQueryRequest) Reset()         { *m = RunQueryRequest{} }
+func (m *RunQueryRequest) String() string { return proto.CompactTextString(m) }
+func (*RunQueryRequest) ProtoMessage()    {}
+func (*RunQueryRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{13}
 }
 
-type RunQueryRequest_StructuredQuery struct {
-	StructuredQuery *StructuredQuery `protobuf:"bytes,2,opt,name=structured_query,json=structuredQuery,oneof"`
+func (m *RunQueryRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RunQueryRequest.Unmarshal(m, b)
 }
-type RunQueryRequest_Transaction struct {
-	Transaction []byte `protobuf:"bytes,5,opt,name=transaction,proto3,oneof"`
+func (m *RunQueryRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RunQueryRequest.Marshal(b, m, deterministic)
 }
-type RunQueryRequest_NewTransaction struct {
-	NewTransaction *TransactionOptions `protobuf:"bytes,6,opt,name=new_transaction,json=newTransaction,oneof"`
+func (m *RunQueryRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RunQueryRequest.Merge(m, src)
 }
-type RunQueryRequest_ReadTime struct {
-	ReadTime *google_protobuf1.Timestamp `protobuf:"bytes,7,opt,name=read_time,json=readTime,oneof"`
+func (m *RunQueryRequest) XXX_Size() int {
+	return xxx_messageInfo_RunQueryRequest.Size(m)
+}
+func (m *RunQueryRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_RunQueryRequest.DiscardUnknown(m)
 }
 
-func (*RunQueryRequest_StructuredQuery) isRunQueryRequest_QueryType()          {}
-func (*RunQueryRequest_Transaction) isRunQueryRequest_ConsistencySelector()    {}
-func (*RunQueryRequest_NewTransaction) isRunQueryRequest_ConsistencySelector() {}
-func (*RunQueryRequest_ReadTime) isRunQueryRequest_ConsistencySelector()       {}
-
-func (m *RunQueryRequest) GetQueryType() isRunQueryRequest_QueryType {
-	if m != nil {
-		return m.QueryType
-	}
-	return nil
-}
-func (m *RunQueryRequest) GetConsistencySelector() isRunQueryRequest_ConsistencySelector {
-	if m != nil {
-		return m.ConsistencySelector
-	}
-	return nil
-}
+var xxx_messageInfo_RunQueryRequest proto.InternalMessageInfo
 
 func (m *RunQueryRequest) GetParent() string {
 	if m != nil {
@@ -1133,9 +1171,55 @@ func (m *RunQueryRequest) GetParent() string {
 	return ""
 }
 
+type isRunQueryRequest_QueryType interface {
+	isRunQueryRequest_QueryType()
+}
+
+type RunQueryRequest_StructuredQuery struct {
+	StructuredQuery *StructuredQuery `protobuf:"bytes,2,opt,name=structured_query,json=structuredQuery,proto3,oneof"`
+}
+
+func (*RunQueryRequest_StructuredQuery) isRunQueryRequest_QueryType() {}
+
+func (m *RunQueryRequest) GetQueryType() isRunQueryRequest_QueryType {
+	if m != nil {
+		return m.QueryType
+	}
+	return nil
+}
+
 func (m *RunQueryRequest) GetStructuredQuery() *StructuredQuery {
 	if x, ok := m.GetQueryType().(*RunQueryRequest_StructuredQuery); ok {
 		return x.StructuredQuery
+	}
+	return nil
+}
+
+type isRunQueryRequest_ConsistencySelector interface {
+	isRunQueryRequest_ConsistencySelector()
+}
+
+type RunQueryRequest_Transaction struct {
+	Transaction []byte `protobuf:"bytes,5,opt,name=transaction,proto3,oneof"`
+}
+
+type RunQueryRequest_NewTransaction struct {
+	NewTransaction *TransactionOptions `protobuf:"bytes,6,opt,name=new_transaction,json=newTransaction,proto3,oneof"`
+}
+
+type RunQueryRequest_ReadTime struct {
+	ReadTime *timestamp.Timestamp `protobuf:"bytes,7,opt,name=read_time,json=readTime,proto3,oneof"`
+}
+
+func (*RunQueryRequest_Transaction) isRunQueryRequest_ConsistencySelector() {}
+
+func (*RunQueryRequest_NewTransaction) isRunQueryRequest_ConsistencySelector() {}
+
+func (*RunQueryRequest_ReadTime) isRunQueryRequest_ConsistencySelector() {}
+
+func (m *RunQueryRequest) GetConsistencySelector() isRunQueryRequest_ConsistencySelector {
+	if m != nil {
+		return m.ConsistencySelector
 	}
 	return nil
 }
@@ -1154,131 +1238,21 @@ func (m *RunQueryRequest) GetNewTransaction() *TransactionOptions {
 	return nil
 }
 
-func (m *RunQueryRequest) GetReadTime() *google_protobuf1.Timestamp {
+func (m *RunQueryRequest) GetReadTime() *timestamp.Timestamp {
 	if x, ok := m.GetConsistencySelector().(*RunQueryRequest_ReadTime); ok {
 		return x.ReadTime
 	}
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*RunQueryRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _RunQueryRequest_OneofMarshaler, _RunQueryRequest_OneofUnmarshaler, _RunQueryRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*RunQueryRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*RunQueryRequest_StructuredQuery)(nil),
 		(*RunQueryRequest_Transaction)(nil),
 		(*RunQueryRequest_NewTransaction)(nil),
 		(*RunQueryRequest_ReadTime)(nil),
 	}
-}
-
-func _RunQueryRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*RunQueryRequest)
-	// query_type
-	switch x := m.QueryType.(type) {
-	case *RunQueryRequest_StructuredQuery:
-		b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.StructuredQuery); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("RunQueryRequest.QueryType has unexpected type %T", x)
-	}
-	// consistency_selector
-	switch x := m.ConsistencySelector.(type) {
-	case *RunQueryRequest_Transaction:
-		b.EncodeVarint(5<<3 | proto.WireBytes)
-		b.EncodeRawBytes(x.Transaction)
-	case *RunQueryRequest_NewTransaction:
-		b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.NewTransaction); err != nil {
-			return err
-		}
-	case *RunQueryRequest_ReadTime:
-		b.EncodeVarint(7<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ReadTime); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("RunQueryRequest.ConsistencySelector has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _RunQueryRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*RunQueryRequest)
-	switch tag {
-	case 2: // query_type.structured_query
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(StructuredQuery)
-		err := b.DecodeMessage(msg)
-		m.QueryType = &RunQueryRequest_StructuredQuery{msg}
-		return true, err
-	case 5: // consistency_selector.transaction
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeRawBytes(true)
-		m.ConsistencySelector = &RunQueryRequest_Transaction{x}
-		return true, err
-	case 6: // consistency_selector.new_transaction
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TransactionOptions)
-		err := b.DecodeMessage(msg)
-		m.ConsistencySelector = &RunQueryRequest_NewTransaction{msg}
-		return true, err
-	case 7: // consistency_selector.read_time
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(google_protobuf1.Timestamp)
-		err := b.DecodeMessage(msg)
-		m.ConsistencySelector = &RunQueryRequest_ReadTime{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _RunQueryRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*RunQueryRequest)
-	// query_type
-	switch x := m.QueryType.(type) {
-	case *RunQueryRequest_StructuredQuery:
-		s := proto.Size(x.StructuredQuery)
-		n += proto.SizeVarint(2<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	// consistency_selector
-	switch x := m.ConsistencySelector.(type) {
-	case *RunQueryRequest_Transaction:
-		n += proto.SizeVarint(5<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.Transaction)))
-		n += len(x.Transaction)
-	case *RunQueryRequest_NewTransaction:
-		s := proto.Size(x.NewTransaction)
-		n += proto.SizeVarint(6<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *RunQueryRequest_ReadTime:
-		s := proto.Size(x.ReadTime)
-		n += proto.SizeVarint(7<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // The response for [Firestore.RunQuery][google.firestore.v1beta1.Firestore.RunQuery].
@@ -1290,7 +1264,7 @@ type RunQueryResponse struct {
 	Transaction []byte `protobuf:"bytes,2,opt,name=transaction,proto3" json:"transaction,omitempty"`
 	// A query result.
 	// Not set when reporting partial progress.
-	Document *Document `protobuf:"bytes,1,opt,name=document" json:"document,omitempty"`
+	Document *Document `protobuf:"bytes,1,opt,name=document,proto3" json:"document,omitempty"`
 	// The time at which the document was read. This may be monotonically
 	// increasing; in this case, the previous documents in the result stream are
 	// guaranteed not to have changed between their `read_time` and this one.
@@ -1298,16 +1272,39 @@ type RunQueryResponse struct {
 	// If the query returns no results, a response with `read_time` and no
 	// `document` will be sent, and this represents the time at which the query
 	// was run.
-	ReadTime *google_protobuf1.Timestamp `protobuf:"bytes,3,opt,name=read_time,json=readTime" json:"read_time,omitempty"`
+	ReadTime *timestamp.Timestamp `protobuf:"bytes,3,opt,name=read_time,json=readTime,proto3" json:"read_time,omitempty"`
 	// The number of results that have been skipped due to an offset between
 	// the last response and the current response.
-	SkippedResults int32 `protobuf:"varint,4,opt,name=skipped_results,json=skippedResults" json:"skipped_results,omitempty"`
+	SkippedResults       int32    `protobuf:"varint,4,opt,name=skipped_results,json=skippedResults,proto3" json:"skipped_results,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *RunQueryResponse) Reset()                    { *m = RunQueryResponse{} }
-func (m *RunQueryResponse) String() string            { return proto.CompactTextString(m) }
-func (*RunQueryResponse) ProtoMessage()               {}
-func (*RunQueryResponse) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{14} }
+func (m *RunQueryResponse) Reset()         { *m = RunQueryResponse{} }
+func (m *RunQueryResponse) String() string { return proto.CompactTextString(m) }
+func (*RunQueryResponse) ProtoMessage()    {}
+func (*RunQueryResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{14}
+}
+
+func (m *RunQueryResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RunQueryResponse.Unmarshal(m, b)
+}
+func (m *RunQueryResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RunQueryResponse.Marshal(b, m, deterministic)
+}
+func (m *RunQueryResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RunQueryResponse.Merge(m, src)
+}
+func (m *RunQueryResponse) XXX_Size() int {
+	return xxx_messageInfo_RunQueryResponse.Size(m)
+}
+func (m *RunQueryResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_RunQueryResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RunQueryResponse proto.InternalMessageInfo
 
 func (m *RunQueryResponse) GetTransaction() []byte {
 	if m != nil {
@@ -1323,7 +1320,7 @@ func (m *RunQueryResponse) GetDocument() *Document {
 	return nil
 }
 
-func (m *RunQueryResponse) GetReadTime() *google_protobuf1.Timestamp {
+func (m *RunQueryResponse) GetReadTime() *timestamp.Timestamp {
 	if m != nil {
 		return m.ReadTime
 	}
@@ -1351,18 +1348,18 @@ type WriteRequest struct {
 	// The database name. In the format:
 	// `projects/{project_id}/databases/{database_id}`.
 	// This is only required in the first message.
-	Database string `protobuf:"bytes,1,opt,name=database" json:"database,omitempty"`
+	Database string `protobuf:"bytes,1,opt,name=database,proto3" json:"database,omitempty"`
 	// The ID of the write stream to resume.
 	// This may only be set in the first message. When left empty, a new write
 	// stream will be created.
-	StreamId string `protobuf:"bytes,2,opt,name=stream_id,json=streamId" json:"stream_id,omitempty"`
+	StreamId string `protobuf:"bytes,2,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"`
 	// The writes to apply.
 	//
 	// Always executed atomically and in order.
 	// This must be empty on the first request.
 	// This may be empty on the last request.
 	// This must not be empty on all other requests.
-	Writes []*Write `protobuf:"bytes,3,rep,name=writes" json:"writes,omitempty"`
+	Writes []*Write `protobuf:"bytes,3,rep,name=writes,proto3" json:"writes,omitempty"`
 	// A stream token that was previously sent by the server.
 	//
 	// The client should set this field to the token from the most recent
@@ -1379,13 +1376,36 @@ type WriteRequest struct {
 	// Leave this field unset when creating a new stream.
 	StreamToken []byte `protobuf:"bytes,4,opt,name=stream_token,json=streamToken,proto3" json:"stream_token,omitempty"`
 	// Labels associated with this write request.
-	Labels map[string]string `protobuf:"bytes,5,rep,name=labels" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Labels               map[string]string `protobuf:"bytes,5,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
 }
 
-func (m *WriteRequest) Reset()                    { *m = WriteRequest{} }
-func (m *WriteRequest) String() string            { return proto.CompactTextString(m) }
-func (*WriteRequest) ProtoMessage()               {}
-func (*WriteRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{15} }
+func (m *WriteRequest) Reset()         { *m = WriteRequest{} }
+func (m *WriteRequest) String() string { return proto.CompactTextString(m) }
+func (*WriteRequest) ProtoMessage()    {}
+func (*WriteRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{15}
+}
+
+func (m *WriteRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_WriteRequest.Unmarshal(m, b)
+}
+func (m *WriteRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_WriteRequest.Marshal(b, m, deterministic)
+}
+func (m *WriteRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WriteRequest.Merge(m, src)
+}
+func (m *WriteRequest) XXX_Size() int {
+	return xxx_messageInfo_WriteRequest.Size(m)
+}
+func (m *WriteRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_WriteRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WriteRequest proto.InternalMessageInfo
 
 func (m *WriteRequest) GetDatabase() string {
 	if m != nil {
@@ -1426,7 +1446,7 @@ func (m *WriteRequest) GetLabels() map[string]string {
 type WriteResponse struct {
 	// The ID of the stream.
 	// Only set on the first message, when a new stream was created.
-	StreamId string `protobuf:"bytes,1,opt,name=stream_id,json=streamId" json:"stream_id,omitempty"`
+	StreamId string `protobuf:"bytes,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"`
 	// A token that represents the position of this response in the stream.
 	// This can be used by a client to resume the stream at this point.
 	//
@@ -1436,15 +1456,38 @@ type WriteResponse struct {
 	//
 	// This i-th write result corresponds to the i-th write in the
 	// request.
-	WriteResults []*WriteResult `protobuf:"bytes,3,rep,name=write_results,json=writeResults" json:"write_results,omitempty"`
+	WriteResults []*WriteResult `protobuf:"bytes,3,rep,name=write_results,json=writeResults,proto3" json:"write_results,omitempty"`
 	// The time at which the commit occurred.
-	CommitTime *google_protobuf1.Timestamp `protobuf:"bytes,4,opt,name=commit_time,json=commitTime" json:"commit_time,omitempty"`
+	CommitTime           *timestamp.Timestamp `protobuf:"bytes,4,opt,name=commit_time,json=commitTime,proto3" json:"commit_time,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
 }
 
-func (m *WriteResponse) Reset()                    { *m = WriteResponse{} }
-func (m *WriteResponse) String() string            { return proto.CompactTextString(m) }
-func (*WriteResponse) ProtoMessage()               {}
-func (*WriteResponse) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{16} }
+func (m *WriteResponse) Reset()         { *m = WriteResponse{} }
+func (m *WriteResponse) String() string { return proto.CompactTextString(m) }
+func (*WriteResponse) ProtoMessage()    {}
+func (*WriteResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{16}
+}
+
+func (m *WriteResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_WriteResponse.Unmarshal(m, b)
+}
+func (m *WriteResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_WriteResponse.Marshal(b, m, deterministic)
+}
+func (m *WriteResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WriteResponse.Merge(m, src)
+}
+func (m *WriteResponse) XXX_Size() int {
+	return xxx_messageInfo_WriteResponse.Size(m)
+}
+func (m *WriteResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_WriteResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WriteResponse proto.InternalMessageInfo
 
 func (m *WriteResponse) GetStreamId() string {
 	if m != nil {
@@ -1467,7 +1510,7 @@ func (m *WriteResponse) GetWriteResults() []*WriteResult {
 	return nil
 }
 
-func (m *WriteResponse) GetCommitTime() *google_protobuf1.Timestamp {
+func (m *WriteResponse) GetCommitTime() *timestamp.Timestamp {
 	if m != nil {
 		return m.CommitTime
 	}
@@ -1478,7 +1521,7 @@ func (m *WriteResponse) GetCommitTime() *google_protobuf1.Timestamp {
 type ListenRequest struct {
 	// The database name. In the format:
 	// `projects/{project_id}/databases/{database_id}`.
-	Database string `protobuf:"bytes,1,opt,name=database" json:"database,omitempty"`
+	Database string `protobuf:"bytes,1,opt,name=database,proto3" json:"database,omitempty"`
 	// The supported target changes.
 	//
 	// Types that are valid to be assigned to TargetChange:
@@ -1486,26 +1529,58 @@ type ListenRequest struct {
 	//	*ListenRequest_RemoveTarget
 	TargetChange isListenRequest_TargetChange `protobuf_oneof:"target_change"`
 	// Labels associated with this target change.
-	Labels map[string]string `protobuf:"bytes,4,rep,name=labels" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Labels               map[string]string `protobuf:"bytes,4,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
 }
 
-func (m *ListenRequest) Reset()                    { *m = ListenRequest{} }
-func (m *ListenRequest) String() string            { return proto.CompactTextString(m) }
-func (*ListenRequest) ProtoMessage()               {}
-func (*ListenRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{17} }
+func (m *ListenRequest) Reset()         { *m = ListenRequest{} }
+func (m *ListenRequest) String() string { return proto.CompactTextString(m) }
+func (*ListenRequest) ProtoMessage()    {}
+func (*ListenRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{17}
+}
+
+func (m *ListenRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListenRequest.Unmarshal(m, b)
+}
+func (m *ListenRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListenRequest.Marshal(b, m, deterministic)
+}
+func (m *ListenRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListenRequest.Merge(m, src)
+}
+func (m *ListenRequest) XXX_Size() int {
+	return xxx_messageInfo_ListenRequest.Size(m)
+}
+func (m *ListenRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListenRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListenRequest proto.InternalMessageInfo
+
+func (m *ListenRequest) GetDatabase() string {
+	if m != nil {
+		return m.Database
+	}
+	return ""
+}
 
 type isListenRequest_TargetChange interface {
 	isListenRequest_TargetChange()
 }
 
 type ListenRequest_AddTarget struct {
-	AddTarget *Target `protobuf:"bytes,2,opt,name=add_target,json=addTarget,oneof"`
-}
-type ListenRequest_RemoveTarget struct {
-	RemoveTarget int32 `protobuf:"varint,3,opt,name=remove_target,json=removeTarget,oneof"`
+	AddTarget *Target `protobuf:"bytes,2,opt,name=add_target,json=addTarget,proto3,oneof"`
 }
 
-func (*ListenRequest_AddTarget) isListenRequest_TargetChange()    {}
+type ListenRequest_RemoveTarget struct {
+	RemoveTarget int32 `protobuf:"varint,3,opt,name=remove_target,json=removeTarget,proto3,oneof"`
+}
+
+func (*ListenRequest_AddTarget) isListenRequest_TargetChange() {}
+
 func (*ListenRequest_RemoveTarget) isListenRequest_TargetChange() {}
 
 func (m *ListenRequest) GetTargetChange() isListenRequest_TargetChange {
@@ -1513,13 +1588,6 @@ func (m *ListenRequest) GetTargetChange() isListenRequest_TargetChange {
 		return m.TargetChange
 	}
 	return nil
-}
-
-func (m *ListenRequest) GetDatabase() string {
-	if m != nil {
-		return m.Database
-	}
-	return ""
 }
 
 func (m *ListenRequest) GetAddTarget() *Target {
@@ -1543,73 +1611,12 @@ func (m *ListenRequest) GetLabels() map[string]string {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ListenRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ListenRequest_OneofMarshaler, _ListenRequest_OneofUnmarshaler, _ListenRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ListenRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ListenRequest_AddTarget)(nil),
 		(*ListenRequest_RemoveTarget)(nil),
 	}
-}
-
-func _ListenRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ListenRequest)
-	// target_change
-	switch x := m.TargetChange.(type) {
-	case *ListenRequest_AddTarget:
-		b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.AddTarget); err != nil {
-			return err
-		}
-	case *ListenRequest_RemoveTarget:
-		b.EncodeVarint(3<<3 | proto.WireVarint)
-		b.EncodeVarint(uint64(x.RemoveTarget))
-	case nil:
-	default:
-		return fmt.Errorf("ListenRequest.TargetChange has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ListenRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ListenRequest)
-	switch tag {
-	case 2: // target_change.add_target
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(Target)
-		err := b.DecodeMessage(msg)
-		m.TargetChange = &ListenRequest_AddTarget{msg}
-		return true, err
-	case 3: // target_change.remove_target
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.TargetChange = &ListenRequest_RemoveTarget{int32(x)}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ListenRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ListenRequest)
-	// target_change
-	switch x := m.TargetChange.(type) {
-	case *ListenRequest_AddTarget:
-		s := proto.Size(x.AddTarget)
-		n += proto.SizeVarint(2<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ListenRequest_RemoveTarget:
-		n += proto.SizeVarint(3<<3 | proto.WireVarint)
-		n += proto.SizeVarint(uint64(x.RemoveTarget))
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // The response for [Firestore.Listen][google.firestore.v1beta1.Firestore.Listen].
@@ -1622,39 +1629,70 @@ type ListenResponse struct {
 	//	*ListenResponse_DocumentDelete
 	//	*ListenResponse_DocumentRemove
 	//	*ListenResponse_Filter
-	ResponseType isListenResponse_ResponseType `protobuf_oneof:"response_type"`
+	ResponseType         isListenResponse_ResponseType `protobuf_oneof:"response_type"`
+	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
+	XXX_unrecognized     []byte                        `json:"-"`
+	XXX_sizecache        int32                         `json:"-"`
 }
 
-func (m *ListenResponse) Reset()                    { *m = ListenResponse{} }
-func (m *ListenResponse) String() string            { return proto.CompactTextString(m) }
-func (*ListenResponse) ProtoMessage()               {}
-func (*ListenResponse) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{18} }
+func (m *ListenResponse) Reset()         { *m = ListenResponse{} }
+func (m *ListenResponse) String() string { return proto.CompactTextString(m) }
+func (*ListenResponse) ProtoMessage()    {}
+func (*ListenResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{18}
+}
+
+func (m *ListenResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListenResponse.Unmarshal(m, b)
+}
+func (m *ListenResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListenResponse.Marshal(b, m, deterministic)
+}
+func (m *ListenResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListenResponse.Merge(m, src)
+}
+func (m *ListenResponse) XXX_Size() int {
+	return xxx_messageInfo_ListenResponse.Size(m)
+}
+func (m *ListenResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListenResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListenResponse proto.InternalMessageInfo
 
 type isListenResponse_ResponseType interface {
 	isListenResponse_ResponseType()
 }
 
 type ListenResponse_TargetChange struct {
-	TargetChange *TargetChange `protobuf:"bytes,2,opt,name=target_change,json=targetChange,oneof"`
-}
-type ListenResponse_DocumentChange struct {
-	DocumentChange *DocumentChange `protobuf:"bytes,3,opt,name=document_change,json=documentChange,oneof"`
-}
-type ListenResponse_DocumentDelete struct {
-	DocumentDelete *DocumentDelete `protobuf:"bytes,4,opt,name=document_delete,json=documentDelete,oneof"`
-}
-type ListenResponse_DocumentRemove struct {
-	DocumentRemove *DocumentRemove `protobuf:"bytes,6,opt,name=document_remove,json=documentRemove,oneof"`
-}
-type ListenResponse_Filter struct {
-	Filter *ExistenceFilter `protobuf:"bytes,5,opt,name=filter,oneof"`
+	TargetChange *TargetChange `protobuf:"bytes,2,opt,name=target_change,json=targetChange,proto3,oneof"`
 }
 
-func (*ListenResponse_TargetChange) isListenResponse_ResponseType()   {}
+type ListenResponse_DocumentChange struct {
+	DocumentChange *DocumentChange `protobuf:"bytes,3,opt,name=document_change,json=documentChange,proto3,oneof"`
+}
+
+type ListenResponse_DocumentDelete struct {
+	DocumentDelete *DocumentDelete `protobuf:"bytes,4,opt,name=document_delete,json=documentDelete,proto3,oneof"`
+}
+
+type ListenResponse_DocumentRemove struct {
+	DocumentRemove *DocumentRemove `protobuf:"bytes,6,opt,name=document_remove,json=documentRemove,proto3,oneof"`
+}
+
+type ListenResponse_Filter struct {
+	Filter *ExistenceFilter `protobuf:"bytes,5,opt,name=filter,proto3,oneof"`
+}
+
+func (*ListenResponse_TargetChange) isListenResponse_ResponseType() {}
+
 func (*ListenResponse_DocumentChange) isListenResponse_ResponseType() {}
+
 func (*ListenResponse_DocumentDelete) isListenResponse_ResponseType() {}
+
 func (*ListenResponse_DocumentRemove) isListenResponse_ResponseType() {}
-func (*ListenResponse_Filter) isListenResponse_ResponseType()         {}
+
+func (*ListenResponse_Filter) isListenResponse_ResponseType() {}
 
 func (m *ListenResponse) GetResponseType() isListenResponse_ResponseType {
 	if m != nil {
@@ -1698,135 +1736,15 @@ func (m *ListenResponse) GetFilter() *ExistenceFilter {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ListenResponse) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ListenResponse_OneofMarshaler, _ListenResponse_OneofUnmarshaler, _ListenResponse_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ListenResponse) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ListenResponse_TargetChange)(nil),
 		(*ListenResponse_DocumentChange)(nil),
 		(*ListenResponse_DocumentDelete)(nil),
 		(*ListenResponse_DocumentRemove)(nil),
 		(*ListenResponse_Filter)(nil),
 	}
-}
-
-func _ListenResponse_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ListenResponse)
-	// response_type
-	switch x := m.ResponseType.(type) {
-	case *ListenResponse_TargetChange:
-		b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.TargetChange); err != nil {
-			return err
-		}
-	case *ListenResponse_DocumentChange:
-		b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DocumentChange); err != nil {
-			return err
-		}
-	case *ListenResponse_DocumentDelete:
-		b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DocumentDelete); err != nil {
-			return err
-		}
-	case *ListenResponse_DocumentRemove:
-		b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DocumentRemove); err != nil {
-			return err
-		}
-	case *ListenResponse_Filter:
-		b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Filter); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("ListenResponse.ResponseType has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ListenResponse_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ListenResponse)
-	switch tag {
-	case 2: // response_type.target_change
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TargetChange)
-		err := b.DecodeMessage(msg)
-		m.ResponseType = &ListenResponse_TargetChange{msg}
-		return true, err
-	case 3: // response_type.document_change
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(DocumentChange)
-		err := b.DecodeMessage(msg)
-		m.ResponseType = &ListenResponse_DocumentChange{msg}
-		return true, err
-	case 4: // response_type.document_delete
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(DocumentDelete)
-		err := b.DecodeMessage(msg)
-		m.ResponseType = &ListenResponse_DocumentDelete{msg}
-		return true, err
-	case 6: // response_type.document_remove
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(DocumentRemove)
-		err := b.DecodeMessage(msg)
-		m.ResponseType = &ListenResponse_DocumentRemove{msg}
-		return true, err
-	case 5: // response_type.filter
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ExistenceFilter)
-		err := b.DecodeMessage(msg)
-		m.ResponseType = &ListenResponse_Filter{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ListenResponse_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ListenResponse)
-	// response_type
-	switch x := m.ResponseType.(type) {
-	case *ListenResponse_TargetChange:
-		s := proto.Size(x.TargetChange)
-		n += proto.SizeVarint(2<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ListenResponse_DocumentChange:
-		s := proto.Size(x.DocumentChange)
-		n += proto.SizeVarint(3<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ListenResponse_DocumentDelete:
-		s := proto.Size(x.DocumentDelete)
-		n += proto.SizeVarint(4<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ListenResponse_DocumentRemove:
-		s := proto.Size(x.DocumentRemove)
-		n += proto.SizeVarint(6<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ListenResponse_Filter:
-		s := proto.Size(x.Filter)
-		n += proto.SizeVarint(5<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // A specification of a set of documents to listen to.
@@ -1846,58 +1764,60 @@ type Target struct {
 	//	*Target_ResumeToken
 	//	*Target_ReadTime
 	ResumeType isTarget_ResumeType `protobuf_oneof:"resume_type"`
-	// A client provided target ID.
-	//
-	// If not set, the server will assign an ID for the target.
-	//
-	// Used for resuming a target without changing IDs. The IDs can either be
-	// client-assigned or be server-assigned in a previous stream. All targets
-	// with client provided IDs must be added before adding a target that needs
-	// a server-assigned id.
-	TargetId int32 `protobuf:"varint,5,opt,name=target_id,json=targetId" json:"target_id,omitempty"`
+	// The target ID that identifies the target on the stream. Must be a positive
+	// number and non-zero.
+	TargetId int32 `protobuf:"varint,5,opt,name=target_id,json=targetId,proto3" json:"target_id,omitempty"`
 	// If the target should be removed once it is current and consistent.
-	Once bool `protobuf:"varint,6,opt,name=once" json:"once,omitempty"`
+	Once                 bool     `protobuf:"varint,6,opt,name=once,proto3" json:"once,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Target) Reset()                    { *m = Target{} }
-func (m *Target) String() string            { return proto.CompactTextString(m) }
-func (*Target) ProtoMessage()               {}
-func (*Target) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{19} }
+func (m *Target) Reset()         { *m = Target{} }
+func (m *Target) String() string { return proto.CompactTextString(m) }
+func (*Target) ProtoMessage()    {}
+func (*Target) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{19}
+}
+
+func (m *Target) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Target.Unmarshal(m, b)
+}
+func (m *Target) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Target.Marshal(b, m, deterministic)
+}
+func (m *Target) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Target.Merge(m, src)
+}
+func (m *Target) XXX_Size() int {
+	return xxx_messageInfo_Target.Size(m)
+}
+func (m *Target) XXX_DiscardUnknown() {
+	xxx_messageInfo_Target.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Target proto.InternalMessageInfo
 
 type isTarget_TargetType interface {
 	isTarget_TargetType()
 }
-type isTarget_ResumeType interface {
-	isTarget_ResumeType()
-}
 
 type Target_Query struct {
-	Query *Target_QueryTarget `protobuf:"bytes,2,opt,name=query,oneof"`
-}
-type Target_Documents struct {
-	Documents *Target_DocumentsTarget `protobuf:"bytes,3,opt,name=documents,oneof"`
-}
-type Target_ResumeToken struct {
-	ResumeToken []byte `protobuf:"bytes,4,opt,name=resume_token,json=resumeToken,proto3,oneof"`
-}
-type Target_ReadTime struct {
-	ReadTime *google_protobuf1.Timestamp `protobuf:"bytes,11,opt,name=read_time,json=readTime,oneof"`
+	Query *Target_QueryTarget `protobuf:"bytes,2,opt,name=query,proto3,oneof"`
 }
 
-func (*Target_Query) isTarget_TargetType()       {}
-func (*Target_Documents) isTarget_TargetType()   {}
-func (*Target_ResumeToken) isTarget_ResumeType() {}
-func (*Target_ReadTime) isTarget_ResumeType()    {}
+type Target_Documents struct {
+	Documents *Target_DocumentsTarget `protobuf:"bytes,3,opt,name=documents,proto3,oneof"`
+}
+
+func (*Target_Query) isTarget_TargetType() {}
+
+func (*Target_Documents) isTarget_TargetType() {}
 
 func (m *Target) GetTargetType() isTarget_TargetType {
 	if m != nil {
 		return m.TargetType
-	}
-	return nil
-}
-func (m *Target) GetResumeType() isTarget_ResumeType {
-	if m != nil {
-		return m.ResumeType
 	}
 	return nil
 }
@@ -1916,6 +1836,29 @@ func (m *Target) GetDocuments() *Target_DocumentsTarget {
 	return nil
 }
 
+type isTarget_ResumeType interface {
+	isTarget_ResumeType()
+}
+
+type Target_ResumeToken struct {
+	ResumeToken []byte `protobuf:"bytes,4,opt,name=resume_token,json=resumeToken,proto3,oneof"`
+}
+
+type Target_ReadTime struct {
+	ReadTime *timestamp.Timestamp `protobuf:"bytes,11,opt,name=read_time,json=readTime,proto3,oneof"`
+}
+
+func (*Target_ResumeToken) isTarget_ResumeType() {}
+
+func (*Target_ReadTime) isTarget_ResumeType() {}
+
+func (m *Target) GetResumeType() isTarget_ResumeType {
+	if m != nil {
+		return m.ResumeType
+	}
+	return nil
+}
+
 func (m *Target) GetResumeToken() []byte {
 	if x, ok := m.GetResumeType().(*Target_ResumeToken); ok {
 		return x.ResumeToken
@@ -1923,7 +1866,7 @@ func (m *Target) GetResumeToken() []byte {
 	return nil
 }
 
-func (m *Target) GetReadTime() *google_protobuf1.Timestamp {
+func (m *Target) GetReadTime() *timestamp.Timestamp {
 	if x, ok := m.GetResumeType().(*Target_ReadTime); ok {
 		return x.ReadTime
 	}
@@ -1944,124 +1887,14 @@ func (m *Target) GetOnce() bool {
 	return false
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*Target) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Target_OneofMarshaler, _Target_OneofUnmarshaler, _Target_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Target) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*Target_Query)(nil),
 		(*Target_Documents)(nil),
 		(*Target_ResumeToken)(nil),
 		(*Target_ReadTime)(nil),
 	}
-}
-
-func _Target_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Target)
-	// target_type
-	switch x := m.TargetType.(type) {
-	case *Target_Query:
-		b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Query); err != nil {
-			return err
-		}
-	case *Target_Documents:
-		b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Documents); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("Target.TargetType has unexpected type %T", x)
-	}
-	// resume_type
-	switch x := m.ResumeType.(type) {
-	case *Target_ResumeToken:
-		b.EncodeVarint(4<<3 | proto.WireBytes)
-		b.EncodeRawBytes(x.ResumeToken)
-	case *Target_ReadTime:
-		b.EncodeVarint(11<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ReadTime); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("Target.ResumeType has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _Target_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Target)
-	switch tag {
-	case 2: // target_type.query
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(Target_QueryTarget)
-		err := b.DecodeMessage(msg)
-		m.TargetType = &Target_Query{msg}
-		return true, err
-	case 3: // target_type.documents
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(Target_DocumentsTarget)
-		err := b.DecodeMessage(msg)
-		m.TargetType = &Target_Documents{msg}
-		return true, err
-	case 4: // resume_type.resume_token
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeRawBytes(true)
-		m.ResumeType = &Target_ResumeToken{x}
-		return true, err
-	case 11: // resume_type.read_time
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(google_protobuf1.Timestamp)
-		err := b.DecodeMessage(msg)
-		m.ResumeType = &Target_ReadTime{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _Target_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Target)
-	// target_type
-	switch x := m.TargetType.(type) {
-	case *Target_Query:
-		s := proto.Size(x.Query)
-		n += proto.SizeVarint(2<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Target_Documents:
-		s := proto.Size(x.Documents)
-		n += proto.SizeVarint(3<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	// resume_type
-	switch x := m.ResumeType.(type) {
-	case *Target_ResumeToken:
-		n += proto.SizeVarint(4<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.ResumeToken)))
-		n += len(x.ResumeToken)
-	case *Target_ReadTime:
-		s := proto.Size(x.ReadTime)
-		n += proto.SizeVarint(11<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // A target specified by a set of documents names.
@@ -2070,13 +1903,36 @@ type Target_DocumentsTarget struct {
 	// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
 	// The request will fail if any of the document is not a child resource of
 	// the given `database`. Duplicate names will be elided.
-	Documents []string `protobuf:"bytes,2,rep,name=documents" json:"documents,omitempty"`
+	Documents            []string `protobuf:"bytes,2,rep,name=documents,proto3" json:"documents,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Target_DocumentsTarget) Reset()                    { *m = Target_DocumentsTarget{} }
-func (m *Target_DocumentsTarget) String() string            { return proto.CompactTextString(m) }
-func (*Target_DocumentsTarget) ProtoMessage()               {}
-func (*Target_DocumentsTarget) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{19, 0} }
+func (m *Target_DocumentsTarget) Reset()         { *m = Target_DocumentsTarget{} }
+func (m *Target_DocumentsTarget) String() string { return proto.CompactTextString(m) }
+func (*Target_DocumentsTarget) ProtoMessage()    {}
+func (*Target_DocumentsTarget) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{19, 0}
+}
+
+func (m *Target_DocumentsTarget) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Target_DocumentsTarget.Unmarshal(m, b)
+}
+func (m *Target_DocumentsTarget) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Target_DocumentsTarget.Marshal(b, m, deterministic)
+}
+func (m *Target_DocumentsTarget) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Target_DocumentsTarget.Merge(m, src)
+}
+func (m *Target_DocumentsTarget) XXX_Size() int {
+	return xxx_messageInfo_Target_DocumentsTarget.Size(m)
+}
+func (m *Target_DocumentsTarget) XXX_DiscardUnknown() {
+	xxx_messageInfo_Target_DocumentsTarget.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Target_DocumentsTarget proto.InternalMessageInfo
 
 func (m *Target_DocumentsTarget) GetDocuments() []string {
 	if m != nil {
@@ -2093,25 +1949,55 @@ type Target_QueryTarget struct {
 	// For example:
 	// `projects/my-project/databases/my-database/documents` or
 	// `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
-	Parent string `protobuf:"bytes,1,opt,name=parent" json:"parent,omitempty"`
+	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// The query to run.
 	//
 	// Types that are valid to be assigned to QueryType:
 	//	*Target_QueryTarget_StructuredQuery
-	QueryType isTarget_QueryTarget_QueryType `protobuf_oneof:"query_type"`
+	QueryType            isTarget_QueryTarget_QueryType `protobuf_oneof:"query_type"`
+	XXX_NoUnkeyedLiteral struct{}                       `json:"-"`
+	XXX_unrecognized     []byte                         `json:"-"`
+	XXX_sizecache        int32                          `json:"-"`
 }
 
-func (m *Target_QueryTarget) Reset()                    { *m = Target_QueryTarget{} }
-func (m *Target_QueryTarget) String() string            { return proto.CompactTextString(m) }
-func (*Target_QueryTarget) ProtoMessage()               {}
-func (*Target_QueryTarget) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{19, 1} }
+func (m *Target_QueryTarget) Reset()         { *m = Target_QueryTarget{} }
+func (m *Target_QueryTarget) String() string { return proto.CompactTextString(m) }
+func (*Target_QueryTarget) ProtoMessage()    {}
+func (*Target_QueryTarget) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{19, 1}
+}
+
+func (m *Target_QueryTarget) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Target_QueryTarget.Unmarshal(m, b)
+}
+func (m *Target_QueryTarget) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Target_QueryTarget.Marshal(b, m, deterministic)
+}
+func (m *Target_QueryTarget) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Target_QueryTarget.Merge(m, src)
+}
+func (m *Target_QueryTarget) XXX_Size() int {
+	return xxx_messageInfo_Target_QueryTarget.Size(m)
+}
+func (m *Target_QueryTarget) XXX_DiscardUnknown() {
+	xxx_messageInfo_Target_QueryTarget.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Target_QueryTarget proto.InternalMessageInfo
+
+func (m *Target_QueryTarget) GetParent() string {
+	if m != nil {
+		return m.Parent
+	}
+	return ""
+}
 
 type isTarget_QueryTarget_QueryType interface {
 	isTarget_QueryTarget_QueryType()
 }
 
 type Target_QueryTarget_StructuredQuery struct {
-	StructuredQuery *StructuredQuery `protobuf:"bytes,2,opt,name=structured_query,json=structuredQuery,oneof"`
+	StructuredQuery *StructuredQuery `protobuf:"bytes,2,opt,name=structured_query,json=structuredQuery,proto3,oneof"`
 }
 
 func (*Target_QueryTarget_StructuredQuery) isTarget_QueryTarget_QueryType() {}
@@ -2123,13 +2009,6 @@ func (m *Target_QueryTarget) GetQueryType() isTarget_QueryTarget_QueryType {
 	return nil
 }
 
-func (m *Target_QueryTarget) GetParent() string {
-	if m != nil {
-		return m.Parent
-	}
-	return ""
-}
-
 func (m *Target_QueryTarget) GetStructuredQuery() *StructuredQuery {
 	if x, ok := m.GetQueryType().(*Target_QueryTarget_StructuredQuery); ok {
 		return x.StructuredQuery
@@ -2137,77 +2016,25 @@ func (m *Target_QueryTarget) GetStructuredQuery() *StructuredQuery {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*Target_QueryTarget) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Target_QueryTarget_OneofMarshaler, _Target_QueryTarget_OneofUnmarshaler, _Target_QueryTarget_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Target_QueryTarget) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*Target_QueryTarget_StructuredQuery)(nil),
 	}
-}
-
-func _Target_QueryTarget_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Target_QueryTarget)
-	// query_type
-	switch x := m.QueryType.(type) {
-	case *Target_QueryTarget_StructuredQuery:
-		b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.StructuredQuery); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("Target_QueryTarget.QueryType has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _Target_QueryTarget_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Target_QueryTarget)
-	switch tag {
-	case 2: // query_type.structured_query
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(StructuredQuery)
-		err := b.DecodeMessage(msg)
-		m.QueryType = &Target_QueryTarget_StructuredQuery{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _Target_QueryTarget_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Target_QueryTarget)
-	// query_type
-	switch x := m.QueryType.(type) {
-	case *Target_QueryTarget_StructuredQuery:
-		s := proto.Size(x.StructuredQuery)
-		n += proto.SizeVarint(2<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // Targets being watched have changed.
 type TargetChange struct {
 	// The type of change that occurred.
-	TargetChangeType TargetChange_TargetChangeType `protobuf:"varint,1,opt,name=target_change_type,json=targetChangeType,enum=google.firestore.v1beta1.TargetChange_TargetChangeType" json:"target_change_type,omitempty"`
+	TargetChangeType TargetChange_TargetChangeType `protobuf:"varint,1,opt,name=target_change_type,json=targetChangeType,proto3,enum=google.firestore.v1beta1.TargetChange_TargetChangeType" json:"target_change_type,omitempty"`
 	// The target IDs of targets that have changed.
 	//
 	// If empty, the change applies to all targets.
 	//
-	// For `target_change_type=ADD`, the order of the target IDs matches the order
-	// of the requests to add the targets. This allows clients to unambiguously
-	// associate server-assigned target IDs with added targets.
-	//
-	// For other states, the order of the target IDs is not defined.
-	TargetIds []int32 `protobuf:"varint,2,rep,packed,name=target_ids,json=targetIds" json:"target_ids,omitempty"`
+	// The order of the target IDs is not defined.
+	TargetIds []int32 `protobuf:"varint,2,rep,packed,name=target_ids,json=targetIds,proto3" json:"target_ids,omitempty"`
 	// The error that resulted in this change, if applicable.
-	Cause *google_rpc.Status `protobuf:"bytes,3,opt,name=cause" json:"cause,omitempty"`
+	Cause *status.Status `protobuf:"bytes,3,opt,name=cause,proto3" json:"cause,omitempty"`
 	// A token that can be used to resume the stream for the given `target_ids`,
 	// or all targets if `target_ids` is empty.
 	//
@@ -2223,13 +2050,36 @@ type TargetChange struct {
 	//
 	// For a given stream, `read_time` is guaranteed to be monotonically
 	// increasing.
-	ReadTime *google_protobuf1.Timestamp `protobuf:"bytes,6,opt,name=read_time,json=readTime" json:"read_time,omitempty"`
+	ReadTime             *timestamp.Timestamp `protobuf:"bytes,6,opt,name=read_time,json=readTime,proto3" json:"read_time,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
 }
 
-func (m *TargetChange) Reset()                    { *m = TargetChange{} }
-func (m *TargetChange) String() string            { return proto.CompactTextString(m) }
-func (*TargetChange) ProtoMessage()               {}
-func (*TargetChange) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{20} }
+func (m *TargetChange) Reset()         { *m = TargetChange{} }
+func (m *TargetChange) String() string { return proto.CompactTextString(m) }
+func (*TargetChange) ProtoMessage()    {}
+func (*TargetChange) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{20}
+}
+
+func (m *TargetChange) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_TargetChange.Unmarshal(m, b)
+}
+func (m *TargetChange) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_TargetChange.Marshal(b, m, deterministic)
+}
+func (m *TargetChange) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TargetChange.Merge(m, src)
+}
+func (m *TargetChange) XXX_Size() int {
+	return xxx_messageInfo_TargetChange.Size(m)
+}
+func (m *TargetChange) XXX_DiscardUnknown() {
+	xxx_messageInfo_TargetChange.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_TargetChange proto.InternalMessageInfo
 
 func (m *TargetChange) GetTargetChangeType() TargetChange_TargetChangeType {
 	if m != nil {
@@ -2245,7 +2095,7 @@ func (m *TargetChange) GetTargetIds() []int32 {
 	return nil
 }
 
-func (m *TargetChange) GetCause() *google_rpc.Status {
+func (m *TargetChange) GetCause() *status.Status {
 	if m != nil {
 		return m.Cause
 	}
@@ -2259,7 +2109,7 @@ func (m *TargetChange) GetResumeToken() []byte {
 	return nil
 }
 
-func (m *TargetChange) GetReadTime() *google_protobuf1.Timestamp {
+func (m *TargetChange) GetReadTime() *timestamp.Timestamp {
 	if m != nil {
 		return m.ReadTime
 	}
@@ -2272,18 +2122,41 @@ type ListCollectionIdsRequest struct {
 	// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
 	// For example:
 	// `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
-	Parent string `protobuf:"bytes,1,opt,name=parent" json:"parent,omitempty"`
+	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// The maximum number of results to return.
-	PageSize int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize" json:"page_size,omitempty"`
+	PageSize int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A page token. Must be a value from
 	// [ListCollectionIdsResponse][google.firestore.v1beta1.ListCollectionIdsResponse].
-	PageToken string `protobuf:"bytes,3,opt,name=page_token,json=pageToken" json:"page_token,omitempty"`
+	PageToken            string   `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ListCollectionIdsRequest) Reset()                    { *m = ListCollectionIdsRequest{} }
-func (m *ListCollectionIdsRequest) String() string            { return proto.CompactTextString(m) }
-func (*ListCollectionIdsRequest) ProtoMessage()               {}
-func (*ListCollectionIdsRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{21} }
+func (m *ListCollectionIdsRequest) Reset()         { *m = ListCollectionIdsRequest{} }
+func (m *ListCollectionIdsRequest) String() string { return proto.CompactTextString(m) }
+func (*ListCollectionIdsRequest) ProtoMessage()    {}
+func (*ListCollectionIdsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{21}
+}
+
+func (m *ListCollectionIdsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListCollectionIdsRequest.Unmarshal(m, b)
+}
+func (m *ListCollectionIdsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListCollectionIdsRequest.Marshal(b, m, deterministic)
+}
+func (m *ListCollectionIdsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListCollectionIdsRequest.Merge(m, src)
+}
+func (m *ListCollectionIdsRequest) XXX_Size() int {
+	return xxx_messageInfo_ListCollectionIdsRequest.Size(m)
+}
+func (m *ListCollectionIdsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListCollectionIdsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListCollectionIdsRequest proto.InternalMessageInfo
 
 func (m *ListCollectionIdsRequest) GetParent() string {
 	if m != nil {
@@ -2309,15 +2182,38 @@ func (m *ListCollectionIdsRequest) GetPageToken() string {
 // The response from [Firestore.ListCollectionIds][google.firestore.v1beta1.Firestore.ListCollectionIds].
 type ListCollectionIdsResponse struct {
 	// The collection ids.
-	CollectionIds []string `protobuf:"bytes,1,rep,name=collection_ids,json=collectionIds" json:"collection_ids,omitempty"`
+	CollectionIds []string `protobuf:"bytes,1,rep,name=collection_ids,json=collectionIds,proto3" json:"collection_ids,omitempty"`
 	// A page token that may be used to continue the list.
-	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken" json:"next_page_token,omitempty"`
+	NextPageToken        string   `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ListCollectionIdsResponse) Reset()                    { *m = ListCollectionIdsResponse{} }
-func (m *ListCollectionIdsResponse) String() string            { return proto.CompactTextString(m) }
-func (*ListCollectionIdsResponse) ProtoMessage()               {}
-func (*ListCollectionIdsResponse) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{22} }
+func (m *ListCollectionIdsResponse) Reset()         { *m = ListCollectionIdsResponse{} }
+func (m *ListCollectionIdsResponse) String() string { return proto.CompactTextString(m) }
+func (*ListCollectionIdsResponse) ProtoMessage()    {}
+func (*ListCollectionIdsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9bc8b30a28454f4b, []int{22}
+}
+
+func (m *ListCollectionIdsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListCollectionIdsResponse.Unmarshal(m, b)
+}
+func (m *ListCollectionIdsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListCollectionIdsResponse.Marshal(b, m, deterministic)
+}
+func (m *ListCollectionIdsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListCollectionIdsResponse.Merge(m, src)
+}
+func (m *ListCollectionIdsResponse) XXX_Size() int {
+	return xxx_messageInfo_ListCollectionIdsResponse.Size(m)
+}
+func (m *ListCollectionIdsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListCollectionIdsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListCollectionIdsResponse proto.InternalMessageInfo
 
 func (m *ListCollectionIdsResponse) GetCollectionIds() []string {
 	if m != nil {
@@ -2334,6 +2230,7 @@ func (m *ListCollectionIdsResponse) GetNextPageToken() string {
 }
 
 func init() {
+	proto.RegisterEnum("google.firestore.v1beta1.TargetChange_TargetChangeType", TargetChange_TargetChangeType_name, TargetChange_TargetChangeType_value)
 	proto.RegisterType((*GetDocumentRequest)(nil), "google.firestore.v1beta1.GetDocumentRequest")
 	proto.RegisterType((*ListDocumentsRequest)(nil), "google.firestore.v1beta1.ListDocumentsRequest")
 	proto.RegisterType((*ListDocumentsResponse)(nil), "google.firestore.v1beta1.ListDocumentsResponse")
@@ -2350,8 +2247,10 @@ func init() {
 	proto.RegisterType((*RunQueryRequest)(nil), "google.firestore.v1beta1.RunQueryRequest")
 	proto.RegisterType((*RunQueryResponse)(nil), "google.firestore.v1beta1.RunQueryResponse")
 	proto.RegisterType((*WriteRequest)(nil), "google.firestore.v1beta1.WriteRequest")
+	proto.RegisterMapType((map[string]string)(nil), "google.firestore.v1beta1.WriteRequest.LabelsEntry")
 	proto.RegisterType((*WriteResponse)(nil), "google.firestore.v1beta1.WriteResponse")
 	proto.RegisterType((*ListenRequest)(nil), "google.firestore.v1beta1.ListenRequest")
+	proto.RegisterMapType((map[string]string)(nil), "google.firestore.v1beta1.ListenRequest.LabelsEntry")
 	proto.RegisterType((*ListenResponse)(nil), "google.firestore.v1beta1.ListenResponse")
 	proto.RegisterType((*Target)(nil), "google.firestore.v1beta1.Target")
 	proto.RegisterType((*Target_DocumentsTarget)(nil), "google.firestore.v1beta1.Target.DocumentsTarget")
@@ -2359,7 +2258,156 @@ func init() {
 	proto.RegisterType((*TargetChange)(nil), "google.firestore.v1beta1.TargetChange")
 	proto.RegisterType((*ListCollectionIdsRequest)(nil), "google.firestore.v1beta1.ListCollectionIdsRequest")
 	proto.RegisterType((*ListCollectionIdsResponse)(nil), "google.firestore.v1beta1.ListCollectionIdsResponse")
-	proto.RegisterEnum("google.firestore.v1beta1.TargetChange_TargetChangeType", TargetChange_TargetChangeType_name, TargetChange_TargetChangeType_value)
+}
+
+func init() {
+	proto.RegisterFile("google/firestore/v1beta1/firestore.proto", fileDescriptor_9bc8b30a28454f4b)
+}
+
+var fileDescriptor_9bc8b30a28454f4b = []byte{
+	// 2271 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x5a, 0xcd, 0x8f, 0x1b, 0x59,
+	0x11, 0x9f, 0xe7, 0xaf, 0xb1, 0xcb, 0xf6, 0x8c, 0xf7, 0x29, 0xc9, 0x3a, 0x4e, 0x96, 0x0c, 0xbd,
+	0x24, 0x19, 0xac, 0x60, 0x27, 0x13, 0xa1, 0xb0, 0x0e, 0x59, 0x32, 0x1f, 0xce, 0x78, 0x42, 0x3e,
+	0x26, 0x3d, 0xb3, 0x09, 0x5a, 0x45, 0xb2, 0x7a, 0xba, 0x5f, 0x9c, 0xde, 0xb1, 0xbb, 0xbd, 0xdd,
+	0xcf, 0x99, 0x9d, 0x5d, 0x05, 0x01, 0x07, 0x38, 0x20, 0xed, 0x85, 0x03, 0xec, 0x05, 0x10, 0x1c,
+	0x90, 0xf6, 0x00, 0x17, 0x24, 0x2e, 0x08, 0xc1, 0x0d, 0x2d, 0x37, 0x90, 0x10, 0x12, 0x07, 0x38,
+	0x70, 0xe2, 0x86, 0xc4, 0x1f, 0x80, 0xde, 0x47, 0xb7, 0xbb, 0xdb, 0xdf, 0x9e, 0x88, 0x9b, 0x5f,
+	0x75, 0x55, 0xbd, 0xfa, 0x55, 0xd5, 0xab, 0x57, 0xaf, 0x66, 0x60, 0xb5, 0x65, 0xdb, 0xad, 0x36,
+	0xa9, 0x3e, 0x33, 0x1d, 0xe2, 0x52, 0xdb, 0x21, 0xd5, 0x17, 0xd7, 0x0e, 0x08, 0xd5, 0xae, 0xf5,
+	0x29, 0x95, 0xae, 0x63, 0x53, 0x1b, 0x17, 0x05, 0x67, 0xa5, 0x4f, 0x97, 0x9c, 0xa5, 0xf3, 0x52,
+	0x87, 0xd6, 0x35, 0xab, 0x9a, 0x65, 0xd9, 0x54, 0xa3, 0xa6, 0x6d, 0xb9, 0x42, 0xae, 0x74, 0x71,
+	0xe4, 0x0e, 0xba, 0xdd, 0xe9, 0xd8, 0x96, 0x64, 0xbb, 0x3c, 0x92, 0xcd, 0xb0, 0xf5, 0x5e, 0x87,
+	0x58, 0x54, 0x32, 0x7e, 0x61, 0x24, 0xe3, 0xfb, 0x3d, 0xe2, 0x1c, 0x4f, 0xe4, 0x3a, 0x72, 0x4c,
+	0x2a, 0x31, 0x95, 0xce, 0x49, 0x2e, 0xbe, 0x3a, 0xe8, 0x3d, 0xab, 0x92, 0x4e, 0x97, 0x7a, 0x2a,
+	0x2e, 0x44, 0x3f, 0x52, 0xb3, 0x43, 0x5c, 0xaa, 0x75, 0xba, 0x92, 0xe1, 0x75, 0xc9, 0xe0, 0x74,
+	0xf5, 0xaa, 0x4b, 0x35, 0xda, 0x73, 0x23, 0x1f, 0x98, 0x43, 0xf4, 0xb6, 0xe9, 0xdb, 0xae, 0xfc,
+	0x1d, 0x01, 0xde, 0x26, 0x74, 0x4b, 0x22, 0x52, 0xc9, 0xfb, 0x3d, 0xe2, 0x52, 0x8c, 0x21, 0x61,
+	0x69, 0x1d, 0x52, 0x44, 0x2b, 0x68, 0x35, 0xa3, 0xf2, 0xdf, 0xb8, 0x06, 0x89, 0x8e, 0xe6, 0x1e,
+	0x16, 0x63, 0x2b, 0x68, 0x35, 0xbb, 0x76, 0xa9, 0x32, 0xca, 0xfb, 0x15, 0x4f, 0xd9, 0x7d, 0xcd,
+	0x3d, 0x54, 0xb9, 0x0c, 0x56, 0x20, 0x4b, 0x1d, 0xcd, 0x72, 0x35, 0x9d, 0x05, 0xa2, 0x18, 0x5f,
+	0x41, 0xab, 0xb9, 0xc6, 0x82, 0x1a, 0x24, 0xe2, 0xb7, 0x20, 0xe3, 0x10, 0xcd, 0x68, 0x32, 0x50,
+	0xc5, 0x24, 0xdf, 0xa4, 0xe4, 0x6d, 0xe2, 0x21, 0xae, 0xec, 0x7b, 0x88, 0x1b, 0x0b, 0x6a, 0x9a,
+	0xb1, 0x33, 0xc2, 0xc6, 0x19, 0x38, 0xa5, 0xdb, 0x96, 0x6b, 0xba, 0x94, 0x58, 0xfa, 0x71, 0xd3,
+	0x25, 0x6d, 0xa2, 0x53, 0xdb, 0x51, 0xbe, 0x15, 0x87, 0x53, 0xf7, 0x4c, 0xd7, 0x87, 0xe7, 0x7a,
+	0xf8, 0xce, 0x40, 0xaa, 0xab, 0x39, 0xc4, 0xa2, 0x12, 0xa1, 0x5c, 0xe1, 0x37, 0x21, 0xaf, 0xdb,
+	0x6d, 0x26, 0x6d, 0xda, 0x56, 0xd3, 0x34, 0x38, 0xd8, 0x8c, 0x9a, 0xeb, 0x13, 0x77, 0x0c, 0x7c,
+	0x0e, 0x32, 0x5d, 0xad, 0x45, 0x9a, 0xae, 0xf9, 0x21, 0xe1, 0x50, 0x92, 0x6a, 0x9a, 0x11, 0xf6,
+	0xcc, 0x0f, 0x09, 0x7e, 0x03, 0x80, 0x7f, 0xa4, 0xf6, 0x21, 0xb1, 0x8a, 0x09, 0x2e, 0xce, 0xd9,
+	0xf7, 0x19, 0x01, 0x9f, 0x85, 0xb4, 0xed, 0x18, 0xc4, 0x69, 0x1e, 0x1c, 0x17, 0x53, 0xfc, 0xe3,
+	0x22, 0x5f, 0x6f, 0x1c, 0xfb, 0xfe, 0x5d, 0x3c, 0xb9, 0x7f, 0xd3, 0x13, 0xfd, 0x0b, 0xb3, 0xf8,
+	0x17, 0x7f, 0x1e, 0x72, 0xee, 0x73, 0xfb, 0xa8, 0xd9, 0x31, 0x5d, 0xd7, 0xb4, 0x5a, 0xc5, 0xdc,
+	0x0a, 0x5a, 0x4d, 0xab, 0x59, 0x46, 0xbb, 0x2f, 0x48, 0x23, 0x43, 0xf0, 0x6d, 0x04, 0xa7, 0x23,
+	0x21, 0x70, 0xbb, 0xb6, 0xe5, 0x12, 0x7c, 0x1b, 0x32, 0xde, 0x41, 0x72, 0x8b, 0x68, 0x25, 0xbe,
+	0x9a, 0x5d, 0x53, 0x26, 0x83, 0x56, 0xfb, 0x42, 0xf8, 0x12, 0x2c, 0x5b, 0xe4, 0x03, 0xda, 0x0c,
+	0x38, 0x5c, 0xc4, 0x2b, 0xcf, 0xc8, 0xbb, 0x9e, 0xd3, 0x95, 0xff, 0x20, 0x38, 0xbd, 0xe9, 0x10,
+	0x8d, 0x92, 0x68, 0x9e, 0x9f, 0x28, 0x0f, 0x2e, 0x40, 0xd6, 0xb3, 0x85, 0xb1, 0xc4, 0x39, 0x0b,
+	0x78, 0xa4, 0x1d, 0x03, 0xbf, 0x0d, 0x69, 0x6f, 0xc5, 0x33, 0x61, 0x3a, 0x80, 0xbe, 0x8c, 0x9f,
+	0x11, 0xc9, 0xd9, 0x33, 0x42, 0xf9, 0x55, 0x0c, 0x4e, 0xbf, 0xd3, 0x35, 0x86, 0x60, 0x0e, 0x5a,
+	0x85, 0xe6, 0xb0, 0x6a, 0x1b, 0xb2, 0x3d, 0xae, 0xb8, 0x39, 0x47, 0x39, 0x00, 0x21, 0xca, 0x7e,
+	0xfb, 0xf0, 0xe2, 0x73, 0x24, 0xfc, 0x23, 0x28, 0xe8, 0x3d, 0x87, 0xc5, 0xaa, 0x19, 0x71, 0xf1,
+	0x18, 0x3d, 0xbb, 0x0e, 0xd1, 0x6d, 0xcb, 0x30, 0x59, 0xfc, 0xd4, 0x65, 0x29, 0xef, 0x29, 0x57,
+	0xbe, 0x09, 0xa7, 0xb7, 0x48, 0x9b, 0x0c, 0x3a, 0x6c, 0x58, 0x31, 0x1c, 0xb6, 0x7f, 0xec, 0x64,
+	0xfb, 0xff, 0x33, 0x06, 0xc5, 0x0d, 0x8d, 0xea, 0xcf, 0x03, 0xf5, 0xd8, 0x2f, 0x58, 0x25, 0x48,
+	0x1b, 0x1a, 0xd5, 0x0e, 0x34, 0xd7, 0xb3, 0xc3, 0x5f, 0xe3, 0xf3, 0xc1, 0x83, 0x14, 0x5b, 0x89,
+	0xb3, 0x8a, 0xd3, 0x3f, 0x24, 0x27, 0xf1, 0x72, 0xa4, 0xac, 0x24, 0x86, 0x95, 0x95, 0x27, 0xec,
+	0x10, 0x1e, 0x35, 0x83, 0x7c, 0x22, 0x5f, 0xaf, 0x8c, 0xde, 0x6a, 0xbf, 0xcf, 0xfc, 0xb0, 0xcb,
+	0xaf, 0xe6, 0xc6, 0x82, 0xba, 0x64, 0x91, 0xa3, 0xfd, 0x51, 0xf5, 0x6a, 0xf1, 0x95, 0xdc, 0x07,
+	0x7f, 0x43, 0x70, 0x76, 0x88, 0x8b, 0x65, 0x41, 0xaa, 0x41, 0xf2, 0x99, 0xdd, 0xb3, 0x8c, 0xe9,
+	0x4f, 0x45, 0x63, 0x41, 0x15, 0x22, 0xb8, 0x04, 0x8b, 0x5e, 0x71, 0xe4, 0xa5, 0xa2, 0xb1, 0xa0,
+	0x7a, 0x04, 0xbc, 0x32, 0xe4, 0xf2, 0x0b, 0xfb, 0xf0, 0x46, 0x10, 0x6a, 0x62, 0x12, 0xd4, 0x00,
+	0xd0, 0x34, 0xa4, 0x1c, 0xe2, 0xf6, 0xda, 0x54, 0x79, 0x09, 0xaf, 0x6f, 0x90, 0x96, 0x69, 0x05,
+	0x3c, 0x38, 0x4d, 0xee, 0xdc, 0x81, 0x45, 0x5b, 0x44, 0x40, 0xa6, 0xef, 0x4c, 0x51, 0x53, 0x3d,
+	0x61, 0xe5, 0xab, 0x50, 0x1c, 0xdc, 0x5e, 0xfa, 0x35, 0x82, 0x1f, 0x0d, 0xe0, 0x57, 0xbe, 0x8b,
+	0x20, 0xbf, 0x69, 0x77, 0x3a, 0x26, 0x9d, 0xc6, 0xe6, 0x1b, 0x90, 0xe2, 0x2d, 0x93, 0x48, 0xf6,
+	0xec, 0xda, 0x85, 0xd1, 0x26, 0x3f, 0x61, 0x7c, 0xaa, 0x64, 0x9f, 0x1c, 0x08, 0xe5, 0x13, 0x04,
+	0x4b, 0x9e, 0x21, 0xd2, 0xfa, 0xbb, 0x90, 0xe7, 0xe2, 0x4d, 0xe1, 0x68, 0xef, 0xaa, 0xba, 0x38,
+	0x69, 0x53, 0xce, 0xad, 0xe6, 0x8e, 0xfa, 0x0b, 0x17, 0xdf, 0x84, 0xac, 0xce, 0xb5, 0x8b, 0x48,
+	0xc7, 0x26, 0x46, 0x1a, 0x04, 0x3b, 0x23, 0x28, 0x0f, 0x61, 0x59, 0xb5, 0xdb, 0xed, 0x03, 0x4d,
+	0x3f, 0x9c, 0xc6, 0x4b, 0x11, 0xb0, 0xb1, 0x41, 0xb0, 0xff, 0x88, 0xc1, 0xb2, 0xda, 0xb3, 0x1e,
+	0xb1, 0x26, 0x75, 0xd2, 0x85, 0xf8, 0x18, 0x0a, 0x2e, 0x75, 0x7a, 0x3a, 0xed, 0x39, 0xc4, 0x68,
+	0xf2, 0xbe, 0x56, 0x9a, 0xff, 0xc5, 0xd1, 0x8e, 0xd8, 0xf3, 0x25, 0xf8, 0x1e, 0x8d, 0x05, 0x75,
+	0xd9, 0x0d, 0x93, 0xa2, 0x15, 0x26, 0xc9, 0x2b, 0x0c, 0x9a, 0x58, 0x61, 0x52, 0x73, 0x54, 0x18,
+	0x74, 0xd2, 0x0a, 0x83, 0x02, 0x07, 0x2f, 0x07, 0xc0, 0x9d, 0xd0, 0xa4, 0xc7, 0xdd, 0xd1, 0xf5,
+	0xe6, 0xaf, 0x08, 0x0a, 0x7d, 0x0f, 0x0f, 0x3f, 0x0e, 0x83, 0x81, 0x39, 0xf1, 0x0d, 0x1d, 0x2a,
+	0x27, 0xf1, 0xe9, 0xcb, 0x09, 0xbe, 0x0c, 0xcb, 0xee, 0xa1, 0xd9, 0xed, 0x12, 0xc3, 0xcf, 0xf6,
+	0x04, 0xef, 0x6f, 0x97, 0x24, 0x59, 0x26, 0xb2, 0xf2, 0x69, 0x0c, 0x72, 0x32, 0xcd, 0x27, 0x67,
+	0xe2, 0x39, 0xc8, 0xb8, 0xd4, 0x21, 0x5a, 0xa7, 0xdf, 0x48, 0xa5, 0x05, 0x61, 0xc7, 0x08, 0x1c,
+	0xe6, 0xf8, 0x6c, 0x87, 0x99, 0xf5, 0xa4, 0x42, 0x6b, 0xbf, 0xd5, 0xce, 0xa9, 0x59, 0x41, 0x13,
+	0xcd, 0xf6, 0x5d, 0x48, 0xb5, 0xb5, 0x03, 0xd2, 0x76, 0x8b, 0x49, 0xae, 0x7b, 0x6d, 0xe2, 0x99,
+	0xe5, 0x60, 0x2a, 0xf7, 0xb8, 0x50, 0xdd, 0xa2, 0xce, 0xb1, 0x2a, 0x35, 0x94, 0xde, 0x82, 0x6c,
+	0x80, 0x8c, 0x0b, 0x10, 0x3f, 0x24, 0xc7, 0x12, 0x2a, 0xfb, 0x89, 0x4f, 0x41, 0xf2, 0x85, 0xd6,
+	0xee, 0x11, 0x89, 0x50, 0x2c, 0x6a, 0xb1, 0xaf, 0x20, 0x76, 0xeb, 0xe4, 0xbd, 0x9a, 0x20, 0x52,
+	0x20, 0xe4, 0x11, 0x14, 0xf1, 0x48, 0x14, 0x58, 0x6c, 0x18, 0xb0, 0x48, 0x4d, 0x8a, 0xbf, 0xb2,
+	0x9a, 0x94, 0x98, 0xa9, 0x26, 0xfd, 0x32, 0x06, 0xf9, 0x7b, 0x3c, 0xed, 0xa7, 0x49, 0x84, 0x75,
+	0x00, 0xcd, 0x30, 0x9a, 0x54, 0x73, 0x5a, 0xc4, 0x6b, 0x97, 0x56, 0xc6, 0x9c, 0x61, 0xce, 0xd7,
+	0x58, 0x50, 0x33, 0x9a, 0x61, 0x88, 0x05, 0xbe, 0x08, 0x79, 0x87, 0x74, 0xec, 0x17, 0xc4, 0xd3,
+	0xc2, 0xdf, 0x5f, 0x8d, 0x05, 0x35, 0x27, 0xc8, 0x92, 0xed, 0xeb, 0x7e, 0xe4, 0x13, 0xdc, 0x33,
+	0xd7, 0x47, 0xef, 0x12, 0x32, 0xff, 0x15, 0x87, 0x7e, 0x63, 0x19, 0xf2, 0xc2, 0xce, 0xa6, 0xfe,
+	0x5c, 0xb3, 0x5a, 0x44, 0xf9, 0x75, 0x1c, 0x96, 0xbc, 0x1d, 0x65, 0x32, 0xdc, 0x8f, 0xf0, 0x4c,
+	0xee, 0x23, 0x05, 0xc8, 0x4d, 0xce, 0xcd, 0xa0, 0xd3, 0xc0, 0x1a, 0xef, 0xc1, 0xb2, 0xff, 0x2a,
+	0x91, 0x0a, 0x45, 0x09, 0x58, 0x9d, 0x5c, 0x43, 0x7c, 0x95, 0x4b, 0x46, 0x88, 0x12, 0x52, 0x6a,
+	0xf0, 0x26, 0x59, 0x26, 0xca, 0x14, 0x4a, 0x45, 0x53, 0x1d, 0x54, 0x2a, 0x28, 0x21, 0xa5, 0x22,
+	0x7a, 0xb2, 0xae, 0x4f, 0xa1, 0x54, 0xe5, 0xfc, 0x41, 0xa5, 0x82, 0x82, 0x37, 0x21, 0xf5, 0xcc,
+	0x6c, 0x53, 0xe2, 0xc8, 0x2e, 0x74, 0xcc, 0xf5, 0x54, 0xff, 0x40, 0x14, 0x6c, 0x72, 0x87, 0x0b,
+	0x34, 0x16, 0x54, 0x29, 0xca, 0xc2, 0xe6, 0xc8, 0xf0, 0xf0, 0x02, 0xaf, 0x7c, 0x9c, 0x80, 0x94,
+	0x4c, 0xad, 0x2d, 0x48, 0x06, 0xaf, 0xbf, 0x2b, 0x93, 0xc2, 0x54, 0xe1, 0xd5, 0xdf, 0xcf, 0x65,
+	0x21, 0x8c, 0x77, 0x83, 0x3d, 0xbb, 0x88, 0xcf, 0xd5, 0x89, 0x9a, 0xfc, 0x96, 0xb5, 0x7f, 0x32,
+	0xfa, 0x7d, 0xfe, 0x9b, 0x90, 0x63, 0xd5, 0xa0, 0x13, 0x1c, 0x3d, 0xf0, 0xab, 0x54, 0x50, 0x45,
+	0xe1, 0x08, 0xdd, 0x78, 0xd9, 0x59, 0x6e, 0x3c, 0x56, 0xb3, 0x64, 0x9a, 0x9a, 0x06, 0xf7, 0x6d,
+	0x52, 0x4d, 0x0b, 0xc2, 0x8e, 0xc1, 0x9e, 0x48, 0xb6, 0xa5, 0x8b, 0xf8, 0xa5, 0x55, 0xfe, 0xbb,
+	0x54, 0x85, 0xe5, 0x88, 0xc1, 0xe3, 0x5f, 0x2a, 0xa5, 0xef, 0x23, 0xc8, 0x06, 0x9c, 0xf5, 0xff,
+	0xee, 0x45, 0x22, 0x77, 0x7a, 0x1e, 0xb2, 0x12, 0xaf, 0xb7, 0xf4, 0xdc, 0xcb, 0x12, 0xe2, 0xdf,
+	0x31, 0xc8, 0x05, 0x8f, 0x21, 0x26, 0x80, 0x43, 0xa7, 0x98, 0xb3, 0x71, 0xc3, 0x97, 0xd6, 0x6e,
+	0x4c, 0x77, 0x94, 0x43, 0x8b, 0xfd, 0xe3, 0x2e, 0x51, 0x0b, 0x34, 0x42, 0xc1, 0x6f, 0x00, 0xf8,
+	0x51, 0x10, 0x2e, 0x4c, 0xaa, 0x19, 0x2f, 0x0c, 0x2e, 0x5e, 0x85, 0xa4, 0xae, 0xf5, 0x5c, 0xef,
+	0xc8, 0x63, 0x6f, 0x63, 0xa7, 0xab, 0x57, 0xf6, 0xf8, 0x40, 0x50, 0x15, 0x0c, 0xec, 0x96, 0x19,
+	0x4c, 0x97, 0x70, 0xb2, 0x84, 0xda, 0x88, 0xd4, 0xf4, 0x6d, 0x84, 0xf2, 0x00, 0x0a, 0x51, 0x28,
+	0x38, 0x0f, 0x99, 0x07, 0x0f, 0x9b, 0x9b, 0x8d, 0xf5, 0x07, 0xdb, 0xf5, 0xc2, 0x02, 0x5e, 0x84,
+	0xf8, 0xfa, 0xd6, 0x56, 0x01, 0x61, 0x80, 0x94, 0x5a, 0xbf, 0xff, 0xf0, 0x71, 0xbd, 0x10, 0xc3,
+	0x59, 0x58, 0xdc, 0x7c, 0x47, 0x55, 0xeb, 0x0f, 0xf6, 0x0b, 0x71, 0x9c, 0x81, 0xa4, 0x5a, 0xdf,
+	0xab, 0xef, 0x17, 0x12, 0x8a, 0x05, 0x45, 0x56, 0x33, 0x37, 0x03, 0xc3, 0x97, 0x89, 0x93, 0xbc,
+	0xd0, 0x90, 0x2e, 0x36, 0x76, 0x48, 0x17, 0x8f, 0x0c, 0xe9, 0x94, 0xf7, 0xe0, 0xec, 0x90, 0xfd,
+	0x64, 0xb9, 0xbe, 0x08, 0x4b, 0xa1, 0xd1, 0x90, 0x78, 0x10, 0x64, 0xd4, 0x7c, 0x70, 0x36, 0x34,
+	0xf5, 0x6c, 0x6a, 0xed, 0xf7, 0xa7, 0x20, 0x73, 0xc7, 0x4b, 0x0b, 0xfc, 0x63, 0x04, 0xd9, 0xc0,
+	0xdb, 0x14, 0x8f, 0xa9, 0x2e, 0x83, 0x53, 0xdb, 0xd2, 0x14, 0x5d, 0xa2, 0x72, 0xeb, 0x3b, 0x7f,
+	0xf9, 0xd7, 0x0f, 0x62, 0x37, 0xf0, 0x97, 0xfd, 0xf1, 0xf3, 0x47, 0x96, 0xd6, 0x21, 0xb7, 0xba,
+	0x8e, 0xfd, 0x1e, 0xd1, 0xa9, 0x5b, 0x2d, 0x57, 0xbd, 0xfb, 0x9a, 0xff, 0xf6, 0x4e, 0x67, 0xb5,
+	0x5c, 0x2d, 0x97, 0x5f, 0xe2, 0x3f, 0x20, 0x71, 0xe1, 0xfb, 0x27, 0x1b, 0x57, 0xc6, 0x5f, 0xad,
+	0xd1, 0x49, 0x46, 0xa9, 0x3a, 0x35, 0xbf, 0x70, 0xb8, 0xf2, 0x90, 0x5b, 0xbc, 0x83, 0xb7, 0xfb,
+	0x16, 0x8b, 0x18, 0x4f, 0x69, 0x73, 0xf5, 0xa3, 0x50, 0xbc, 0x5e, 0xe2, 0xdf, 0xb1, 0x47, 0x5e,
+	0x68, 0x1c, 0x88, 0xc7, 0x18, 0x35, 0x74, 0x70, 0x38, 0x95, 0xab, 0x9f, 0x70, 0xc3, 0x1f, 0x29,
+	0xf5, 0x39, 0x0c, 0x1f, 0x34, 0xbb, 0xd6, 0xef, 0xef, 0x7f, 0x83, 0x60, 0x29, 0x3c, 0xdb, 0x1b,
+	0x07, 0x60, 0xe8, 0x14, 0x70, 0x2a, 0x00, 0xbb, 0x1c, 0xc0, 0xdd, 0xb5, 0xb7, 0xfb, 0x00, 0xfc,
+	0x3f, 0x7d, 0xcc, 0x90, 0x34, 0x01, 0xcb, 0x7f, 0x84, 0x60, 0x29, 0x3c, 0x64, 0x1b, 0x67, 0xf9,
+	0xd0, 0x71, 0x5c, 0xe9, 0xcc, 0x40, 0x0d, 0xaa, 0x77, 0xba, 0xf4, 0xd8, 0xcb, 0xec, 0xf2, 0x9c,
+	0x99, 0xfd, 0x47, 0x04, 0xaf, 0x0d, 0xcc, 0x86, 0xf0, 0x98, 0x27, 0xc3, 0xa8, 0x59, 0x5d, 0xe9,
+	0xfa, 0x4c, 0x32, 0x32, 0xcb, 0x1b, 0xdc, 0xfa, 0x0d, 0xe5, 0x56, 0xc0, 0xd7, 0xd2, 0xda, 0x11,
+	0x08, 0x5e, 0xf6, 0x21, 0xd4, 0x0e, 0xa4, 0xde, 0x1a, 0x2a, 0x5f, 0x45, 0xf8, 0x4f, 0x08, 0x0a,
+	0xd1, 0x69, 0x0c, 0xbe, 0x36, 0xc6, 0xaa, 0xe1, 0x83, 0xa3, 0xd2, 0xda, 0x2c, 0x22, 0x12, 0x87,
+	0xcc, 0x99, 0x60, 0xd2, 0xcf, 0x82, 0x23, 0xa2, 0xb6, 0x86, 0xca, 0xf8, 0xe7, 0x08, 0x52, 0x62,
+	0x26, 0x83, 0x2f, 0x8f, 0x39, 0xa6, 0xc1, 0xf1, 0x51, 0x69, 0x75, 0x32, 0xa3, 0xb4, 0xf7, 0x0e,
+	0xb7, 0xf7, 0xb6, 0x72, 0x73, 0x2e, 0x7b, 0xc5, 0x53, 0x88, 0x59, 0xf9, 0x43, 0x04, 0x69, 0x6f,
+	0x3c, 0x83, 0xc7, 0xf4, 0x21, 0x91, 0x11, 0xce, 0xc8, 0x6c, 0x3e, 0x59, 0x3e, 0x38, 0x72, 0x17,
+	0x66, 0xd9, 0x7f, 0x99, 0x65, 0x72, 0x08, 0x31, 0xd6, 0xb2, 0xf0, 0x28, 0xa8, 0x54, 0x9e, 0x86,
+	0x55, 0x7a, 0xf1, 0x63, 0xc4, 0xcd, 0xfd, 0x1e, 0x0a, 0xfa, 0x71, 0xca, 0x62, 0xf7, 0xb2, 0xe6,
+	0x48, 0x75, 0x35, 0x54, 0x7e, 0xb7, 0xae, 0xdc, 0x9e, 0xb3, 0xce, 0x07, 0xd5, 0x5c, 0x45, 0x2c,
+	0x6d, 0x92, 0xfc, 0xd5, 0x8b, 0x2f, 0x4d, 0xf7, 0xec, 0x2f, 0x5d, 0x9e, 0xfc, 0x7c, 0x16, 0x68,
+	0xeb, 0x1c, 0xec, 0xd7, 0x94, 0xda, 0x5c, 0xb1, 0xe1, 0xaf, 0xef, 0x1a, 0x2a, 0xaf, 0xa2, 0xab,
+	0x08, 0xff, 0x02, 0x41, 0x4a, 0xbc, 0x07, 0xc7, 0x25, 0x77, 0xe8, 0x8d, 0x3a, 0x2e, 0xb9, 0xc3,
+	0x4f, 0xcb, 0x13, 0x26, 0x77, 0x9b, 0x2b, 0xf3, 0x2c, 0xfd, 0x49, 0x0c, 0x5e, 0x1b, 0xe8, 0x8a,
+	0xc6, 0xd5, 0xc7, 0x51, 0x2d, 0x5b, 0xe9, 0xfa, 0x4c, 0x32, 0x12, 0xca, 0x4f, 0x45, 0x86, 0x7d,
+	0x82, 0x94, 0xad, 0x39, 0x32, 0xac, 0x1d, 0xd5, 0xcb, 0x52, 0xed, 0x81, 0xb2, 0x33, 0x6f, 0xaa,
+	0x0d, 0xd3, 0x57, 0x7a, 0xf1, 0xd9, 0x7a, 0xb1, 0x0f, 0x49, 0x60, 0xd4, 0xba, 0xa6, 0x5b, 0xd1,
+	0xed, 0xce, 0x9f, 0xd7, 0xbf, 0xf1, 0x9c, 0xd2, 0xae, 0x5b, 0xab, 0x56, 0x8f, 0x8e, 0x8e, 0x22,
+	0x1f, 0xab, 0x5a, 0x8f, 0x3e, 0xaf, 0xea, 0x6d, 0xbb, 0x67, 0x7c, 0xa9, 0xdb, 0xd6, 0xe8, 0x33,
+	0xdb, 0xe9, 0x5c, 0x99, 0xc4, 0xce, 0xcc, 0xe3, 0x3b, 0x6d, 0xfc, 0x16, 0xc1, 0x79, 0xdd, 0xee,
+	0x8c, 0xf4, 0xea, 0xc6, 0x92, 0xdf, 0x60, 0xee, 0xb2, 0x22, 0xb3, 0x8b, 0xde, 0x5d, 0x97, 0xbc,
+	0x2d, 0xbb, 0xad, 0x59, 0xad, 0x8a, 0xed, 0xb4, 0xaa, 0x2d, 0x62, 0xf1, 0x12, 0x54, 0xed, 0x6f,
+	0x36, 0xf8, 0xbf, 0x0a, 0x37, 0x7d, 0xca, 0xcf, 0x62, 0x89, 0xed, 0xcd, 0x3b, 0x7b, 0x9f, 0xc6,
+	0x3e, 0xb7, 0x2d, 0x54, 0x6d, 0x32, 0xf3, 0x2b, 0xfe, 0x4e, 0x95, 0xc7, 0xd7, 0x36, 0x98, 0xc4,
+	0x67, 0x1e, 0xc3, 0x53, 0xce, 0xf0, 0xd4, 0x67, 0x78, 0xfa, 0x58, 0xa8, 0x3c, 0x48, 0xf1, 0x6d,
+	0xaf, 0xff, 0x2f, 0x00, 0x00, 0xff, 0xff, 0x53, 0xd6, 0xaa, 0xe3, 0xf9, 0x21, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -2370,8 +2418,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for Firestore service
-
+// FirestoreClient is the client API for Firestore service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type FirestoreClient interface {
 	// Gets a single document.
 	GetDocument(ctx context.Context, in *GetDocumentRequest, opts ...grpc.CallOption) (*Document, error)
@@ -2382,7 +2431,7 @@ type FirestoreClient interface {
 	// Updates or inserts a document.
 	UpdateDocument(ctx context.Context, in *UpdateDocumentRequest, opts ...grpc.CallOption) (*Document, error)
 	// Deletes a document.
-	DeleteDocument(ctx context.Context, in *DeleteDocumentRequest, opts ...grpc.CallOption) (*google_protobuf4.Empty, error)
+	DeleteDocument(ctx context.Context, in *DeleteDocumentRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	// Gets multiple documents.
 	//
 	// Documents returned by this method are not guaranteed to be returned in the
@@ -2393,7 +2442,7 @@ type FirestoreClient interface {
 	// Commits a transaction, while optionally updating documents.
 	Commit(ctx context.Context, in *CommitRequest, opts ...grpc.CallOption) (*CommitResponse, error)
 	// Rolls back a transaction.
-	Rollback(ctx context.Context, in *RollbackRequest, opts ...grpc.CallOption) (*google_protobuf4.Empty, error)
+	Rollback(ctx context.Context, in *RollbackRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	// Runs a query.
 	RunQuery(ctx context.Context, in *RunQueryRequest, opts ...grpc.CallOption) (Firestore_RunQueryClient, error)
 	// Streams batches of document updates and deletes, in order.
@@ -2414,7 +2463,7 @@ func NewFirestoreClient(cc *grpc.ClientConn) FirestoreClient {
 
 func (c *firestoreClient) GetDocument(ctx context.Context, in *GetDocumentRequest, opts ...grpc.CallOption) (*Document, error) {
 	out := new(Document)
-	err := grpc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/GetDocument", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/GetDocument", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2423,7 +2472,7 @@ func (c *firestoreClient) GetDocument(ctx context.Context, in *GetDocumentReques
 
 func (c *firestoreClient) ListDocuments(ctx context.Context, in *ListDocumentsRequest, opts ...grpc.CallOption) (*ListDocumentsResponse, error) {
 	out := new(ListDocumentsResponse)
-	err := grpc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/ListDocuments", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/ListDocuments", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2432,7 +2481,7 @@ func (c *firestoreClient) ListDocuments(ctx context.Context, in *ListDocumentsRe
 
 func (c *firestoreClient) CreateDocument(ctx context.Context, in *CreateDocumentRequest, opts ...grpc.CallOption) (*Document, error) {
 	out := new(Document)
-	err := grpc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/CreateDocument", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/CreateDocument", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2441,16 +2490,16 @@ func (c *firestoreClient) CreateDocument(ctx context.Context, in *CreateDocument
 
 func (c *firestoreClient) UpdateDocument(ctx context.Context, in *UpdateDocumentRequest, opts ...grpc.CallOption) (*Document, error) {
 	out := new(Document)
-	err := grpc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/UpdateDocument", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/UpdateDocument", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *firestoreClient) DeleteDocument(ctx context.Context, in *DeleteDocumentRequest, opts ...grpc.CallOption) (*google_protobuf4.Empty, error) {
-	out := new(google_protobuf4.Empty)
-	err := grpc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/DeleteDocument", in, out, c.cc, opts...)
+func (c *firestoreClient) DeleteDocument(ctx context.Context, in *DeleteDocumentRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/DeleteDocument", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2458,7 +2507,7 @@ func (c *firestoreClient) DeleteDocument(ctx context.Context, in *DeleteDocument
 }
 
 func (c *firestoreClient) BatchGetDocuments(ctx context.Context, in *BatchGetDocumentsRequest, opts ...grpc.CallOption) (Firestore_BatchGetDocumentsClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_Firestore_serviceDesc.Streams[0], c.cc, "/google.firestore.v1beta1.Firestore/BatchGetDocuments", opts...)
+	stream, err := c.cc.NewStream(ctx, &_Firestore_serviceDesc.Streams[0], "/google.firestore.v1beta1.Firestore/BatchGetDocuments", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2491,7 +2540,7 @@ func (x *firestoreBatchGetDocumentsClient) Recv() (*BatchGetDocumentsResponse, e
 
 func (c *firestoreClient) BeginTransaction(ctx context.Context, in *BeginTransactionRequest, opts ...grpc.CallOption) (*BeginTransactionResponse, error) {
 	out := new(BeginTransactionResponse)
-	err := grpc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/BeginTransaction", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/BeginTransaction", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2500,16 +2549,16 @@ func (c *firestoreClient) BeginTransaction(ctx context.Context, in *BeginTransac
 
 func (c *firestoreClient) Commit(ctx context.Context, in *CommitRequest, opts ...grpc.CallOption) (*CommitResponse, error) {
 	out := new(CommitResponse)
-	err := grpc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/Commit", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/Commit", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *firestoreClient) Rollback(ctx context.Context, in *RollbackRequest, opts ...grpc.CallOption) (*google_protobuf4.Empty, error) {
-	out := new(google_protobuf4.Empty)
-	err := grpc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/Rollback", in, out, c.cc, opts...)
+func (c *firestoreClient) Rollback(ctx context.Context, in *RollbackRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/Rollback", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2517,7 +2566,7 @@ func (c *firestoreClient) Rollback(ctx context.Context, in *RollbackRequest, opt
 }
 
 func (c *firestoreClient) RunQuery(ctx context.Context, in *RunQueryRequest, opts ...grpc.CallOption) (Firestore_RunQueryClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_Firestore_serviceDesc.Streams[1], c.cc, "/google.firestore.v1beta1.Firestore/RunQuery", opts...)
+	stream, err := c.cc.NewStream(ctx, &_Firestore_serviceDesc.Streams[1], "/google.firestore.v1beta1.Firestore/RunQuery", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2549,7 +2598,7 @@ func (x *firestoreRunQueryClient) Recv() (*RunQueryResponse, error) {
 }
 
 func (c *firestoreClient) Write(ctx context.Context, opts ...grpc.CallOption) (Firestore_WriteClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_Firestore_serviceDesc.Streams[2], c.cc, "/google.firestore.v1beta1.Firestore/Write", opts...)
+	stream, err := c.cc.NewStream(ctx, &_Firestore_serviceDesc.Streams[2], "/google.firestore.v1beta1.Firestore/Write", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2580,7 +2629,7 @@ func (x *firestoreWriteClient) Recv() (*WriteResponse, error) {
 }
 
 func (c *firestoreClient) Listen(ctx context.Context, opts ...grpc.CallOption) (Firestore_ListenClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_Firestore_serviceDesc.Streams[3], c.cc, "/google.firestore.v1beta1.Firestore/Listen", opts...)
+	stream, err := c.cc.NewStream(ctx, &_Firestore_serviceDesc.Streams[3], "/google.firestore.v1beta1.Firestore/Listen", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2612,15 +2661,14 @@ func (x *firestoreListenClient) Recv() (*ListenResponse, error) {
 
 func (c *firestoreClient) ListCollectionIds(ctx context.Context, in *ListCollectionIdsRequest, opts ...grpc.CallOption) (*ListCollectionIdsResponse, error) {
 	out := new(ListCollectionIdsResponse)
-	err := grpc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/ListCollectionIds", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/google.firestore.v1beta1.Firestore/ListCollectionIds", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for Firestore service
-
+// FirestoreServer is the server API for Firestore service.
 type FirestoreServer interface {
 	// Gets a single document.
 	GetDocument(context.Context, *GetDocumentRequest) (*Document, error)
@@ -2631,7 +2679,7 @@ type FirestoreServer interface {
 	// Updates or inserts a document.
 	UpdateDocument(context.Context, *UpdateDocumentRequest) (*Document, error)
 	// Deletes a document.
-	DeleteDocument(context.Context, *DeleteDocumentRequest) (*google_protobuf4.Empty, error)
+	DeleteDocument(context.Context, *DeleteDocumentRequest) (*empty.Empty, error)
 	// Gets multiple documents.
 	//
 	// Documents returned by this method are not guaranteed to be returned in the
@@ -2642,7 +2690,7 @@ type FirestoreServer interface {
 	// Commits a transaction, while optionally updating documents.
 	Commit(context.Context, *CommitRequest) (*CommitResponse, error)
 	// Rolls back a transaction.
-	Rollback(context.Context, *RollbackRequest) (*google_protobuf4.Empty, error)
+	Rollback(context.Context, *RollbackRequest) (*empty.Empty, error)
 	// Runs a query.
 	RunQuery(*RunQueryRequest, Firestore_RunQueryServer) error
 	// Streams batches of document updates and deletes, in order.
@@ -2651,6 +2699,50 @@ type FirestoreServer interface {
 	Listen(Firestore_ListenServer) error
 	// Lists all the collection IDs underneath a document.
 	ListCollectionIds(context.Context, *ListCollectionIdsRequest) (*ListCollectionIdsResponse, error)
+}
+
+// UnimplementedFirestoreServer can be embedded to have forward compatible implementations.
+type UnimplementedFirestoreServer struct {
+}
+
+func (*UnimplementedFirestoreServer) GetDocument(ctx context.Context, req *GetDocumentRequest) (*Document, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method GetDocument not implemented")
+}
+func (*UnimplementedFirestoreServer) ListDocuments(ctx context.Context, req *ListDocumentsRequest) (*ListDocumentsResponse, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method ListDocuments not implemented")
+}
+func (*UnimplementedFirestoreServer) CreateDocument(ctx context.Context, req *CreateDocumentRequest) (*Document, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method CreateDocument not implemented")
+}
+func (*UnimplementedFirestoreServer) UpdateDocument(ctx context.Context, req *UpdateDocumentRequest) (*Document, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method UpdateDocument not implemented")
+}
+func (*UnimplementedFirestoreServer) DeleteDocument(ctx context.Context, req *DeleteDocumentRequest) (*empty.Empty, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method DeleteDocument not implemented")
+}
+func (*UnimplementedFirestoreServer) BatchGetDocuments(req *BatchGetDocumentsRequest, srv Firestore_BatchGetDocumentsServer) error {
+	return status1.Errorf(codes.Unimplemented, "method BatchGetDocuments not implemented")
+}
+func (*UnimplementedFirestoreServer) BeginTransaction(ctx context.Context, req *BeginTransactionRequest) (*BeginTransactionResponse, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method BeginTransaction not implemented")
+}
+func (*UnimplementedFirestoreServer) Commit(ctx context.Context, req *CommitRequest) (*CommitResponse, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method Commit not implemented")
+}
+func (*UnimplementedFirestoreServer) Rollback(ctx context.Context, req *RollbackRequest) (*empty.Empty, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method Rollback not implemented")
+}
+func (*UnimplementedFirestoreServer) RunQuery(req *RunQueryRequest, srv Firestore_RunQueryServer) error {
+	return status1.Errorf(codes.Unimplemented, "method RunQuery not implemented")
+}
+func (*UnimplementedFirestoreServer) Write(srv Firestore_WriteServer) error {
+	return status1.Errorf(codes.Unimplemented, "method Write not implemented")
+}
+func (*UnimplementedFirestoreServer) Listen(srv Firestore_ListenServer) error {
+	return status1.Errorf(codes.Unimplemented, "method Listen not implemented")
+}
+func (*UnimplementedFirestoreServer) ListCollectionIds(ctx context.Context, req *ListCollectionIdsRequest) (*ListCollectionIdsResponse, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method ListCollectionIds not implemented")
 }
 
 func RegisterFirestoreServer(s *grpc.Server, srv FirestoreServer) {
@@ -2979,147 +3071,4 @@ var _Firestore_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Metadata: "google/firestore/v1beta1/firestore.proto",
-}
-
-func init() { proto.RegisterFile("google/firestore/v1beta1/firestore.proto", fileDescriptor2) }
-
-var fileDescriptor2 = []byte{
-	// 2180 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x59, 0xcd, 0x8f, 0x1b, 0x49,
-	0x15, 0x77, 0xf9, 0x6b, 0xec, 0xe7, 0x8f, 0xf1, 0x96, 0x92, 0xac, 0xe3, 0x64, 0xc9, 0xd0, 0x4b,
-	0x12, 0x63, 0xad, 0xec, 0x64, 0x22, 0x14, 0xd6, 0x21, 0xcb, 0x66, 0x66, 0x9c, 0xf1, 0x84, 0x24,
-	0x33, 0xe9, 0x99, 0x4d, 0x24, 0x14, 0xc9, 0xea, 0xe9, 0xae, 0x38, 0xbd, 0x63, 0x77, 0x7b, 0xbb,
-	0xcb, 0x99, 0x9d, 0x5d, 0x0d, 0x02, 0x0e, 0x5c, 0x90, 0xb8, 0x70, 0x00, 0x2e, 0x1c, 0xd8, 0x03,
-	0xd2, 0x22, 0xe0, 0x82, 0xc4, 0x05, 0x21, 0x71, 0x43, 0x20, 0x4e, 0x48, 0x08, 0x89, 0x03, 0x1c,
-	0x38, 0x71, 0xe3, 0x3f, 0x40, 0x5d, 0x55, 0xdd, 0xee, 0x6e, 0x7f, 0xb5, 0x3d, 0x11, 0xb7, 0xae,
-	0xe7, 0x57, 0xaf, 0xde, 0xc7, 0xef, 0xbd, 0x7a, 0xf5, 0x0c, 0xd5, 0xae, 0x69, 0x76, 0x7b, 0xa4,
-	0xf1, 0x42, 0xb7, 0x88, 0x4d, 0x4d, 0x8b, 0x34, 0x5e, 0xdd, 0x3c, 0x24, 0x54, 0xb9, 0x39, 0xa2,
-	0xd4, 0x07, 0x96, 0x49, 0x4d, 0x5c, 0xe6, 0x9c, 0xf5, 0x11, 0x5d, 0x70, 0x56, 0x2e, 0x0b, 0x19,
-	0xca, 0x40, 0x6f, 0x28, 0x86, 0x61, 0x52, 0x85, 0xea, 0xa6, 0x61, 0xf3, 0x7d, 0x95, 0xab, 0x53,
-	0x4f, 0x50, 0xcd, 0x7e, 0xdf, 0x34, 0x04, 0xdb, 0xf5, 0xa9, 0x6c, 0x9a, 0xa9, 0x0e, 0xfb, 0xc4,
-	0xa0, 0x82, 0xf1, 0x4b, 0x53, 0x19, 0x3f, 0x1a, 0x12, 0xeb, 0x64, 0x2e, 0xd7, 0xb1, 0xa5, 0x53,
-	0x61, 0x53, 0xe5, 0x92, 0xe0, 0x62, 0xab, 0xc3, 0xe1, 0x8b, 0x06, 0xe9, 0x0f, 0xa8, 0x2b, 0xe2,
-	0x4a, 0xf8, 0x47, 0xaa, 0xf7, 0x89, 0x4d, 0x95, 0xfe, 0x40, 0x30, 0xbc, 0x29, 0x18, 0xac, 0x81,
-	0xda, 0xb0, 0xa9, 0x42, 0x87, 0xc2, 0x64, 0xe9, 0x1f, 0x08, 0xf0, 0x36, 0xa1, 0x5b, 0x42, 0x71,
-	0x99, 0x7c, 0x34, 0x24, 0x36, 0xc5, 0x18, 0x92, 0x86, 0xd2, 0x27, 0x65, 0xb4, 0x86, 0xaa, 0x59,
-	0x99, 0x7d, 0xe3, 0x26, 0x24, 0xfb, 0x8a, 0x7d, 0x54, 0x8e, 0xaf, 0xa1, 0x6a, 0x6e, 0xfd, 0x5a,
-	0x7d, 0x9a, 0x93, 0xeb, 0xae, 0xb0, 0x47, 0x8a, 0x7d, 0x24, 0xb3, 0x3d, 0x58, 0x82, 0x1c, 0xb5,
-	0x14, 0xc3, 0x56, 0x54, 0xc7, 0xdf, 0xe5, 0xc4, 0x1a, 0xaa, 0xe6, 0xdb, 0x31, 0xd9, 0x4f, 0xc4,
-	0xef, 0x42, 0xd6, 0x22, 0x8a, 0xd6, 0x71, 0x74, 0x2f, 0xa7, 0xd8, 0x21, 0x15, 0xf7, 0x10, 0xd7,
-	0xb0, 0xfa, 0x81, 0x6b, 0x58, 0x3b, 0x26, 0x67, 0x1c, 0x76, 0x87, 0xb0, 0x71, 0x01, 0xce, 0xa9,
-	0xa6, 0x61, 0xeb, 0x36, 0x25, 0x86, 0x7a, 0xd2, 0xb1, 0x49, 0x8f, 0xa8, 0xd4, 0xb4, 0xa4, 0x6f,
-	0x27, 0xe0, 0xdc, 0x43, 0xdd, 0xf6, 0xcc, 0xb3, 0x5d, 0xfb, 0x2e, 0x40, 0x7a, 0xa0, 0x58, 0xc4,
-	0xa0, 0xc2, 0x42, 0xb1, 0xc2, 0x6f, 0x43, 0x41, 0x35, 0x7b, 0xce, 0x6e, 0xdd, 0x34, 0x3a, 0xba,
-	0xc6, 0x8c, 0xcd, 0xca, 0xf9, 0x11, 0x71, 0x47, 0xc3, 0x97, 0x20, 0x3b, 0x50, 0xba, 0xa4, 0x63,
-	0xeb, 0x9f, 0x10, 0x66, 0x4a, 0x4a, 0xce, 0x38, 0x84, 0x7d, 0xfd, 0x13, 0x82, 0xdf, 0x02, 0x60,
-	0x3f, 0x52, 0xf3, 0x88, 0x18, 0xe5, 0x24, 0xdb, 0xce, 0xd8, 0x0f, 0x1c, 0x02, 0xbe, 0x08, 0x19,
-	0xd3, 0xd2, 0x88, 0xd5, 0x39, 0x3c, 0x29, 0xa7, 0xd9, 0x8f, 0x2b, 0x6c, 0xbd, 0x71, 0xe2, 0xf9,
-	0x77, 0xe5, 0xec, 0xfe, 0xcd, 0xcc, 0xf5, 0x2f, 0x2c, 0xe2, 0x5f, 0xfc, 0x45, 0xc8, 0xdb, 0x2f,
-	0xcd, 0xe3, 0x4e, 0x5f, 0xb7, 0x6d, 0xdd, 0xe8, 0x96, 0xf3, 0x6b, 0xa8, 0x9a, 0x91, 0x73, 0x0e,
-	0xed, 0x11, 0x27, 0x4d, 0x0d, 0xc1, 0x77, 0x10, 0x9c, 0x0f, 0x85, 0xc0, 0x1e, 0x98, 0x86, 0x4d,
-	0xf0, 0xfb, 0x90, 0x75, 0xf3, 0xc5, 0x2e, 0xa3, 0xb5, 0x44, 0x35, 0xb7, 0x2e, 0xcd, 0x37, 0x5a,
-	0x1e, 0x6d, 0xc2, 0xd7, 0x60, 0xd5, 0x20, 0x1f, 0xd3, 0x8e, 0xcf, 0xe1, 0x3c, 0x5e, 0x05, 0x87,
-	0xbc, 0xe7, 0x3a, 0x5d, 0xfa, 0x2f, 0x82, 0xf3, 0x9b, 0x16, 0x51, 0x28, 0x09, 0xe3, 0xfc, 0x4c,
-	0x38, 0xb8, 0x02, 0x39, 0x57, 0x17, 0x87, 0x25, 0xc1, 0x58, 0xc0, 0x25, 0xed, 0x68, 0xf8, 0x3d,
-	0xc8, 0xb8, 0x2b, 0x86, 0x84, 0x68, 0x06, 0x7a, 0x7b, 0x3c, 0x44, 0xa4, 0x16, 0x47, 0x84, 0xf4,
-	0xeb, 0x38, 0x9c, 0xff, 0x60, 0xa0, 0x4d, 0xb0, 0xd9, 0xaf, 0x15, 0x5a, 0x42, 0xab, 0x6d, 0xc8,
-	0x0d, 0x99, 0xe0, 0xce, 0x12, 0xe5, 0x00, 0xf8, 0x56, 0xe7, 0xdb, 0x33, 0x2f, 0xb1, 0x04, 0xe0,
-	0x9f, 0x40, 0x49, 0x1d, 0x5a, 0x4e, 0xac, 0x3a, 0x21, 0x17, 0xcf, 0x90, 0xb3, 0x67, 0x11, 0xd5,
-	0x34, 0x34, 0xdd, 0x89, 0x9f, 0xbc, 0x2a, 0xf6, 0xbb, 0xc2, 0xa5, 0x6f, 0xc1, 0xf9, 0x2d, 0xd2,
-	0x23, 0xe3, 0x0e, 0x9b, 0x54, 0x0c, 0x27, 0x9d, 0x1f, 0x3f, 0xdb, 0xf9, 0xff, 0x8a, 0x43, 0x79,
-	0x43, 0xa1, 0xea, 0x4b, 0x5f, 0x3d, 0xf6, 0x0a, 0x56, 0x05, 0x32, 0x9a, 0x42, 0x95, 0x43, 0xc5,
-	0x76, 0xf5, 0xf0, 0xd6, 0xf8, 0xb2, 0x3f, 0x91, 0xe2, 0x6b, 0x09, 0xa7, 0xe2, 0x8c, 0x92, 0xe4,
-	0x2c, 0x5e, 0x0e, 0x95, 0x95, 0xe4, 0xa4, 0xb2, 0xf2, 0xcc, 0x49, 0xc2, 0xe3, 0x8e, 0x9f, 0x8f,
-	0xe3, 0xf5, 0x9d, 0xe9, 0x47, 0x1d, 0x8c, 0x98, 0x77, 0x07, 0xec, 0x06, 0x6e, 0xc7, 0xe4, 0xa2,
-	0x41, 0x8e, 0x0f, 0xa6, 0xd5, 0xab, 0x95, 0xd7, 0x72, 0x1f, 0xfc, 0x1d, 0xc1, 0xc5, 0x09, 0x2e,
-	0x16, 0x05, 0xa9, 0x09, 0xa9, 0x17, 0xe6, 0xd0, 0xd0, 0xa2, 0x67, 0x45, 0x3b, 0x26, 0xf3, 0x2d,
-	0xb8, 0x02, 0x2b, 0x6e, 0x71, 0x64, 0xa5, 0xa2, 0x1d, 0x93, 0x5d, 0x02, 0x5e, 0x9b, 0x70, 0xf9,
-	0x05, 0x7d, 0x78, 0xdb, 0x6f, 0x6a, 0x72, 0x9e, 0xa9, 0x3e, 0x43, 0x33, 0x90, 0xb6, 0x88, 0x3d,
-	0xec, 0x51, 0xe9, 0x14, 0xde, 0xdc, 0x20, 0x5d, 0xdd, 0xf0, 0x79, 0x30, 0x0a, 0x76, 0xee, 0xc3,
-	0x8a, 0xc9, 0x23, 0x20, 0xe0, 0xbb, 0x50, 0xd4, 0x64, 0x77, 0xb3, 0xf4, 0x35, 0x28, 0x8f, 0x1f,
-	0x2f, 0xfc, 0x1a, 0xb2, 0x1f, 0x8d, 0xd9, 0x2f, 0x7d, 0x0f, 0x41, 0x61, 0xd3, 0xec, 0xf7, 0x75,
-	0x1a, 0x45, 0xe7, 0xdb, 0x90, 0x66, 0x9d, 0x11, 0x07, 0x7b, 0x6e, 0xfd, 0xca, 0x74, 0x95, 0x9f,
-	0x39, 0x7c, 0xb2, 0x60, 0x9f, 0x1f, 0x08, 0xe9, 0x27, 0x08, 0x8a, 0xae, 0x22, 0x42, 0xfb, 0x07,
-	0x50, 0x60, 0xdb, 0x3b, 0xdc, 0xd1, 0xee, 0x55, 0x75, 0x75, 0xde, 0xa1, 0x8c, 0x5b, 0xce, 0x1f,
-	0x8f, 0x16, 0x36, 0xbe, 0x03, 0x39, 0x95, 0x49, 0xe7, 0x91, 0x8e, 0xcf, 0x8d, 0x34, 0x70, 0x76,
-	0x87, 0x20, 0xed, 0xc2, 0xaa, 0x6c, 0xf6, 0x7a, 0x87, 0x8a, 0x7a, 0x14, 0xc5, 0x4b, 0x21, 0x63,
-	0xe3, 0xe3, 0xc6, 0xfe, 0x33, 0x0e, 0xab, 0xf2, 0xd0, 0x78, 0xe2, 0xf4, 0xa2, 0xf3, 0x2e, 0xc4,
-	0xa7, 0x50, 0xb2, 0xa9, 0x35, 0x54, 0xe9, 0xd0, 0x22, 0x5a, 0x87, 0xb5, 0xaf, 0x42, 0xfd, 0x2f,
-	0x4f, 0x77, 0xc4, 0xbe, 0xb7, 0x83, 0x9d, 0xd1, 0x8e, 0xc9, 0xab, 0x76, 0x90, 0x14, 0xae, 0x30,
-	0x29, 0x56, 0x61, 0xd0, 0xdc, 0x0a, 0x93, 0x5e, 0xa2, 0xc2, 0xa0, 0xb3, 0x56, 0x18, 0xe4, 0x4b,
-	0xbc, 0x3c, 0x00, 0x73, 0x42, 0x87, 0x9e, 0x0c, 0xa6, 0xd7, 0x9b, 0xbf, 0x21, 0x28, 0x8d, 0x3c,
-	0x3c, 0x39, 0x1d, 0xc6, 0x03, 0x73, 0xe6, 0x1b, 0x3a, 0x50, 0x4e, 0x12, 0xd1, 0xcb, 0x09, 0xbe,
-	0x0e, 0xab, 0xf6, 0x91, 0x3e, 0x18, 0x10, 0xcd, 0x43, 0x7b, 0x92, 0xf5, 0xb7, 0x45, 0x41, 0x16,
-	0x40, 0x96, 0x3e, 0x8f, 0x43, 0x5e, 0xc0, 0x7c, 0x3e, 0x12, 0x2f, 0x41, 0xd6, 0xa6, 0x16, 0x51,
-	0xfa, 0xa3, 0x46, 0x2a, 0xc3, 0x09, 0x3b, 0x9a, 0x2f, 0x99, 0x13, 0x8b, 0x25, 0xb3, 0xd3, 0x93,
-	0x72, 0xa9, 0xa3, 0x56, 0x3b, 0x2f, 0xe7, 0x38, 0x8d, 0x37, 0xdb, 0x0f, 0x20, 0xdd, 0x53, 0x0e,
-	0x49, 0xcf, 0x2e, 0xa7, 0x98, 0xec, 0xf5, 0xb9, 0x39, 0xcb, 0x8c, 0xa9, 0x3f, 0x64, 0x9b, 0x5a,
-	0x06, 0xb5, 0x4e, 0x64, 0x21, 0xa1, 0xf2, 0x2e, 0xe4, 0x7c, 0x64, 0x5c, 0x82, 0xc4, 0x11, 0x39,
-	0x11, 0xa6, 0x3a, 0x9f, 0xf8, 0x1c, 0xa4, 0x5e, 0x29, 0xbd, 0x21, 0x11, 0x16, 0xf2, 0x45, 0x33,
-	0xfe, 0x55, 0xe4, 0xdc, 0x3a, 0x05, 0xb7, 0x26, 0x70, 0x08, 0x04, 0x3c, 0x82, 0x42, 0x1e, 0x09,
-	0x1b, 0x16, 0x9f, 0x64, 0x58, 0xa8, 0x26, 0x25, 0x5e, 0x5b, 0x4d, 0x4a, 0x2e, 0x54, 0x93, 0x7e,
-	0x15, 0x87, 0xc2, 0x43, 0x06, 0xfb, 0x28, 0x40, 0xb8, 0x07, 0xa0, 0x68, 0x5a, 0x87, 0x2a, 0x56,
-	0x97, 0xb8, 0xed, 0xd2, 0xda, 0x8c, 0x1c, 0x66, 0x7c, 0xed, 0x98, 0x9c, 0x55, 0x34, 0x8d, 0x2f,
-	0xf0, 0x55, 0x28, 0x58, 0xa4, 0x6f, 0xbe, 0x22, 0xae, 0x14, 0xf6, 0xfe, 0x6a, 0xc7, 0xe4, 0x3c,
-	0x27, 0x0b, 0xb6, 0x6f, 0x78, 0x91, 0x4f, 0x32, 0xcf, 0xdc, 0x9a, 0x7e, 0x4a, 0x40, 0xfd, 0xd7,
-	0x1c, 0xfa, 0x8d, 0x55, 0x28, 0x70, 0x3d, 0x3b, 0xea, 0x4b, 0xc5, 0xe8, 0x12, 0xe9, 0x37, 0x09,
-	0x28, 0xba, 0x27, 0x0a, 0x30, 0x3c, 0x0a, 0xf1, 0xcc, 0xef, 0x23, 0xb9, 0x91, 0x9b, 0x8c, 0xdb,
-	0x31, 0x9d, 0xfa, 0xd6, 0x78, 0x1f, 0x56, 0xbd, 0x57, 0x89, 0x10, 0xc8, 0x4b, 0x40, 0x75, 0x7e,
-	0x0d, 0xf1, 0x44, 0x16, 0xb5, 0x00, 0x25, 0x20, 0x54, 0x63, 0x4d, 0xb2, 0x00, 0x4a, 0x04, 0xa1,
-	0xbc, 0xa9, 0xf6, 0x0b, 0xe5, 0x94, 0x80, 0x50, 0x1e, 0x3d, 0x51, 0xd7, 0x23, 0x08, 0x95, 0x19,
-	0xbf, 0x5f, 0x28, 0xa7, 0xe0, 0x4d, 0x48, 0xbf, 0xd0, 0x7b, 0x94, 0x58, 0xa2, 0x0b, 0x9d, 0x71,
-	0x3d, 0xb5, 0x3e, 0xe6, 0x05, 0x9b, 0xdc, 0x67, 0x1b, 0xda, 0x31, 0x59, 0x6c, 0x75, 0xc2, 0x66,
-	0x89, 0xf0, 0xb0, 0x02, 0x2f, 0xfd, 0x20, 0x09, 0x69, 0x01, 0xad, 0x2d, 0x48, 0xf9, 0xaf, 0xbf,
-	0x77, 0xe6, 0x85, 0xa9, 0xce, 0xaa, 0xbf, 0x87, 0x65, 0xbe, 0x19, 0xef, 0xf9, 0x7b, 0x76, 0x1e,
-	0x9f, 0x1b, 0x73, 0x25, 0x79, 0x2d, 0xeb, 0x28, 0x33, 0x46, 0x7d, 0xfe, 0xdb, 0x90, 0x77, 0xaa,
-	0x41, 0xdf, 0x3f, 0x7a, 0x60, 0x57, 0x29, 0xa7, 0xf2, 0xc2, 0x11, 0xb8, 0xf1, 0x72, 0x8b, 0xdc,
-	0x78, 0x4e, 0xcd, 0x12, 0x30, 0xd5, 0x35, 0xe6, 0xdb, 0x94, 0x9c, 0xe1, 0x84, 0x1d, 0xcd, 0x79,
-	0x22, 0x99, 0x86, 0xca, 0xe3, 0x97, 0x91, 0xd9, 0x77, 0xa5, 0x01, 0xab, 0x21, 0x85, 0x67, 0xbf,
-	0x54, 0x2a, 0xdf, 0x47, 0x90, 0xf3, 0x39, 0xeb, 0xff, 0xdd, 0x8b, 0x84, 0xee, 0xf4, 0x02, 0xe4,
-	0x84, 0xbd, 0xee, 0xd2, 0x75, 0xaf, 0x03, 0x88, 0xff, 0xc4, 0x21, 0xef, 0x4f, 0x43, 0x4c, 0x00,
-	0x07, 0xb2, 0x98, 0xb1, 0x31, 0xc5, 0x8b, 0xeb, 0xb7, 0xa3, 0xa5, 0x72, 0x60, 0x71, 0x70, 0x32,
-	0x20, 0x72, 0x89, 0x86, 0x28, 0xf8, 0x2d, 0x00, 0x2f, 0x0a, 0xdc, 0x85, 0x29, 0x39, 0xeb, 0x86,
-	0xc1, 0xc6, 0x55, 0x48, 0xa9, 0xca, 0xd0, 0x76, 0x53, 0x1e, 0xbb, 0x07, 0x5b, 0x03, 0xb5, 0xbe,
-	0xcf, 0xe6, 0x7e, 0x32, 0x67, 0x70, 0x6e, 0x99, 0x71, 0xb8, 0x04, 0xc1, 0x12, 0x68, 0x23, 0xd2,
-	0xd1, 0xdb, 0x08, 0xe9, 0x31, 0x94, 0xc2, 0xa6, 0xe0, 0x02, 0x64, 0x1f, 0xef, 0x76, 0x36, 0xdb,
-	0xf7, 0x1e, 0x6f, 0xb7, 0x4a, 0x31, 0xbc, 0x02, 0x89, 0x7b, 0x5b, 0x5b, 0x25, 0x84, 0x01, 0xd2,
-	0x72, 0xeb, 0xd1, 0xee, 0xd3, 0x56, 0x29, 0x8e, 0x73, 0xb0, 0xb2, 0xf9, 0x81, 0x2c, 0xb7, 0x1e,
-	0x1f, 0x94, 0x12, 0x38, 0x0b, 0x29, 0xb9, 0xb5, 0xdf, 0x3a, 0x28, 0x25, 0x25, 0x03, 0xca, 0x4e,
-	0xcd, 0xdc, 0xf4, 0x0d, 0x5f, 0xe6, 0x4e, 0xf2, 0x02, 0x43, 0xba, 0xf8, 0xcc, 0x21, 0x5d, 0x22,
-	0x34, 0xa4, 0x93, 0x3e, 0x84, 0x8b, 0x13, 0xce, 0x13, 0xe5, 0xfa, 0x2a, 0x14, 0x03, 0xa3, 0x21,
-	0xfe, 0x20, 0xc8, 0xca, 0x05, 0xff, 0x6c, 0x28, 0xf2, 0x6c, 0x6a, 0xfd, 0x97, 0x18, 0xb2, 0xf7,
-	0x5d, 0x58, 0xe0, 0x9f, 0x22, 0xc8, 0xf9, 0xde, 0xa6, 0x78, 0x46, 0x75, 0x19, 0x9f, 0xda, 0x56,
-	0x22, 0x74, 0x89, 0xd2, 0xdd, 0xef, 0xfe, 0xf5, 0xdf, 0x3f, 0x8c, 0xdf, 0xc6, 0x5f, 0xf1, 0xa6,
-	0xcc, 0x9f, 0x1a, 0x4a, 0x9f, 0xdc, 0x1d, 0x58, 0xe6, 0x87, 0x44, 0xa5, 0x76, 0xa3, 0xd6, 0x70,
-	0xef, 0x6b, 0xf6, 0xed, 0x66, 0x67, 0xa3, 0xd6, 0xa8, 0xd5, 0x4e, 0xf1, 0x1f, 0x10, 0xbf, 0xf0,
-	0xbd, 0xcc, 0xc6, 0xf5, 0xd9, 0x57, 0x6b, 0x78, 0x92, 0x51, 0x69, 0x44, 0xe6, 0xe7, 0x0e, 0x97,
-	0x76, 0x99, 0xc6, 0x3b, 0x78, 0x7b, 0xa4, 0x31, 0x8f, 0x71, 0x44, 0x9d, 0x1b, 0x9f, 0x06, 0xe2,
-	0x75, 0x8a, 0x7f, 0xef, 0x3c, 0xf2, 0x02, 0xe3, 0x40, 0x3c, 0x43, 0xa9, 0x89, 0x83, 0xc3, 0x48,
-	0xae, 0x7e, 0xc6, 0x14, 0x7f, 0x22, 0xb5, 0x96, 0x50, 0x7c, 0x5c, 0xed, 0xe6, 0xa8, 0xbf, 0xff,
-	0x2d, 0x82, 0x62, 0x70, 0xb6, 0x37, 0xcb, 0x80, 0x89, 0x53, 0xc0, 0x48, 0x06, 0xec, 0x31, 0x03,
-	0x1e, 0xac, 0xbf, 0x37, 0x32, 0xc0, 0xfb, 0x87, 0x63, 0x01, 0xd0, 0xf8, 0x34, 0xff, 0x31, 0x82,
-	0x62, 0x70, 0xc8, 0x36, 0x4b, 0xf3, 0x89, 0xe3, 0xb8, 0xca, 0x85, 0xb1, 0x1a, 0xd4, 0xea, 0x0f,
-	0xe8, 0x89, 0x8b, 0xec, 0xda, 0x92, 0xc8, 0xfe, 0x23, 0x82, 0x37, 0xc6, 0x66, 0x43, 0x78, 0xc6,
-	0x93, 0x61, 0xda, 0xac, 0xae, 0x72, 0x6b, 0xa1, 0x3d, 0x02, 0xe5, 0x6d, 0xa6, 0xfd, 0x86, 0x74,
-	0xd7, 0xe7, 0x6b, 0xa1, 0xed, 0x14, 0x0b, 0x4e, 0x47, 0x26, 0x34, 0x0f, 0x85, 0xdc, 0x26, 0xaa,
-	0xdd, 0x40, 0xf8, 0xcf, 0x08, 0x4a, 0xe1, 0x69, 0x0c, 0xbe, 0x39, 0x43, 0xab, 0xc9, 0x83, 0xa3,
-	0xca, 0xfa, 0x22, 0x5b, 0x84, 0x1d, 0x02, 0x33, 0x7e, 0xd0, 0x2f, 0x62, 0x47, 0x48, 0x6c, 0x13,
-	0xd5, 0xf0, 0x67, 0x08, 0xd2, 0x7c, 0x26, 0x83, 0xaf, 0xcf, 0x48, 0x53, 0xff, 0xf8, 0xa8, 0x52,
-	0x9d, 0xcf, 0x28, 0xf4, 0xbd, 0xcf, 0xf4, 0x7d, 0x5f, 0xba, 0xb3, 0x94, 0xbe, 0xfc, 0x29, 0xe4,
-	0x68, 0xf9, 0x23, 0x04, 0x19, 0x77, 0x3c, 0x83, 0x67, 0xf4, 0x21, 0xa1, 0x11, 0xce, 0x54, 0x34,
-	0x9f, 0x0d, 0x0f, 0x96, 0x38, 0xc5, 0xd1, 0xec, 0x17, 0x8e, 0x66, 0x62, 0x08, 0x31, 0x53, 0xb3,
-	0xe0, 0x28, 0xa8, 0x52, 0x8b, 0xc2, 0x3a, 0xdd, 0x8b, 0x11, 0x4b, 0xdd, 0x69, 0xd3, 0x12, 0xc2,
-	0x38, 0x76, 0x3f, 0x43, 0x90, 0x62, 0x8f, 0x55, 0x7c, 0x2d, 0xda, 0x6b, 0xbd, 0x72, 0x7d, 0xfe,
-	0xab, 0x97, 0x2b, 0xd9, 0x62, 0x4a, 0x7e, 0x5d, 0x6a, 0x2e, 0xe5, 0x52, 0xf6, 0x68, 0x6e, 0xa2,
-	0x5a, 0x15, 0xdd, 0x40, 0xf8, 0xe7, 0x08, 0xd2, 0xfc, 0x19, 0x37, 0x0b, 0x93, 0x81, 0xa7, 0xe5,
-	0x2c, 0x4c, 0x06, 0x5f, 0x84, 0x67, 0xc4, 0x64, 0x8f, 0x09, 0x73, 0x35, 0xfd, 0x0b, 0x82, 0x37,
-	0xc6, 0x9a, 0x99, 0x59, 0x65, 0x6d, 0x5a, 0xa7, 0x55, 0xb9, 0xb5, 0xd0, 0x9e, 0xe0, 0xe5, 0x2d,
-	0x6d, 0x2d, 0x01, 0x8c, 0x5e, 0x58, 0x6a, 0x13, 0xd5, 0x36, 0x7e, 0x87, 0xe0, 0xb2, 0x6a, 0xf6,
-	0xa7, 0xea, 0xb2, 0x51, 0xf4, 0xba, 0xa9, 0x3d, 0x27, 0xa3, 0xf6, 0xd0, 0x37, 0xef, 0x09, 0xde,
-	0xae, 0xd9, 0x53, 0x8c, 0x6e, 0xdd, 0xb4, 0xba, 0x8d, 0x2e, 0x31, 0x58, 0xbe, 0x35, 0xf8, 0x4f,
-	0xca, 0x40, 0xb7, 0xc7, 0xff, 0x7f, 0xbf, 0xe3, 0x51, 0x7e, 0x16, 0x4f, 0x6e, 0x6f, 0xde, 0xdf,
-	0xff, 0x3c, 0xfe, 0x85, 0x6d, 0x2e, 0x6a, 0xb3, 0x67, 0x0e, 0xb5, 0xba, 0x77, 0x52, 0xfd, 0xe9,
-	0xcd, 0x0d, 0x67, 0xc7, 0x9f, 0x5c, 0x86, 0xe7, 0x8c, 0xe1, 0xb9, 0xc7, 0xf0, 0xfc, 0x29, 0x17,
-	0x79, 0x98, 0x66, 0xc7, 0xde, 0xfa, 0x5f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x63, 0xa1, 0x5f, 0x1d,
-	0xcd, 0x20, 0x00, 0x00,
 }

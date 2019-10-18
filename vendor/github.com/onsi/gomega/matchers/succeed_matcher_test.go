@@ -2,6 +2,7 @@ package matchers_test
 
 import (
 	"errors"
+	"regexp"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -59,4 +60,14 @@ var _ = Describe("Succeed", func() {
 		Expect(err).Should(Succeed())
 	})
 
+	It("builds failure message", func() {
+		actual := Succeed().FailureMessage(errors.New("oops"))
+		actual = regexp.MustCompile(" 0x.*>").ReplaceAllString(actual, " 0x00000000>")
+		Expect(actual).To(Equal("Expected success, but got an error:\n    <*errors.errorString | 0x00000000>: {s: \"oops\"}\n    oops"))
+	})
+
+	It("builds negated failure message", func() {
+		actual := Succeed().NegatedFailureMessage(123)
+		Expect(actual).To(Equal("Expected failure, but got no error."))
+	})
 })

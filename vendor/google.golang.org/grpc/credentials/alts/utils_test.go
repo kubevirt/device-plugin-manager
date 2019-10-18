@@ -19,10 +19,43 @@
 package alts
 
 import (
+	"context"
 	"io"
+	"os"
 	"strings"
 	"testing"
+
+	altspb "google.golang.org/grpc/credentials/alts/internal/proto/grpc_gcp"
+	"google.golang.org/grpc/peer"
 )
+
+func setupManufacturerReader(testOS string, reader func() (io.Reader, error)) func() {
+	tmpOS := runningOS
+	tmpReader := manufacturerReader
+
+	// Set test OS and reader function.
+	runningOS = testOS
+	manufacturerReader = reader
+	return func() {
+		runningOS = tmpOS
+		manufacturerReader = tmpReader
+	}
+
+}
+
+func setup(testOS string, testReader io.Reader) func() {
+	reader := func() (io.Reader, error) {
+		return testReader, nil
+	}
+	return setupManufacturerReader(testOS, reader)
+}
+
+func setupError(testOS string, err error) func() {
+	reader := func() (io.Reader, error) {
+		return nil, err
+	}
+	return setupManufacturerReader(testOS, reader)
+}
 
 func TestIsRunningOnGCP(t *testing.T) {
 	for _, tc := range []struct {
@@ -49,18 +82,79 @@ func TestIsRunningOnGCP(t *testing.T) {
 	}
 }
 
-func setup(testOS string, testReader io.Reader) func() {
-	tmpOS := runningOS
-	tmpReader := manufacturerReader
-
-	// Set test OS and reader function.
-	runningOS = testOS
-	manufacturerReader = func() (io.Reader, error) {
-		return testReader, nil
+func TestIsRunningOnGCPNoProductNameFile(t *testing.T) {
+	reverseFunc := setupError("linux", os.ErrNotExist)
+	if isRunningOnGCP() {
+		t.Errorf("ErrNotExist: isRunningOnGCP()=true, want false")
 	}
+	reverseFunc()
+}
 
-	return func() {
-		runningOS = tmpOS
-		manufacturerReader = tmpReader
+func TestAuthInfoFromContext(t *testing.T) {
+	ctx := context.Background()
+	altsAuthInfo := &fakeALTSAuthInfo{}
+	p := &peer.Peer{
+		AuthInfo: altsAuthInfo,
+	}
+	for _, tc := range []struct {
+		desc    string
+		ctx     context.Context
+		success bool
+		out     AuthInfo
+	}{
+		{
+			"working case",
+			peer.NewContext(ctx, p),
+			true,
+			altsAuthInfo,
+		},
+	} {
+		authInfo, err := AuthInfoFromContext(tc.ctx)
+		if got, want := (err == nil), tc.success; got != want {
+			t.Errorf("%v: AuthInfoFromContext(_)=(err=nil)=%v, want %v", tc.desc, got, want)
+		}
+		if got, want := authInfo, tc.out; got != want {
+			t.Errorf("%v:, AuthInfoFromContext(_)=(%v, _), want (%v, _)", tc.desc, got, want)
+		}
 	}
 }
+
+func TestAuthInfoFromPeer(t *testing.T) {
+	altsAuthInfo := &fakeALTSAuthInfo{}
+	p := &peer.Peer{
+		AuthInfo: altsAuthInfo,
+	}
+	for _, tc := range []struct {
+		desc    string
+		p       *peer.Peer
+		success bool
+		out     AuthInfo
+	}{
+		{
+			"working case",
+			p,
+			true,
+			altsAuthInfo,
+		},
+	} {
+		authInfo, err := AuthInfoFromPeer(tc.p)
+		if got, want := (err == nil), tc.success; got != want {
+			t.Errorf("%v: AuthInfoFromPeer(_)=(err=nil)=%v, want %v", tc.desc, got, want)
+		}
+		if got, want := authInfo, tc.out; got != want {
+			t.Errorf("%v:, AuthInfoFromPeer(_)=(%v, _), want (%v, _)", tc.desc, got, want)
+		}
+	}
+}
+
+type fakeALTSAuthInfo struct{}
+
+func (*fakeALTSAuthInfo) AuthType() string            { return "" }
+func (*fakeALTSAuthInfo) ApplicationProtocol() string { return "" }
+func (*fakeALTSAuthInfo) RecordProtocol() string      { return "" }
+func (*fakeALTSAuthInfo) SecurityLevel() altspb.SecurityLevel {
+	return altspb.SecurityLevel_SECURITY_NONE
+}
+func (*fakeALTSAuthInfo) PeerServiceAccount() string                   { return "" }
+func (*fakeALTSAuthInfo) LocalServiceAccount() string                  { return "" }
+func (*fakeALTSAuthInfo) PeerRPCVersions() *altspb.RpcProtocolVersions { return nil }

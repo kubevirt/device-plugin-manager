@@ -1,5 +1,5 @@
 /*
-Copyright 2018 The Kubernetes Authors.
+Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ import (
 	fakeexampleinternalversion "k8s.io/code-generator/_examples/apiserver/clientset/internalversion/typed/example/internalversion/fake"
 	secondexampleinternalversion "k8s.io/code-generator/_examples/apiserver/clientset/internalversion/typed/example2/internalversion"
 	fakesecondexampleinternalversion "k8s.io/code-generator/_examples/apiserver/clientset/internalversion/typed/example2/internalversion/fake"
+	thirdexampleinternalversion "k8s.io/code-generator/_examples/apiserver/clientset/internalversion/typed/example3.io/internalversion"
+	fakethirdexampleinternalversion "k8s.io/code-generator/_examples/apiserver/clientset/internalversion/typed/example3.io/internalversion/fake"
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.
@@ -43,9 +45,10 @@ func NewSimpleClientset(objects ...runtime.Object) *Clientset {
 		}
 	}
 
-	fakePtr := testing.Fake{}
-	fakePtr.AddReactor("*", "*", testing.ObjectReaction(o))
-	fakePtr.AddWatchReactor("*", func(action testing.Action) (handled bool, ret watch.Interface, err error) {
+	cs := &Clientset{tracker: o}
+	cs.discovery = &fakediscovery.FakeDiscovery{Fake: &cs.Fake}
+	cs.AddReactor("*", "*", testing.ObjectReaction(o))
+	cs.AddWatchReactor("*", func(action testing.Action) (handled bool, ret watch.Interface, err error) {
 		gvr := action.GetResource()
 		ns := action.GetNamespace()
 		watch, err := o.Watch(gvr, ns)
@@ -55,7 +58,7 @@ func NewSimpleClientset(objects ...runtime.Object) *Clientset {
 		return true, watch, nil
 	})
 
-	return &Clientset{fakePtr, &fakediscovery.FakeDiscovery{Fake: &fakePtr}}
+	return cs
 }
 
 // Clientset implements clientset.Interface. Meant to be embedded into a
@@ -64,10 +67,15 @@ func NewSimpleClientset(objects ...runtime.Object) *Clientset {
 type Clientset struct {
 	testing.Fake
 	discovery *fakediscovery.FakeDiscovery
+	tracker   testing.ObjectTracker
 }
 
 func (c *Clientset) Discovery() discovery.DiscoveryInterface {
 	return c.discovery
+}
+
+func (c *Clientset) Tracker() testing.ObjectTracker {
+	return c.tracker
 }
 
 var _ clientset.Interface = &Clientset{}
@@ -80,4 +88,9 @@ func (c *Clientset) Example() exampleinternalversion.ExampleInterface {
 // SecondExample retrieves the SecondExampleClient
 func (c *Clientset) SecondExample() secondexampleinternalversion.SecondExampleInterface {
 	return &fakesecondexampleinternalversion.FakeSecondExample{Fake: &c.Fake}
+}
+
+// ThirdExample retrieves the ThirdExampleClient
+func (c *Clientset) ThirdExample() thirdexampleinternalversion.ThirdExampleInterface {
+	return &fakethirdexampleinternalversion.FakeThirdExample{Fake: &c.Fake}
 }

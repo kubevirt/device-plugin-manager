@@ -17,13 +17,16 @@ limitations under the License.
 package predicates
 
 import (
-	"github.com/golang/glog"
+	"strings"
+
 	"k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	storagev1beta1 "k8s.io/api/storage/v1beta1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/kubernetes/pkg/scheduler/algorithm"
-	schedutil "k8s.io/kubernetes/pkg/scheduler/util"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	csilibplugins "k8s.io/csi-translation-lib/plugins"
+	"k8s.io/kubernetes/pkg/features"
+	schedulernodeinfo "k8s.io/kubernetes/pkg/scheduler/nodeinfo"
 )
 
 // FindLabelsInSet gets as many key/value pairs as possible out of a label set.
@@ -70,72 +73,9 @@ func CreateSelectorFromLabels(aL map[string]string) labels.Selector {
 	return labels.Set(aL).AsSelector()
 }
 
-// EquivalencePodGenerator is a generator of equivalence class for pod with consideration of PVC info.
-type EquivalencePodGenerator struct {
-	pvcInfo PersistentVolumeClaimInfo
-}
-
-// NewEquivalencePodGenerator returns a getEquivalencePod method with consideration of PVC info.
-func NewEquivalencePodGenerator(pvcInfo PersistentVolumeClaimInfo) algorithm.GetEquivalencePodFunc {
-	g := &EquivalencePodGenerator{
-		pvcInfo: pvcInfo,
-	}
-	return g.getEquivalencePod
-}
-
-// GetEquivalencePod returns a EquivalencePod which contains a group of pod attributes which can be reused.
-func (e *EquivalencePodGenerator) getEquivalencePod(pod *v1.Pod) interface{} {
-	// For now we only consider pods:
-	// 1. OwnerReferences is Controller
-	// 2. with same OwnerReferences
-	// 3. with same PVC claim
-	// to be equivalent
-	for _, ref := range pod.OwnerReferences {
-		if ref.Controller != nil && *ref.Controller {
-			pvcSet, err := e.getPVCSet(pod)
-			if err == nil {
-				// A pod can only belongs to one controller, so let's return.
-				return &EquivalencePod{
-					ControllerRef: ref,
-					PVCSet:        pvcSet,
-				}
-			}
-
-			// If error encountered, log warning and return nil (i.e. no equivalent pod found)
-			glog.Warningf("[EquivalencePodGenerator] for pod: %v failed due to: %v", pod.GetName(), err)
-			return nil
-		}
-	}
-	return nil
-}
-
-// getPVCSet returns a set of PVC UIDs of given pod.
-func (e *EquivalencePodGenerator) getPVCSet(pod *v1.Pod) (sets.String, error) {
-	result := sets.NewString()
-	for _, volume := range pod.Spec.Volumes {
-		if volume.PersistentVolumeClaim == nil {
-			continue
-		}
-		pvcName := volume.PersistentVolumeClaim.ClaimName
-		pvc, err := e.pvcInfo.GetPersistentVolumeClaimInfo(pod.GetNamespace(), pvcName)
-		if err != nil {
-			return nil, err
-		}
-		result.Insert(string(pvc.UID))
-	}
-
-	return result, nil
-}
-
-// EquivalencePod is a group of pod attributes which can be reused as equivalence to schedule other pods.
-type EquivalencePod struct {
-	ControllerRef metav1.OwnerReference
-	PVCSet        sets.String
-}
-
 // portsConflict check whether existingPorts and wantPorts conflict with each other
 // return true if we have a conflict
-func portsConflict(existingPorts schedutil.HostPortInfo, wantPorts []*v1.ContainerPort) bool {
+func portsConflict(existingPorts schedulernodeinfo.HostPortInfo, wantPorts []*v1.ContainerPort) bool {
 	for _, cp := range wantPorts {
 		if existingPorts.CheckConflict(cp.HostIP, string(cp.Protocol), cp.HostPort) {
 			return true
@@ -143,4 +83,67 @@ func portsConflict(existingPorts schedutil.HostPortInfo, wantPorts []*v1.Contain
 	}
 
 	return false
+}
+
+// SetPredicatesOrderingDuringTest sets the predicatesOrdering to the specified
+// value, and returns a function that restores the original value.
+func SetPredicatesOrderingDuringTest(value []string) func() {
+	origVal := predicatesOrdering
+	predicatesOrdering = value
+	return func() {
+		predicatesOrdering = origVal
+	}
+}
+
+// isCSIMigrationOn returns a boolean value indicating whether
+// the CSI migration has been enabled for a particular storage plugin.
+func isCSIMigrationOn(csiNode *storagev1beta1.CSINode, pluginName string) bool {
+	if csiNode == nil || len(pluginName) == 0 {
+		return false
+	}
+
+	// In-tree storage to CSI driver migration feature should be enabled,
+	// along with the plugin-specific one
+	if !utilfeature.DefaultFeatureGate.Enabled(features.CSIMigration) {
+		return false
+	}
+
+	switch pluginName {
+	case csilibplugins.AWSEBSInTreePluginName:
+		if !utilfeature.DefaultFeatureGate.Enabled(features.CSIMigrationAWS) {
+			return false
+		}
+	case csilibplugins.GCEPDInTreePluginName:
+		if !utilfeature.DefaultFeatureGate.Enabled(features.CSIMigrationGCE) {
+			return false
+		}
+	case csilibplugins.AzureDiskInTreePluginName:
+		if !utilfeature.DefaultFeatureGate.Enabled(features.CSIMigrationAzureDisk) {
+			return false
+		}
+	case csilibplugins.CinderInTreePluginName:
+		if !utilfeature.DefaultFeatureGate.Enabled(features.CSIMigrationOpenStack) {
+			return false
+		}
+	default:
+		return false
+	}
+
+	// The plugin name should be listed in the CSINode object annotation.
+	// This indicates that the plugin has been migrated to a CSI driver in the node.
+	csiNodeAnn := csiNode.GetAnnotations()
+	if csiNodeAnn == nil {
+		return false
+	}
+
+	var mpaSet sets.String
+	mpa := csiNodeAnn[v1.MigratedPluginsAnnotationKey]
+	if len(mpa) == 0 {
+		mpaSet = sets.NewString()
+	} else {
+		tok := strings.Split(mpa, ",")
+		mpaSet = sets.NewString(tok...)
+	}
+
+	return mpaSet.Has(pluginName)
 }

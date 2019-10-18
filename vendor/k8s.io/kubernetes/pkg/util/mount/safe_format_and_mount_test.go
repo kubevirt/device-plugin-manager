@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"os"
 	"runtime"
+	"strings"
 	"testing"
 
 	fakeexec "k8s.io/utils/exec/testing"
@@ -83,7 +84,7 @@ func TestSafeFormatAndMount(t *testing.T) {
 			execScripts: []ExecArgs{
 				{"fsck", []string{"-a", "/dev/foo"}, "", &fakeexec.FakeExitError{Status: 4}},
 			},
-			expectedError: fmt.Errorf("'fsck' found errors on device /dev/foo but could not correct them: ."),
+			expectedError: fmt.Errorf("'fsck' found errors on device /dev/foo but could not correct them"),
 		},
 		{
 			description: "Test 'fsck' fails with exit status 1 (errors found and corrected)",
@@ -116,7 +117,7 @@ func TestSafeFormatAndMount(t *testing.T) {
 			execScripts: []ExecArgs{
 				{"fsck", []string{"-a", "/dev/foo"}, "", nil},
 				{"blkid", []string{"-p", "-s", "TYPE", "-s", "PTTYPE", "-o", "export", "/dev/foo"}, "", &fakeexec.FakeExitError{Status: 2}},
-				{"mkfs.ext4", []string{"-F", "/dev/foo"}, "", fmt.Errorf("formatting failed")},
+				{"mkfs.ext4", []string{"-F", "-m0", "/dev/foo"}, "", fmt.Errorf("formatting failed")},
 			},
 			expectedError: fmt.Errorf("formatting failed"),
 		},
@@ -127,7 +128,7 @@ func TestSafeFormatAndMount(t *testing.T) {
 			execScripts: []ExecArgs{
 				{"fsck", []string{"-a", "/dev/foo"}, "", nil},
 				{"blkid", []string{"-p", "-s", "TYPE", "-s", "PTTYPE", "-o", "export", "/dev/foo"}, "", &fakeexec.FakeExitError{Status: 2}},
-				{"mkfs.ext4", []string{"-F", "/dev/foo"}, "", nil},
+				{"mkfs.ext4", []string{"-F", "-m0", "/dev/foo"}, "", nil},
 			},
 			expectedError: fmt.Errorf("Still cannot mount"),
 		},
@@ -138,7 +139,7 @@ func TestSafeFormatAndMount(t *testing.T) {
 			execScripts: []ExecArgs{
 				{"fsck", []string{"-a", "/dev/foo"}, "", nil},
 				{"blkid", []string{"-p", "-s", "TYPE", "-s", "PTTYPE", "-o", "export", "/dev/foo"}, "", &fakeexec.FakeExitError{Status: 2}},
-				{"mkfs.ext4", []string{"-F", "/dev/foo"}, "", nil},
+				{"mkfs.ext4", []string{"-F", "-m0", "/dev/foo"}, "", nil},
 			},
 			expectedError: nil,
 		},
@@ -149,7 +150,7 @@ func TestSafeFormatAndMount(t *testing.T) {
 			execScripts: []ExecArgs{
 				{"fsck", []string{"-a", "/dev/foo"}, "", nil},
 				{"blkid", []string{"-p", "-s", "TYPE", "-s", "PTTYPE", "-o", "export", "/dev/foo"}, "", &fakeexec.FakeExitError{Status: 2}},
-				{"mkfs.ext3", []string{"-F", "/dev/foo"}, "", nil},
+				{"mkfs.ext3", []string{"-F", "-m0", "/dev/foo"}, "", nil},
 			},
 			expectedError: nil,
 		},
@@ -234,7 +235,7 @@ func TestSafeFormatAndMount(t *testing.T) {
 				t.Errorf("test \"%s\" the correct device was not mounted", test.description)
 			}
 		} else {
-			if err == nil || test.expectedError.Error() != err.Error() {
+			if err == nil || !strings.HasPrefix(err.Error(), test.expectedError.Error()) {
 				t.Errorf("test \"%s\" unexpected error: \n          [%v]. \nExpecting [%v]", test.description, err, test.expectedError)
 			}
 		}

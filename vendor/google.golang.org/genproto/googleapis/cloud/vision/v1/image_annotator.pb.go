@@ -3,23 +3,34 @@
 
 package vision
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import _ "google.golang.org/genproto/googleapis/api/annotations"
-import google_rpc "google.golang.org/genproto/googleapis/rpc/status"
-import google_type "google.golang.org/genproto/googleapis/type/color"
-import google_type1 "google.golang.org/genproto/googleapis/type/latlng"
-
 import (
-	context "golang.org/x/net/context"
+	context "context"
+	fmt "fmt"
+	math "math"
+
+	proto "github.com/golang/protobuf/proto"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
+	longrunning "google.golang.org/genproto/googleapis/longrunning"
+	status "google.golang.org/genproto/googleapis/rpc/status"
+	color "google.golang.org/genproto/googleapis/type/color"
+	latlng "google.golang.org/genproto/googleapis/type/latlng"
+	_ "google.golang.org/genproto/protobuf/field_mask"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status1 "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the proto package it is being compiled against.
+// A compilation error at this line likely means your copy of the
+// proto package needs to be updated.
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // A bucketized representation of likelihood, which is intended to give clients
 // highly stable results across model upgrades.
@@ -28,15 +39,15 @@ type Likelihood int32
 const (
 	// Unknown likelihood.
 	Likelihood_UNKNOWN Likelihood = 0
-	// It is very unlikely that the image belongs to the specified vertical.
+	// It is very unlikely.
 	Likelihood_VERY_UNLIKELY Likelihood = 1
-	// It is unlikely that the image belongs to the specified vertical.
+	// It is unlikely.
 	Likelihood_UNLIKELY Likelihood = 2
-	// It is possible that the image belongs to the specified vertical.
+	// It is possible.
 	Likelihood_POSSIBLE Likelihood = 3
-	// It is likely that the image belongs to the specified vertical.
+	// It is likely.
 	Likelihood_LIKELY Likelihood = 4
-	// It is very likely that the image belongs to the specified vertical.
+	// It is very likely.
 	Likelihood_VERY_LIKELY Likelihood = 5
 )
 
@@ -48,6 +59,7 @@ var Likelihood_name = map[int32]string{
 	4: "LIKELY",
 	5: "VERY_LIKELY",
 }
+
 var Likelihood_value = map[string]int32{
 	"UNKNOWN":       0,
 	"VERY_UNLIKELY": 1,
@@ -60,7 +72,10 @@ var Likelihood_value = map[string]int32{
 func (x Likelihood) String() string {
 	return proto.EnumName(Likelihood_name, int32(x))
 }
-func (Likelihood) EnumDescriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
+
+func (Likelihood) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{0}
+}
 
 // Type of Google Cloud Vision API feature to be extracted.
 type Feature_Type int32
@@ -93,6 +108,10 @@ const (
 	Feature_CROP_HINTS Feature_Type = 9
 	// Run web detection.
 	Feature_WEB_DETECTION Feature_Type = 10
+	// Run Product Search.
+	Feature_PRODUCT_SEARCH Feature_Type = 12
+	// Run localizer for object detection.
+	Feature_OBJECT_LOCALIZATION Feature_Type = 19
 )
 
 var Feature_Type_name = map[int32]string{
@@ -107,7 +126,10 @@ var Feature_Type_name = map[int32]string{
 	7:  "IMAGE_PROPERTIES",
 	9:  "CROP_HINTS",
 	10: "WEB_DETECTION",
+	12: "PRODUCT_SEARCH",
+	19: "OBJECT_LOCALIZATION",
 }
+
 var Feature_Type_value = map[string]int32{
 	"TYPE_UNSPECIFIED":        0,
 	"FACE_DETECTION":          1,
@@ -120,12 +142,17 @@ var Feature_Type_value = map[string]int32{
 	"IMAGE_PROPERTIES":        7,
 	"CROP_HINTS":              9,
 	"WEB_DETECTION":           10,
+	"PRODUCT_SEARCH":          12,
+	"OBJECT_LOCALIZATION":     19,
 }
 
 func (x Feature_Type) String() string {
 	return proto.EnumName(Feature_Type_name, int32(x))
 }
-func (Feature_Type) EnumDescriptor() ([]byte, []int) { return fileDescriptor1, []int{0, 0} }
+
+func (Feature_Type) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{0, 0}
+}
 
 // Face landmark (feature) type.
 // Left and right are defined from the vantage of the viewer of the image
@@ -243,6 +270,7 @@ var FaceAnnotation_Landmark_Type_name = map[int32]string{
 	33: "CHIN_LEFT_GONION",
 	34: "CHIN_RIGHT_GONION",
 }
+
 var FaceAnnotation_Landmark_Type_value = map[string]int32{
 	"UNKNOWN_LANDMARK":             0,
 	"LEFT_EYE":                     1,
@@ -284,8 +312,49 @@ var FaceAnnotation_Landmark_Type_value = map[string]int32{
 func (x FaceAnnotation_Landmark_Type) String() string {
 	return proto.EnumName(FaceAnnotation_Landmark_Type_name, int32(x))
 }
+
 func (FaceAnnotation_Landmark_Type) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor1, []int{3, 0, 0}
+	return fileDescriptor_49e74116a4d6fd69, []int{3, 0, 0}
+}
+
+// Batch operation states.
+type OperationMetadata_State int32
+
+const (
+	// Invalid.
+	OperationMetadata_STATE_UNSPECIFIED OperationMetadata_State = 0
+	// Request is received.
+	OperationMetadata_CREATED OperationMetadata_State = 1
+	// Request is actively being processed.
+	OperationMetadata_RUNNING OperationMetadata_State = 2
+	// The batch processing is done.
+	OperationMetadata_DONE OperationMetadata_State = 3
+	// The batch processing was cancelled.
+	OperationMetadata_CANCELLED OperationMetadata_State = 4
+)
+
+var OperationMetadata_State_name = map[int32]string{
+	0: "STATE_UNSPECIFIED",
+	1: "CREATED",
+	2: "RUNNING",
+	3: "DONE",
+	4: "CANCELLED",
+}
+
+var OperationMetadata_State_value = map[string]int32{
+	"STATE_UNSPECIFIED": 0,
+	"CREATED":           1,
+	"RUNNING":           2,
+	"DONE":              3,
+	"CANCELLED":         4,
+}
+
+func (x OperationMetadata_State) String() string {
+	return proto.EnumName(OperationMetadata_State_name, int32(x))
+}
+
+func (OperationMetadata_State) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{37, 0}
 }
 
 // The type of Google Cloud Vision API detection to perform, and the maximum
@@ -293,20 +362,43 @@ func (FaceAnnotation_Landmark_Type) EnumDescriptor() ([]byte, []int) {
 // be specified in the `features` list.
 type Feature struct {
 	// The feature type.
-	Type Feature_Type `protobuf:"varint,1,opt,name=type,enum=google.cloud.vision.v1.Feature_Type" json:"type,omitempty"`
+	Type Feature_Type `protobuf:"varint,1,opt,name=type,proto3,enum=google.cloud.vision.v1.Feature_Type" json:"type,omitempty"`
 	// Maximum number of results of this type. Does not apply to
 	// `TEXT_DETECTION`, `DOCUMENT_TEXT_DETECTION`, or `CROP_HINTS`.
-	MaxResults int32 `protobuf:"varint,2,opt,name=max_results,json=maxResults" json:"max_results,omitempty"`
+	MaxResults int32 `protobuf:"varint,2,opt,name=max_results,json=maxResults,proto3" json:"max_results,omitempty"`
 	// Model to use for the feature.
 	// Supported values: "builtin/stable" (the default if unset) and
 	// "builtin/latest".
-	Model string `protobuf:"bytes,3,opt,name=model" json:"model,omitempty"`
+	Model                string   `protobuf:"bytes,3,opt,name=model,proto3" json:"model,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Feature) Reset()                    { *m = Feature{} }
-func (m *Feature) String() string            { return proto.CompactTextString(m) }
-func (*Feature) ProtoMessage()               {}
-func (*Feature) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
+func (m *Feature) Reset()         { *m = Feature{} }
+func (m *Feature) String() string { return proto.CompactTextString(m) }
+func (*Feature) ProtoMessage()    {}
+func (*Feature) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{0}
+}
+
+func (m *Feature) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Feature.Unmarshal(m, b)
+}
+func (m *Feature) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Feature.Marshal(b, m, deterministic)
+}
+func (m *Feature) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Feature.Merge(m, src)
+}
+func (m *Feature) XXX_Size() int {
+	return xxx_messageInfo_Feature.Size(m)
+}
+func (m *Feature) XXX_DiscardUnknown() {
+	xxx_messageInfo_Feature.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Feature proto.InternalMessageInfo
 
 func (m *Feature) GetType() Feature_Type {
 	if m != nil {
@@ -337,7 +429,7 @@ type ImageSource struct {
 	// `gs://bucket_name/object_name`. Object versioning is not supported. See
 	// [Google Cloud Storage Request
 	// URIs](https://cloud.google.com/storage/docs/reference-uris) for more info.
-	GcsImageUri string `protobuf:"bytes,1,opt,name=gcs_image_uri,json=gcsImageUri" json:"gcs_image_uri,omitempty"`
+	GcsImageUri string `protobuf:"bytes,1,opt,name=gcs_image_uri,json=gcsImageUri,proto3" json:"gcs_image_uri,omitempty"`
 	// The URI of the source image. Can be either:
 	//
 	// 1. A Google Cloud Storage URI of the form
@@ -355,13 +447,36 @@ type ImageSource struct {
 	//
 	// When both `gcs_image_uri` and `image_uri` are specified, `image_uri` takes
 	// precedence.
-	ImageUri string `protobuf:"bytes,2,opt,name=image_uri,json=imageUri" json:"image_uri,omitempty"`
+	ImageUri             string   `protobuf:"bytes,2,opt,name=image_uri,json=imageUri,proto3" json:"image_uri,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ImageSource) Reset()                    { *m = ImageSource{} }
-func (m *ImageSource) String() string            { return proto.CompactTextString(m) }
-func (*ImageSource) ProtoMessage()               {}
-func (*ImageSource) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{1} }
+func (m *ImageSource) Reset()         { *m = ImageSource{} }
+func (m *ImageSource) String() string { return proto.CompactTextString(m) }
+func (*ImageSource) ProtoMessage()    {}
+func (*ImageSource) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{1}
+}
+
+func (m *ImageSource) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ImageSource.Unmarshal(m, b)
+}
+func (m *ImageSource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ImageSource.Marshal(b, m, deterministic)
+}
+func (m *ImageSource) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ImageSource.Merge(m, src)
+}
+func (m *ImageSource) XXX_Size() int {
+	return xxx_messageInfo_ImageSource.Size(m)
+}
+func (m *ImageSource) XXX_DiscardUnknown() {
+	xxx_messageInfo_ImageSource.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ImageSource proto.InternalMessageInfo
 
 func (m *ImageSource) GetGcsImageUri() string {
 	if m != nil {
@@ -386,13 +501,36 @@ type Image struct {
 	// Google Cloud Storage image location, or publicly-accessible image
 	// URL. If both `content` and `source` are provided for an image, `content`
 	// takes precedence and is used to perform the image annotation request.
-	Source *ImageSource `protobuf:"bytes,2,opt,name=source" json:"source,omitempty"`
+	Source               *ImageSource `protobuf:"bytes,2,opt,name=source,proto3" json:"source,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
 }
 
-func (m *Image) Reset()                    { *m = Image{} }
-func (m *Image) String() string            { return proto.CompactTextString(m) }
-func (*Image) ProtoMessage()               {}
-func (*Image) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{2} }
+func (m *Image) Reset()         { *m = Image{} }
+func (m *Image) String() string { return proto.CompactTextString(m) }
+func (*Image) ProtoMessage()    {}
+func (*Image) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{2}
+}
+
+func (m *Image) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Image.Unmarshal(m, b)
+}
+func (m *Image) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Image.Marshal(b, m, deterministic)
+}
+func (m *Image) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Image.Merge(m, src)
+}
+func (m *Image) XXX_Size() int {
+	return xxx_messageInfo_Image.Size(m)
+}
+func (m *Image) XXX_DiscardUnknown() {
+	xxx_messageInfo_Image.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Image proto.InternalMessageInfo
 
 func (m *Image) GetContent() []byte {
 	if m != nil {
@@ -411,57 +549,80 @@ func (m *Image) GetSource() *ImageSource {
 // A face annotation object contains the results of face detection.
 type FaceAnnotation struct {
 	// The bounding polygon around the face. The coordinates of the bounding box
-	// are in the original image's scale, as returned in `ImageParams`.
+	// are in the original image's scale.
 	// The bounding box is computed to "frame" the face in accordance with human
 	// expectations. It is based on the landmarker results.
 	// Note that one or more x and/or y coordinates may not be generated in the
 	// `BoundingPoly` (the polygon will be unbounded) if only a partial face
 	// appears in the image to be annotated.
-	BoundingPoly *BoundingPoly `protobuf:"bytes,1,opt,name=bounding_poly,json=boundingPoly" json:"bounding_poly,omitempty"`
+	BoundingPoly *BoundingPoly `protobuf:"bytes,1,opt,name=bounding_poly,json=boundingPoly,proto3" json:"bounding_poly,omitempty"`
 	// The `fd_bounding_poly` bounding polygon is tighter than the
 	// `boundingPoly`, and encloses only the skin part of the face. Typically, it
 	// is used to eliminate the face from any image analysis that detects the
 	// "amount of skin" visible in an image. It is not based on the
 	// landmarker results, only on the initial face detection, hence
 	// the <code>fd</code> (face detection) prefix.
-	FdBoundingPoly *BoundingPoly `protobuf:"bytes,2,opt,name=fd_bounding_poly,json=fdBoundingPoly" json:"fd_bounding_poly,omitempty"`
+	FdBoundingPoly *BoundingPoly `protobuf:"bytes,2,opt,name=fd_bounding_poly,json=fdBoundingPoly,proto3" json:"fd_bounding_poly,omitempty"`
 	// Detected face landmarks.
-	Landmarks []*FaceAnnotation_Landmark `protobuf:"bytes,3,rep,name=landmarks" json:"landmarks,omitempty"`
+	Landmarks []*FaceAnnotation_Landmark `protobuf:"bytes,3,rep,name=landmarks,proto3" json:"landmarks,omitempty"`
 	// Roll angle, which indicates the amount of clockwise/anti-clockwise rotation
 	// of the face relative to the image vertical about the axis perpendicular to
 	// the face. Range [-180,180].
-	RollAngle float32 `protobuf:"fixed32,4,opt,name=roll_angle,json=rollAngle" json:"roll_angle,omitempty"`
+	RollAngle float32 `protobuf:"fixed32,4,opt,name=roll_angle,json=rollAngle,proto3" json:"roll_angle,omitempty"`
 	// Yaw angle, which indicates the leftward/rightward angle that the face is
 	// pointing relative to the vertical plane perpendicular to the image. Range
 	// [-180,180].
-	PanAngle float32 `protobuf:"fixed32,5,opt,name=pan_angle,json=panAngle" json:"pan_angle,omitempty"`
+	PanAngle float32 `protobuf:"fixed32,5,opt,name=pan_angle,json=panAngle,proto3" json:"pan_angle,omitempty"`
 	// Pitch angle, which indicates the upwards/downwards angle that the face is
 	// pointing relative to the image's horizontal plane. Range [-180,180].
-	TiltAngle float32 `protobuf:"fixed32,6,opt,name=tilt_angle,json=tiltAngle" json:"tilt_angle,omitempty"`
+	TiltAngle float32 `protobuf:"fixed32,6,opt,name=tilt_angle,json=tiltAngle,proto3" json:"tilt_angle,omitempty"`
 	// Detection confidence. Range [0, 1].
-	DetectionConfidence float32 `protobuf:"fixed32,7,opt,name=detection_confidence,json=detectionConfidence" json:"detection_confidence,omitempty"`
+	DetectionConfidence float32 `protobuf:"fixed32,7,opt,name=detection_confidence,json=detectionConfidence,proto3" json:"detection_confidence,omitempty"`
 	// Face landmarking confidence. Range [0, 1].
-	LandmarkingConfidence float32 `protobuf:"fixed32,8,opt,name=landmarking_confidence,json=landmarkingConfidence" json:"landmarking_confidence,omitempty"`
+	LandmarkingConfidence float32 `protobuf:"fixed32,8,opt,name=landmarking_confidence,json=landmarkingConfidence,proto3" json:"landmarking_confidence,omitempty"`
 	// Joy likelihood.
-	JoyLikelihood Likelihood `protobuf:"varint,9,opt,name=joy_likelihood,json=joyLikelihood,enum=google.cloud.vision.v1.Likelihood" json:"joy_likelihood,omitempty"`
+	JoyLikelihood Likelihood `protobuf:"varint,9,opt,name=joy_likelihood,json=joyLikelihood,proto3,enum=google.cloud.vision.v1.Likelihood" json:"joy_likelihood,omitempty"`
 	// Sorrow likelihood.
-	SorrowLikelihood Likelihood `protobuf:"varint,10,opt,name=sorrow_likelihood,json=sorrowLikelihood,enum=google.cloud.vision.v1.Likelihood" json:"sorrow_likelihood,omitempty"`
+	SorrowLikelihood Likelihood `protobuf:"varint,10,opt,name=sorrow_likelihood,json=sorrowLikelihood,proto3,enum=google.cloud.vision.v1.Likelihood" json:"sorrow_likelihood,omitempty"`
 	// Anger likelihood.
-	AngerLikelihood Likelihood `protobuf:"varint,11,opt,name=anger_likelihood,json=angerLikelihood,enum=google.cloud.vision.v1.Likelihood" json:"anger_likelihood,omitempty"`
+	AngerLikelihood Likelihood `protobuf:"varint,11,opt,name=anger_likelihood,json=angerLikelihood,proto3,enum=google.cloud.vision.v1.Likelihood" json:"anger_likelihood,omitempty"`
 	// Surprise likelihood.
-	SurpriseLikelihood Likelihood `protobuf:"varint,12,opt,name=surprise_likelihood,json=surpriseLikelihood,enum=google.cloud.vision.v1.Likelihood" json:"surprise_likelihood,omitempty"`
+	SurpriseLikelihood Likelihood `protobuf:"varint,12,opt,name=surprise_likelihood,json=surpriseLikelihood,proto3,enum=google.cloud.vision.v1.Likelihood" json:"surprise_likelihood,omitempty"`
 	// Under-exposed likelihood.
-	UnderExposedLikelihood Likelihood `protobuf:"varint,13,opt,name=under_exposed_likelihood,json=underExposedLikelihood,enum=google.cloud.vision.v1.Likelihood" json:"under_exposed_likelihood,omitempty"`
+	UnderExposedLikelihood Likelihood `protobuf:"varint,13,opt,name=under_exposed_likelihood,json=underExposedLikelihood,proto3,enum=google.cloud.vision.v1.Likelihood" json:"under_exposed_likelihood,omitempty"`
 	// Blurred likelihood.
-	BlurredLikelihood Likelihood `protobuf:"varint,14,opt,name=blurred_likelihood,json=blurredLikelihood,enum=google.cloud.vision.v1.Likelihood" json:"blurred_likelihood,omitempty"`
+	BlurredLikelihood Likelihood `protobuf:"varint,14,opt,name=blurred_likelihood,json=blurredLikelihood,proto3,enum=google.cloud.vision.v1.Likelihood" json:"blurred_likelihood,omitempty"`
 	// Headwear likelihood.
-	HeadwearLikelihood Likelihood `protobuf:"varint,15,opt,name=headwear_likelihood,json=headwearLikelihood,enum=google.cloud.vision.v1.Likelihood" json:"headwear_likelihood,omitempty"`
+	HeadwearLikelihood   Likelihood `protobuf:"varint,15,opt,name=headwear_likelihood,json=headwearLikelihood,proto3,enum=google.cloud.vision.v1.Likelihood" json:"headwear_likelihood,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
 }
 
-func (m *FaceAnnotation) Reset()                    { *m = FaceAnnotation{} }
-func (m *FaceAnnotation) String() string            { return proto.CompactTextString(m) }
-func (*FaceAnnotation) ProtoMessage()               {}
-func (*FaceAnnotation) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{3} }
+func (m *FaceAnnotation) Reset()         { *m = FaceAnnotation{} }
+func (m *FaceAnnotation) String() string { return proto.CompactTextString(m) }
+func (*FaceAnnotation) ProtoMessage()    {}
+func (*FaceAnnotation) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{3}
+}
+
+func (m *FaceAnnotation) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FaceAnnotation.Unmarshal(m, b)
+}
+func (m *FaceAnnotation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FaceAnnotation.Marshal(b, m, deterministic)
+}
+func (m *FaceAnnotation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FaceAnnotation.Merge(m, src)
+}
+func (m *FaceAnnotation) XXX_Size() int {
+	return xxx_messageInfo_FaceAnnotation.Size(m)
+}
+func (m *FaceAnnotation) XXX_DiscardUnknown() {
+	xxx_messageInfo_FaceAnnotation.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FaceAnnotation proto.InternalMessageInfo
 
 func (m *FaceAnnotation) GetBoundingPoly() *BoundingPoly {
 	if m != nil {
@@ -571,15 +732,38 @@ func (m *FaceAnnotation) GetHeadwearLikelihood() Likelihood {
 // A face-specific landmark (for example, a face feature).
 type FaceAnnotation_Landmark struct {
 	// Face landmark type.
-	Type FaceAnnotation_Landmark_Type `protobuf:"varint,3,opt,name=type,enum=google.cloud.vision.v1.FaceAnnotation_Landmark_Type" json:"type,omitempty"`
+	Type FaceAnnotation_Landmark_Type `protobuf:"varint,3,opt,name=type,proto3,enum=google.cloud.vision.v1.FaceAnnotation_Landmark_Type" json:"type,omitempty"`
 	// Face landmark position.
-	Position *Position `protobuf:"bytes,4,opt,name=position" json:"position,omitempty"`
+	Position             *Position `protobuf:"bytes,4,opt,name=position,proto3" json:"position,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
 }
 
-func (m *FaceAnnotation_Landmark) Reset()                    { *m = FaceAnnotation_Landmark{} }
-func (m *FaceAnnotation_Landmark) String() string            { return proto.CompactTextString(m) }
-func (*FaceAnnotation_Landmark) ProtoMessage()               {}
-func (*FaceAnnotation_Landmark) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{3, 0} }
+func (m *FaceAnnotation_Landmark) Reset()         { *m = FaceAnnotation_Landmark{} }
+func (m *FaceAnnotation_Landmark) String() string { return proto.CompactTextString(m) }
+func (*FaceAnnotation_Landmark) ProtoMessage()    {}
+func (*FaceAnnotation_Landmark) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{3, 0}
+}
+
+func (m *FaceAnnotation_Landmark) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FaceAnnotation_Landmark.Unmarshal(m, b)
+}
+func (m *FaceAnnotation_Landmark) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FaceAnnotation_Landmark.Marshal(b, m, deterministic)
+}
+func (m *FaceAnnotation_Landmark) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FaceAnnotation_Landmark.Merge(m, src)
+}
+func (m *FaceAnnotation_Landmark) XXX_Size() int {
+	return xxx_messageInfo_FaceAnnotation_Landmark.Size(m)
+}
+func (m *FaceAnnotation_Landmark) XXX_DiscardUnknown() {
+	xxx_messageInfo_FaceAnnotation_Landmark.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FaceAnnotation_Landmark proto.InternalMessageInfo
 
 func (m *FaceAnnotation_Landmark) GetType() FaceAnnotation_Landmark_Type {
 	if m != nil {
@@ -598,15 +782,38 @@ func (m *FaceAnnotation_Landmark) GetPosition() *Position {
 // Detected entity location information.
 type LocationInfo struct {
 	// lat/long location coordinates.
-	LatLng *google_type1.LatLng `protobuf:"bytes,1,opt,name=lat_lng,json=latLng" json:"lat_lng,omitempty"`
+	LatLng               *latlng.LatLng `protobuf:"bytes,1,opt,name=lat_lng,json=latLng,proto3" json:"lat_lng,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
-func (m *LocationInfo) Reset()                    { *m = LocationInfo{} }
-func (m *LocationInfo) String() string            { return proto.CompactTextString(m) }
-func (*LocationInfo) ProtoMessage()               {}
-func (*LocationInfo) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{4} }
+func (m *LocationInfo) Reset()         { *m = LocationInfo{} }
+func (m *LocationInfo) String() string { return proto.CompactTextString(m) }
+func (*LocationInfo) ProtoMessage()    {}
+func (*LocationInfo) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{4}
+}
 
-func (m *LocationInfo) GetLatLng() *google_type1.LatLng {
+func (m *LocationInfo) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_LocationInfo.Unmarshal(m, b)
+}
+func (m *LocationInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_LocationInfo.Marshal(b, m, deterministic)
+}
+func (m *LocationInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_LocationInfo.Merge(m, src)
+}
+func (m *LocationInfo) XXX_Size() int {
+	return xxx_messageInfo_LocationInfo.Size(m)
+}
+func (m *LocationInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_LocationInfo.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_LocationInfo proto.InternalMessageInfo
+
+func (m *LocationInfo) GetLatLng() *latlng.LatLng {
 	if m != nil {
 		return m.LatLng
 	}
@@ -616,17 +823,40 @@ func (m *LocationInfo) GetLatLng() *google_type1.LatLng {
 // A `Property` consists of a user-supplied name/value pair.
 type Property struct {
 	// Name of the property.
-	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Value of the property.
-	Value string `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
+	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	// Value of numeric properties.
-	Uint64Value uint64 `protobuf:"varint,3,opt,name=uint64_value,json=uint64Value" json:"uint64_value,omitempty"`
+	Uint64Value          uint64   `protobuf:"varint,3,opt,name=uint64_value,json=uint64Value,proto3" json:"uint64_value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Property) Reset()                    { *m = Property{} }
-func (m *Property) String() string            { return proto.CompactTextString(m) }
-func (*Property) ProtoMessage()               {}
-func (*Property) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{5} }
+func (m *Property) Reset()         { *m = Property{} }
+func (m *Property) String() string { return proto.CompactTextString(m) }
+func (*Property) ProtoMessage()    {}
+func (*Property) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{5}
+}
+
+func (m *Property) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Property.Unmarshal(m, b)
+}
+func (m *Property) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Property.Marshal(b, m, deterministic)
+}
+func (m *Property) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Property.Merge(m, src)
+}
+func (m *Property) XXX_Size() int {
+	return xxx_messageInfo_Property.Size(m)
+}
+func (m *Property) XXX_DiscardUnknown() {
+	xxx_messageInfo_Property.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Property proto.InternalMessageInfo
 
 func (m *Property) GetName() string {
 	if m != nil {
@@ -654,44 +884,67 @@ type EntityAnnotation struct {
 	// Opaque entity ID. Some IDs may be available in
 	// [Google Knowledge Graph Search
 	// API](https://developers.google.com/knowledge-graph/).
-	Mid string `protobuf:"bytes,1,opt,name=mid" json:"mid,omitempty"`
+	Mid string `protobuf:"bytes,1,opt,name=mid,proto3" json:"mid,omitempty"`
 	// The language code for the locale in which the entity textual
 	// `description` is expressed.
-	Locale string `protobuf:"bytes,2,opt,name=locale" json:"locale,omitempty"`
+	Locale string `protobuf:"bytes,2,opt,name=locale,proto3" json:"locale,omitempty"`
 	// Entity textual description, expressed in its `locale` language.
-	Description string `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// Overall score of the result. Range [0, 1].
-	Score float32 `protobuf:"fixed32,4,opt,name=score" json:"score,omitempty"`
+	Score float32 `protobuf:"fixed32,4,opt,name=score,proto3" json:"score,omitempty"`
 	// **Deprecated. Use `score` instead.**
 	// The accuracy of the entity detection in an image.
 	// For example, for an image in which the "Eiffel Tower" entity is detected,
 	// this field represents the confidence that there is a tower in the query
 	// image. Range [0, 1].
-	Confidence float32 `protobuf:"fixed32,5,opt,name=confidence" json:"confidence,omitempty"`
+	Confidence float32 `protobuf:"fixed32,5,opt,name=confidence,proto3" json:"confidence,omitempty"` // Deprecated: Do not use.
 	// The relevancy of the ICA (Image Content Annotation) label to the
 	// image. For example, the relevancy of "tower" is likely higher to an image
 	// containing the detected "Eiffel Tower" than to an image containing a
 	// detected distant towering building, even though the confidence that
 	// there is a tower in each image may be the same. Range [0, 1].
-	Topicality float32 `protobuf:"fixed32,6,opt,name=topicality" json:"topicality,omitempty"`
+	Topicality float32 `protobuf:"fixed32,6,opt,name=topicality,proto3" json:"topicality,omitempty"`
 	// Image region to which this entity belongs. Not produced
 	// for `LABEL_DETECTION` features.
-	BoundingPoly *BoundingPoly `protobuf:"bytes,7,opt,name=bounding_poly,json=boundingPoly" json:"bounding_poly,omitempty"`
+	BoundingPoly *BoundingPoly `protobuf:"bytes,7,opt,name=bounding_poly,json=boundingPoly,proto3" json:"bounding_poly,omitempty"`
 	// The location information for the detected entity. Multiple
 	// `LocationInfo` elements can be present because one location may
 	// indicate the location of the scene in the image, and another location
 	// may indicate the location of the place where the image was taken.
 	// Location information is usually present for landmarks.
-	Locations []*LocationInfo `protobuf:"bytes,8,rep,name=locations" json:"locations,omitempty"`
+	Locations []*LocationInfo `protobuf:"bytes,8,rep,name=locations,proto3" json:"locations,omitempty"`
 	// Some entities may have optional user-supplied `Property` (name/value)
 	// fields, such a score or string that qualifies the entity.
-	Properties []*Property `protobuf:"bytes,9,rep,name=properties" json:"properties,omitempty"`
+	Properties           []*Property `protobuf:"bytes,9,rep,name=properties,proto3" json:"properties,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
 }
 
-func (m *EntityAnnotation) Reset()                    { *m = EntityAnnotation{} }
-func (m *EntityAnnotation) String() string            { return proto.CompactTextString(m) }
-func (*EntityAnnotation) ProtoMessage()               {}
-func (*EntityAnnotation) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{6} }
+func (m *EntityAnnotation) Reset()         { *m = EntityAnnotation{} }
+func (m *EntityAnnotation) String() string { return proto.CompactTextString(m) }
+func (*EntityAnnotation) ProtoMessage()    {}
+func (*EntityAnnotation) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{6}
+}
+
+func (m *EntityAnnotation) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_EntityAnnotation.Unmarshal(m, b)
+}
+func (m *EntityAnnotation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_EntityAnnotation.Marshal(b, m, deterministic)
+}
+func (m *EntityAnnotation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EntityAnnotation.Merge(m, src)
+}
+func (m *EntityAnnotation) XXX_Size() int {
+	return xxx_messageInfo_EntityAnnotation.Size(m)
+}
+func (m *EntityAnnotation) XXX_DiscardUnknown() {
+	xxx_messageInfo_EntityAnnotation.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EntityAnnotation proto.InternalMessageInfo
 
 func (m *EntityAnnotation) GetMid() string {
 	if m != nil {
@@ -721,6 +974,7 @@ func (m *EntityAnnotation) GetScore() float32 {
 	return 0
 }
 
+// Deprecated: Do not use.
 func (m *EntityAnnotation) GetConfidence() float32 {
 	if m != nil {
 		return m.Confidence
@@ -756,6 +1010,85 @@ func (m *EntityAnnotation) GetProperties() []*Property {
 	return nil
 }
 
+// Set of detected objects with bounding boxes.
+type LocalizedObjectAnnotation struct {
+	// Object ID that should align with EntityAnnotation mid.
+	Mid string `protobuf:"bytes,1,opt,name=mid,proto3" json:"mid,omitempty"`
+	// The BCP-47 language code, such as "en-US" or "sr-Latn". For more
+	// information, see
+	// http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+	LanguageCode string `protobuf:"bytes,2,opt,name=language_code,json=languageCode,proto3" json:"language_code,omitempty"`
+	// Object name, expressed in its `language_code` language.
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	// Score of the result. Range [0, 1].
+	Score float32 `protobuf:"fixed32,4,opt,name=score,proto3" json:"score,omitempty"`
+	// Image region to which this object belongs. This must be populated.
+	BoundingPoly         *BoundingPoly `protobuf:"bytes,5,opt,name=bounding_poly,json=boundingPoly,proto3" json:"bounding_poly,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
+}
+
+func (m *LocalizedObjectAnnotation) Reset()         { *m = LocalizedObjectAnnotation{} }
+func (m *LocalizedObjectAnnotation) String() string { return proto.CompactTextString(m) }
+func (*LocalizedObjectAnnotation) ProtoMessage()    {}
+func (*LocalizedObjectAnnotation) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{7}
+}
+
+func (m *LocalizedObjectAnnotation) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_LocalizedObjectAnnotation.Unmarshal(m, b)
+}
+func (m *LocalizedObjectAnnotation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_LocalizedObjectAnnotation.Marshal(b, m, deterministic)
+}
+func (m *LocalizedObjectAnnotation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_LocalizedObjectAnnotation.Merge(m, src)
+}
+func (m *LocalizedObjectAnnotation) XXX_Size() int {
+	return xxx_messageInfo_LocalizedObjectAnnotation.Size(m)
+}
+func (m *LocalizedObjectAnnotation) XXX_DiscardUnknown() {
+	xxx_messageInfo_LocalizedObjectAnnotation.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_LocalizedObjectAnnotation proto.InternalMessageInfo
+
+func (m *LocalizedObjectAnnotation) GetMid() string {
+	if m != nil {
+		return m.Mid
+	}
+	return ""
+}
+
+func (m *LocalizedObjectAnnotation) GetLanguageCode() string {
+	if m != nil {
+		return m.LanguageCode
+	}
+	return ""
+}
+
+func (m *LocalizedObjectAnnotation) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *LocalizedObjectAnnotation) GetScore() float32 {
+	if m != nil {
+		return m.Score
+	}
+	return 0
+}
+
+func (m *LocalizedObjectAnnotation) GetBoundingPoly() *BoundingPoly {
+	if m != nil {
+		return m.BoundingPoly
+	}
+	return nil
+}
+
 // Set of features pertaining to the image, computed by computer vision
 // methods over safe-search verticals (for example, adult, spoof, medical,
 // violence).
@@ -763,26 +1096,67 @@ type SafeSearchAnnotation struct {
 	// Represents the adult content likelihood for the image. Adult content may
 	// contain elements such as nudity, pornographic images or cartoons, or
 	// sexual activities.
-	Adult Likelihood `protobuf:"varint,1,opt,name=adult,enum=google.cloud.vision.v1.Likelihood" json:"adult,omitempty"`
+	Adult Likelihood `protobuf:"varint,1,opt,name=adult,proto3,enum=google.cloud.vision.v1.Likelihood" json:"adult,omitempty"`
 	// Spoof likelihood. The likelihood that an modification
 	// was made to the image's canonical version to make it appear
 	// funny or offensive.
-	Spoof Likelihood `protobuf:"varint,2,opt,name=spoof,enum=google.cloud.vision.v1.Likelihood" json:"spoof,omitempty"`
+	Spoof Likelihood `protobuf:"varint,2,opt,name=spoof,proto3,enum=google.cloud.vision.v1.Likelihood" json:"spoof,omitempty"`
 	// Likelihood that this is a medical image.
-	Medical Likelihood `protobuf:"varint,3,opt,name=medical,enum=google.cloud.vision.v1.Likelihood" json:"medical,omitempty"`
+	Medical Likelihood `protobuf:"varint,3,opt,name=medical,proto3,enum=google.cloud.vision.v1.Likelihood" json:"medical,omitempty"`
 	// Likelihood that this image contains violent content.
-	Violence Likelihood `protobuf:"varint,4,opt,name=violence,enum=google.cloud.vision.v1.Likelihood" json:"violence,omitempty"`
+	Violence Likelihood `protobuf:"varint,4,opt,name=violence,proto3,enum=google.cloud.vision.v1.Likelihood" json:"violence,omitempty"`
 	// Likelihood that the request image contains racy content. Racy content may
 	// include (but is not limited to) skimpy or sheer clothing, strategically
 	// covered nudity, lewd or provocative poses, or close-ups of sensitive
 	// body areas.
-	Racy Likelihood `protobuf:"varint,9,opt,name=racy,enum=google.cloud.vision.v1.Likelihood" json:"racy,omitempty"`
+	Racy Likelihood `protobuf:"varint,9,opt,name=racy,proto3,enum=google.cloud.vision.v1.Likelihood" json:"racy,omitempty"`
+	// Confidence of adult_score. Range [0, 1]. 0 means not confident, 1 means
+	// very confident.
+	AdultConfidence float32 `protobuf:"fixed32,16,opt,name=adult_confidence,json=adultConfidence,proto3" json:"adult_confidence,omitempty"`
+	// Confidence of spoof_score. Range [0, 1]. 0 means not confident, 1 means
+	// very confident.
+	SpoofConfidence float32 `protobuf:"fixed32,18,opt,name=spoof_confidence,json=spoofConfidence,proto3" json:"spoof_confidence,omitempty"`
+	// Confidence of medical_score. Range [0, 1]. 0 means not confident, 1 means
+	// very confident.
+	MedicalConfidence float32 `protobuf:"fixed32,20,opt,name=medical_confidence,json=medicalConfidence,proto3" json:"medical_confidence,omitempty"`
+	// Confidence of violence_score. Range [0, 1]. 0 means not confident, 1 means
+	// very confident.
+	ViolenceConfidence float32 `protobuf:"fixed32,22,opt,name=violence_confidence,json=violenceConfidence,proto3" json:"violence_confidence,omitempty"`
+	// Confidence of racy_score. Range [0, 1]. 0 means not confident, 1 means very
+	// confident.
+	RacyConfidence float32 `protobuf:"fixed32,24,opt,name=racy_confidence,json=racyConfidence,proto3" json:"racy_confidence,omitempty"`
+	// Confidence of nsfw_score. Range [0, 1]. 0 means not confident, 1 means very
+	// confident.
+	NsfwConfidence       float32  `protobuf:"fixed32,26,opt,name=nsfw_confidence,json=nsfwConfidence,proto3" json:"nsfw_confidence,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *SafeSearchAnnotation) Reset()                    { *m = SafeSearchAnnotation{} }
-func (m *SafeSearchAnnotation) String() string            { return proto.CompactTextString(m) }
-func (*SafeSearchAnnotation) ProtoMessage()               {}
-func (*SafeSearchAnnotation) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{7} }
+func (m *SafeSearchAnnotation) Reset()         { *m = SafeSearchAnnotation{} }
+func (m *SafeSearchAnnotation) String() string { return proto.CompactTextString(m) }
+func (*SafeSearchAnnotation) ProtoMessage()    {}
+func (*SafeSearchAnnotation) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{8}
+}
+
+func (m *SafeSearchAnnotation) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SafeSearchAnnotation.Unmarshal(m, b)
+}
+func (m *SafeSearchAnnotation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SafeSearchAnnotation.Marshal(b, m, deterministic)
+}
+func (m *SafeSearchAnnotation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SafeSearchAnnotation.Merge(m, src)
+}
+func (m *SafeSearchAnnotation) XXX_Size() int {
+	return xxx_messageInfo_SafeSearchAnnotation.Size(m)
+}
+func (m *SafeSearchAnnotation) XXX_DiscardUnknown() {
+	xxx_messageInfo_SafeSearchAnnotation.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SafeSearchAnnotation proto.InternalMessageInfo
 
 func (m *SafeSearchAnnotation) GetAdult() Likelihood {
 	if m != nil {
@@ -819,27 +1193,92 @@ func (m *SafeSearchAnnotation) GetRacy() Likelihood {
 	return Likelihood_UNKNOWN
 }
 
+func (m *SafeSearchAnnotation) GetAdultConfidence() float32 {
+	if m != nil {
+		return m.AdultConfidence
+	}
+	return 0
+}
+
+func (m *SafeSearchAnnotation) GetSpoofConfidence() float32 {
+	if m != nil {
+		return m.SpoofConfidence
+	}
+	return 0
+}
+
+func (m *SafeSearchAnnotation) GetMedicalConfidence() float32 {
+	if m != nil {
+		return m.MedicalConfidence
+	}
+	return 0
+}
+
+func (m *SafeSearchAnnotation) GetViolenceConfidence() float32 {
+	if m != nil {
+		return m.ViolenceConfidence
+	}
+	return 0
+}
+
+func (m *SafeSearchAnnotation) GetRacyConfidence() float32 {
+	if m != nil {
+		return m.RacyConfidence
+	}
+	return 0
+}
+
+func (m *SafeSearchAnnotation) GetNsfwConfidence() float32 {
+	if m != nil {
+		return m.NsfwConfidence
+	}
+	return 0
+}
+
 // Rectangle determined by min and max `LatLng` pairs.
 type LatLongRect struct {
 	// Min lat/long pair.
-	MinLatLng *google_type1.LatLng `protobuf:"bytes,1,opt,name=min_lat_lng,json=minLatLng" json:"min_lat_lng,omitempty"`
+	MinLatLng *latlng.LatLng `protobuf:"bytes,1,opt,name=min_lat_lng,json=minLatLng,proto3" json:"min_lat_lng,omitempty"`
 	// Max lat/long pair.
-	MaxLatLng *google_type1.LatLng `protobuf:"bytes,2,opt,name=max_lat_lng,json=maxLatLng" json:"max_lat_lng,omitempty"`
+	MaxLatLng            *latlng.LatLng `protobuf:"bytes,2,opt,name=max_lat_lng,json=maxLatLng,proto3" json:"max_lat_lng,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
-func (m *LatLongRect) Reset()                    { *m = LatLongRect{} }
-func (m *LatLongRect) String() string            { return proto.CompactTextString(m) }
-func (*LatLongRect) ProtoMessage()               {}
-func (*LatLongRect) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{8} }
+func (m *LatLongRect) Reset()         { *m = LatLongRect{} }
+func (m *LatLongRect) String() string { return proto.CompactTextString(m) }
+func (*LatLongRect) ProtoMessage()    {}
+func (*LatLongRect) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{9}
+}
 
-func (m *LatLongRect) GetMinLatLng() *google_type1.LatLng {
+func (m *LatLongRect) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_LatLongRect.Unmarshal(m, b)
+}
+func (m *LatLongRect) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_LatLongRect.Marshal(b, m, deterministic)
+}
+func (m *LatLongRect) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_LatLongRect.Merge(m, src)
+}
+func (m *LatLongRect) XXX_Size() int {
+	return xxx_messageInfo_LatLongRect.Size(m)
+}
+func (m *LatLongRect) XXX_DiscardUnknown() {
+	xxx_messageInfo_LatLongRect.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_LatLongRect proto.InternalMessageInfo
+
+func (m *LatLongRect) GetMinLatLng() *latlng.LatLng {
 	if m != nil {
 		return m.MinLatLng
 	}
 	return nil
 }
 
-func (m *LatLongRect) GetMaxLatLng() *google_type1.LatLng {
+func (m *LatLongRect) GetMaxLatLng() *latlng.LatLng {
 	if m != nil {
 		return m.MaxLatLng
 	}
@@ -850,20 +1289,43 @@ func (m *LatLongRect) GetMaxLatLng() *google_type1.LatLng {
 // the image that the color occupies in the image.
 type ColorInfo struct {
 	// RGB components of the color.
-	Color *google_type.Color `protobuf:"bytes,1,opt,name=color" json:"color,omitempty"`
+	Color *color.Color `protobuf:"bytes,1,opt,name=color,proto3" json:"color,omitempty"`
 	// Image-specific score for this color. Value in range [0, 1].
-	Score float32 `protobuf:"fixed32,2,opt,name=score" json:"score,omitempty"`
+	Score float32 `protobuf:"fixed32,2,opt,name=score,proto3" json:"score,omitempty"`
 	// The fraction of pixels the color occupies in the image.
 	// Value in range [0, 1].
-	PixelFraction float32 `protobuf:"fixed32,3,opt,name=pixel_fraction,json=pixelFraction" json:"pixel_fraction,omitempty"`
+	PixelFraction        float32  `protobuf:"fixed32,3,opt,name=pixel_fraction,json=pixelFraction,proto3" json:"pixel_fraction,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ColorInfo) Reset()                    { *m = ColorInfo{} }
-func (m *ColorInfo) String() string            { return proto.CompactTextString(m) }
-func (*ColorInfo) ProtoMessage()               {}
-func (*ColorInfo) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{9} }
+func (m *ColorInfo) Reset()         { *m = ColorInfo{} }
+func (m *ColorInfo) String() string { return proto.CompactTextString(m) }
+func (*ColorInfo) ProtoMessage()    {}
+func (*ColorInfo) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{10}
+}
 
-func (m *ColorInfo) GetColor() *google_type.Color {
+func (m *ColorInfo) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ColorInfo.Unmarshal(m, b)
+}
+func (m *ColorInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ColorInfo.Marshal(b, m, deterministic)
+}
+func (m *ColorInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ColorInfo.Merge(m, src)
+}
+func (m *ColorInfo) XXX_Size() int {
+	return xxx_messageInfo_ColorInfo.Size(m)
+}
+func (m *ColorInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_ColorInfo.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ColorInfo proto.InternalMessageInfo
+
+func (m *ColorInfo) GetColor() *color.Color {
 	if m != nil {
 		return m.Color
 	}
@@ -887,13 +1349,36 @@ func (m *ColorInfo) GetPixelFraction() float32 {
 // Set of dominant colors and their corresponding scores.
 type DominantColorsAnnotation struct {
 	// RGB color values with their score and pixel fraction.
-	Colors []*ColorInfo `protobuf:"bytes,1,rep,name=colors" json:"colors,omitempty"`
+	Colors               []*ColorInfo `protobuf:"bytes,1,rep,name=colors,proto3" json:"colors,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
 }
 
-func (m *DominantColorsAnnotation) Reset()                    { *m = DominantColorsAnnotation{} }
-func (m *DominantColorsAnnotation) String() string            { return proto.CompactTextString(m) }
-func (*DominantColorsAnnotation) ProtoMessage()               {}
-func (*DominantColorsAnnotation) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{10} }
+func (m *DominantColorsAnnotation) Reset()         { *m = DominantColorsAnnotation{} }
+func (m *DominantColorsAnnotation) String() string { return proto.CompactTextString(m) }
+func (*DominantColorsAnnotation) ProtoMessage()    {}
+func (*DominantColorsAnnotation) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{11}
+}
+
+func (m *DominantColorsAnnotation) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DominantColorsAnnotation.Unmarshal(m, b)
+}
+func (m *DominantColorsAnnotation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DominantColorsAnnotation.Marshal(b, m, deterministic)
+}
+func (m *DominantColorsAnnotation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DominantColorsAnnotation.Merge(m, src)
+}
+func (m *DominantColorsAnnotation) XXX_Size() int {
+	return xxx_messageInfo_DominantColorsAnnotation.Size(m)
+}
+func (m *DominantColorsAnnotation) XXX_DiscardUnknown() {
+	xxx_messageInfo_DominantColorsAnnotation.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DominantColorsAnnotation proto.InternalMessageInfo
 
 func (m *DominantColorsAnnotation) GetColors() []*ColorInfo {
 	if m != nil {
@@ -905,13 +1390,36 @@ func (m *DominantColorsAnnotation) GetColors() []*ColorInfo {
 // Stores image properties, such as dominant colors.
 type ImageProperties struct {
 	// If present, dominant colors completed successfully.
-	DominantColors *DominantColorsAnnotation `protobuf:"bytes,1,opt,name=dominant_colors,json=dominantColors" json:"dominant_colors,omitempty"`
+	DominantColors       *DominantColorsAnnotation `protobuf:"bytes,1,opt,name=dominant_colors,json=dominantColors,proto3" json:"dominant_colors,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                  `json:"-"`
+	XXX_unrecognized     []byte                    `json:"-"`
+	XXX_sizecache        int32                     `json:"-"`
 }
 
-func (m *ImageProperties) Reset()                    { *m = ImageProperties{} }
-func (m *ImageProperties) String() string            { return proto.CompactTextString(m) }
-func (*ImageProperties) ProtoMessage()               {}
-func (*ImageProperties) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{11} }
+func (m *ImageProperties) Reset()         { *m = ImageProperties{} }
+func (m *ImageProperties) String() string { return proto.CompactTextString(m) }
+func (*ImageProperties) ProtoMessage()    {}
+func (*ImageProperties) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{12}
+}
+
+func (m *ImageProperties) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ImageProperties.Unmarshal(m, b)
+}
+func (m *ImageProperties) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ImageProperties.Marshal(b, m, deterministic)
+}
+func (m *ImageProperties) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ImageProperties.Merge(m, src)
+}
+func (m *ImageProperties) XXX_Size() int {
+	return xxx_messageInfo_ImageProperties.Size(m)
+}
+func (m *ImageProperties) XXX_DiscardUnknown() {
+	xxx_messageInfo_ImageProperties.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ImageProperties proto.InternalMessageInfo
 
 func (m *ImageProperties) GetDominantColors() *DominantColorsAnnotation {
 	if m != nil {
@@ -923,19 +1431,42 @@ func (m *ImageProperties) GetDominantColors() *DominantColorsAnnotation {
 // Single crop hint that is used to generate a new crop when serving an image.
 type CropHint struct {
 	// The bounding polygon for the crop region. The coordinates of the bounding
-	// box are in the original image's scale, as returned in `ImageParams`.
-	BoundingPoly *BoundingPoly `protobuf:"bytes,1,opt,name=bounding_poly,json=boundingPoly" json:"bounding_poly,omitempty"`
+	// box are in the original image's scale.
+	BoundingPoly *BoundingPoly `protobuf:"bytes,1,opt,name=bounding_poly,json=boundingPoly,proto3" json:"bounding_poly,omitempty"`
 	// Confidence of this being a salient region.  Range [0, 1].
-	Confidence float32 `protobuf:"fixed32,2,opt,name=confidence" json:"confidence,omitempty"`
+	Confidence float32 `protobuf:"fixed32,2,opt,name=confidence,proto3" json:"confidence,omitempty"`
 	// Fraction of importance of this salient region with respect to the original
 	// image.
-	ImportanceFraction float32 `protobuf:"fixed32,3,opt,name=importance_fraction,json=importanceFraction" json:"importance_fraction,omitempty"`
+	ImportanceFraction   float32  `protobuf:"fixed32,3,opt,name=importance_fraction,json=importanceFraction,proto3" json:"importance_fraction,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *CropHint) Reset()                    { *m = CropHint{} }
-func (m *CropHint) String() string            { return proto.CompactTextString(m) }
-func (*CropHint) ProtoMessage()               {}
-func (*CropHint) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{12} }
+func (m *CropHint) Reset()         { *m = CropHint{} }
+func (m *CropHint) String() string { return proto.CompactTextString(m) }
+func (*CropHint) ProtoMessage()    {}
+func (*CropHint) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{13}
+}
+
+func (m *CropHint) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CropHint.Unmarshal(m, b)
+}
+func (m *CropHint) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CropHint.Marshal(b, m, deterministic)
+}
+func (m *CropHint) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CropHint.Merge(m, src)
+}
+func (m *CropHint) XXX_Size() int {
+	return xxx_messageInfo_CropHint.Size(m)
+}
+func (m *CropHint) XXX_DiscardUnknown() {
+	xxx_messageInfo_CropHint.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CropHint proto.InternalMessageInfo
 
 func (m *CropHint) GetBoundingPoly() *BoundingPoly {
 	if m != nil {
@@ -961,13 +1492,36 @@ func (m *CropHint) GetImportanceFraction() float32 {
 // Set of crop hints that are used to generate new crops when serving images.
 type CropHintsAnnotation struct {
 	// Crop hint results.
-	CropHints []*CropHint `protobuf:"bytes,1,rep,name=crop_hints,json=cropHints" json:"crop_hints,omitempty"`
+	CropHints            []*CropHint `protobuf:"bytes,1,rep,name=crop_hints,json=cropHints,proto3" json:"crop_hints,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
 }
 
-func (m *CropHintsAnnotation) Reset()                    { *m = CropHintsAnnotation{} }
-func (m *CropHintsAnnotation) String() string            { return proto.CompactTextString(m) }
-func (*CropHintsAnnotation) ProtoMessage()               {}
-func (*CropHintsAnnotation) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{13} }
+func (m *CropHintsAnnotation) Reset()         { *m = CropHintsAnnotation{} }
+func (m *CropHintsAnnotation) String() string { return proto.CompactTextString(m) }
+func (*CropHintsAnnotation) ProtoMessage()    {}
+func (*CropHintsAnnotation) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{14}
+}
+
+func (m *CropHintsAnnotation) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CropHintsAnnotation.Unmarshal(m, b)
+}
+func (m *CropHintsAnnotation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CropHintsAnnotation.Marshal(b, m, deterministic)
+}
+func (m *CropHintsAnnotation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CropHintsAnnotation.Merge(m, src)
+}
+func (m *CropHintsAnnotation) XXX_Size() int {
+	return xxx_messageInfo_CropHintsAnnotation.Size(m)
+}
+func (m *CropHintsAnnotation) XXX_DiscardUnknown() {
+	xxx_messageInfo_CropHintsAnnotation.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CropHintsAnnotation proto.InternalMessageInfo
 
 func (m *CropHintsAnnotation) GetCropHints() []*CropHint {
 	if m != nil {
@@ -984,13 +1538,36 @@ type CropHintsParams struct {
 	// best possible crop is returned. The number of provided aspect ratios is
 	// limited to a maximum of 16; any aspect ratios provided after the 16th are
 	// ignored.
-	AspectRatios []float32 `protobuf:"fixed32,1,rep,packed,name=aspect_ratios,json=aspectRatios" json:"aspect_ratios,omitempty"`
+	AspectRatios         []float32 `protobuf:"fixed32,1,rep,packed,name=aspect_ratios,json=aspectRatios,proto3" json:"aspect_ratios,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
 }
 
-func (m *CropHintsParams) Reset()                    { *m = CropHintsParams{} }
-func (m *CropHintsParams) String() string            { return proto.CompactTextString(m) }
-func (*CropHintsParams) ProtoMessage()               {}
-func (*CropHintsParams) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{14} }
+func (m *CropHintsParams) Reset()         { *m = CropHintsParams{} }
+func (m *CropHintsParams) String() string { return proto.CompactTextString(m) }
+func (*CropHintsParams) ProtoMessage()    {}
+func (*CropHintsParams) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{15}
+}
+
+func (m *CropHintsParams) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CropHintsParams.Unmarshal(m, b)
+}
+func (m *CropHintsParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CropHintsParams.Marshal(b, m, deterministic)
+}
+func (m *CropHintsParams) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CropHintsParams.Merge(m, src)
+}
+func (m *CropHintsParams) XXX_Size() int {
+	return xxx_messageInfo_CropHintsParams.Size(m)
+}
+func (m *CropHintsParams) XXX_DiscardUnknown() {
+	xxx_messageInfo_CropHintsParams.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CropHintsParams proto.InternalMessageInfo
 
 func (m *CropHintsParams) GetAspectRatios() []float32 {
 	if m != nil {
@@ -1002,13 +1579,36 @@ func (m *CropHintsParams) GetAspectRatios() []float32 {
 // Parameters for web detection request.
 type WebDetectionParams struct {
 	// Whether to include results derived from the geo information in the image.
-	IncludeGeoResults bool `protobuf:"varint,2,opt,name=include_geo_results,json=includeGeoResults" json:"include_geo_results,omitempty"`
+	IncludeGeoResults    bool     `protobuf:"varint,2,opt,name=include_geo_results,json=includeGeoResults,proto3" json:"include_geo_results,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *WebDetectionParams) Reset()                    { *m = WebDetectionParams{} }
-func (m *WebDetectionParams) String() string            { return proto.CompactTextString(m) }
-func (*WebDetectionParams) ProtoMessage()               {}
-func (*WebDetectionParams) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{15} }
+func (m *WebDetectionParams) Reset()         { *m = WebDetectionParams{} }
+func (m *WebDetectionParams) String() string { return proto.CompactTextString(m) }
+func (*WebDetectionParams) ProtoMessage()    {}
+func (*WebDetectionParams) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{16}
+}
+
+func (m *WebDetectionParams) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_WebDetectionParams.Unmarshal(m, b)
+}
+func (m *WebDetectionParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_WebDetectionParams.Marshal(b, m, deterministic)
+}
+func (m *WebDetectionParams) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WebDetectionParams.Merge(m, src)
+}
+func (m *WebDetectionParams) XXX_Size() int {
+	return xxx_messageInfo_WebDetectionParams.Size(m)
+}
+func (m *WebDetectionParams) XXX_DiscardUnknown() {
+	xxx_messageInfo_WebDetectionParams.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WebDetectionParams proto.InternalMessageInfo
 
 func (m *WebDetectionParams) GetIncludeGeoResults() bool {
 	if m != nil {
@@ -1019,8 +1619,8 @@ func (m *WebDetectionParams) GetIncludeGeoResults() bool {
 
 // Image context and/or feature-specific parameters.
 type ImageContext struct {
-	// lat/long rectangle that specifies the location of the image.
-	LatLongRect *LatLongRect `protobuf:"bytes,1,opt,name=lat_long_rect,json=latLongRect" json:"lat_long_rect,omitempty"`
+	// Not used.
+	LatLongRect *LatLongRect `protobuf:"bytes,1,opt,name=lat_long_rect,json=latLongRect,proto3" json:"lat_long_rect,omitempty"`
 	// List of languages to use for TEXT_DETECTION. In most cases, an empty value
 	// yields the best results since it enables automatic language detection. For
 	// languages based on the Latin alphabet, setting `language_hints` is not
@@ -1029,17 +1629,42 @@ type ImageContext struct {
 	// significant hindrance if the hint is wrong). Text detection returns an
 	// error if one or more of the specified languages is not one of the
 	// [supported languages](/vision/docs/languages).
-	LanguageHints []string `protobuf:"bytes,2,rep,name=language_hints,json=languageHints" json:"language_hints,omitempty"`
+	LanguageHints []string `protobuf:"bytes,2,rep,name=language_hints,json=languageHints,proto3" json:"language_hints,omitempty"`
 	// Parameters for crop hints annotation request.
-	CropHintsParams *CropHintsParams `protobuf:"bytes,4,opt,name=crop_hints_params,json=cropHintsParams" json:"crop_hints_params,omitempty"`
+	CropHintsParams *CropHintsParams `protobuf:"bytes,4,opt,name=crop_hints_params,json=cropHintsParams,proto3" json:"crop_hints_params,omitempty"`
+	// Parameters for product search.
+	ProductSearchParams *ProductSearchParams `protobuf:"bytes,5,opt,name=product_search_params,json=productSearchParams,proto3" json:"product_search_params,omitempty"`
 	// Parameters for web detection.
-	WebDetectionParams *WebDetectionParams `protobuf:"bytes,6,opt,name=web_detection_params,json=webDetectionParams" json:"web_detection_params,omitempty"`
+	WebDetectionParams   *WebDetectionParams `protobuf:"bytes,6,opt,name=web_detection_params,json=webDetectionParams,proto3" json:"web_detection_params,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
+	XXX_unrecognized     []byte              `json:"-"`
+	XXX_sizecache        int32               `json:"-"`
 }
 
-func (m *ImageContext) Reset()                    { *m = ImageContext{} }
-func (m *ImageContext) String() string            { return proto.CompactTextString(m) }
-func (*ImageContext) ProtoMessage()               {}
-func (*ImageContext) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{16} }
+func (m *ImageContext) Reset()         { *m = ImageContext{} }
+func (m *ImageContext) String() string { return proto.CompactTextString(m) }
+func (*ImageContext) ProtoMessage()    {}
+func (*ImageContext) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{17}
+}
+
+func (m *ImageContext) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ImageContext.Unmarshal(m, b)
+}
+func (m *ImageContext) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ImageContext.Marshal(b, m, deterministic)
+}
+func (m *ImageContext) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ImageContext.Merge(m, src)
+}
+func (m *ImageContext) XXX_Size() int {
+	return xxx_messageInfo_ImageContext.Size(m)
+}
+func (m *ImageContext) XXX_DiscardUnknown() {
+	xxx_messageInfo_ImageContext.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ImageContext proto.InternalMessageInfo
 
 func (m *ImageContext) GetLatLongRect() *LatLongRect {
 	if m != nil {
@@ -1062,6 +1687,13 @@ func (m *ImageContext) GetCropHintsParams() *CropHintsParams {
 	return nil
 }
 
+func (m *ImageContext) GetProductSearchParams() *ProductSearchParams {
+	if m != nil {
+		return m.ProductSearchParams
+	}
+	return nil
+}
+
 func (m *ImageContext) GetWebDetectionParams() *WebDetectionParams {
 	if m != nil {
 		return m.WebDetectionParams
@@ -1070,20 +1702,43 @@ func (m *ImageContext) GetWebDetectionParams() *WebDetectionParams {
 }
 
 // Request for performing Google Cloud Vision API tasks over a user-provided
-// image, with user-requested features.
+// image, with user-requested features, and with context information.
 type AnnotateImageRequest struct {
 	// The image to be processed.
-	Image *Image `protobuf:"bytes,1,opt,name=image" json:"image,omitempty"`
+	Image *Image `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
 	// Requested features.
-	Features []*Feature `protobuf:"bytes,2,rep,name=features" json:"features,omitempty"`
+	Features []*Feature `protobuf:"bytes,2,rep,name=features,proto3" json:"features,omitempty"`
 	// Additional context that may accompany the image.
-	ImageContext *ImageContext `protobuf:"bytes,3,opt,name=image_context,json=imageContext" json:"image_context,omitempty"`
+	ImageContext         *ImageContext `protobuf:"bytes,3,opt,name=image_context,json=imageContext,proto3" json:"image_context,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
-func (m *AnnotateImageRequest) Reset()                    { *m = AnnotateImageRequest{} }
-func (m *AnnotateImageRequest) String() string            { return proto.CompactTextString(m) }
-func (*AnnotateImageRequest) ProtoMessage()               {}
-func (*AnnotateImageRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{17} }
+func (m *AnnotateImageRequest) Reset()         { *m = AnnotateImageRequest{} }
+func (m *AnnotateImageRequest) String() string { return proto.CompactTextString(m) }
+func (*AnnotateImageRequest) ProtoMessage()    {}
+func (*AnnotateImageRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{18}
+}
+
+func (m *AnnotateImageRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AnnotateImageRequest.Unmarshal(m, b)
+}
+func (m *AnnotateImageRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AnnotateImageRequest.Marshal(b, m, deterministic)
+}
+func (m *AnnotateImageRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AnnotateImageRequest.Merge(m, src)
+}
+func (m *AnnotateImageRequest) XXX_Size() int {
+	return xxx_messageInfo_AnnotateImageRequest.Size(m)
+}
+func (m *AnnotateImageRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AnnotateImageRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AnnotateImageRequest proto.InternalMessageInfo
 
 func (m *AnnotateImageRequest) GetImage() *Image {
 	if m != nil {
@@ -1106,41 +1761,124 @@ func (m *AnnotateImageRequest) GetImageContext() *ImageContext {
 	return nil
 }
 
+// If an image was produced from a file (e.g. a PDF), this message gives
+// information about the source of that image.
+type ImageAnnotationContext struct {
+	// The URI of the file used to produce the image.
+	Uri string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
+	// If the file was a PDF or TIFF, this field gives the page number within
+	// the file used to produce the image.
+	PageNumber           int32    `protobuf:"varint,2,opt,name=page_number,json=pageNumber,proto3" json:"page_number,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ImageAnnotationContext) Reset()         { *m = ImageAnnotationContext{} }
+func (m *ImageAnnotationContext) String() string { return proto.CompactTextString(m) }
+func (*ImageAnnotationContext) ProtoMessage()    {}
+func (*ImageAnnotationContext) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{19}
+}
+
+func (m *ImageAnnotationContext) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ImageAnnotationContext.Unmarshal(m, b)
+}
+func (m *ImageAnnotationContext) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ImageAnnotationContext.Marshal(b, m, deterministic)
+}
+func (m *ImageAnnotationContext) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ImageAnnotationContext.Merge(m, src)
+}
+func (m *ImageAnnotationContext) XXX_Size() int {
+	return xxx_messageInfo_ImageAnnotationContext.Size(m)
+}
+func (m *ImageAnnotationContext) XXX_DiscardUnknown() {
+	xxx_messageInfo_ImageAnnotationContext.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ImageAnnotationContext proto.InternalMessageInfo
+
+func (m *ImageAnnotationContext) GetUri() string {
+	if m != nil {
+		return m.Uri
+	}
+	return ""
+}
+
+func (m *ImageAnnotationContext) GetPageNumber() int32 {
+	if m != nil {
+		return m.PageNumber
+	}
+	return 0
+}
+
 // Response to an image annotation request.
 type AnnotateImageResponse struct {
 	// If present, face detection has completed successfully.
-	FaceAnnotations []*FaceAnnotation `protobuf:"bytes,1,rep,name=face_annotations,json=faceAnnotations" json:"face_annotations,omitempty"`
+	FaceAnnotations []*FaceAnnotation `protobuf:"bytes,1,rep,name=face_annotations,json=faceAnnotations,proto3" json:"face_annotations,omitempty"`
 	// If present, landmark detection has completed successfully.
-	LandmarkAnnotations []*EntityAnnotation `protobuf:"bytes,2,rep,name=landmark_annotations,json=landmarkAnnotations" json:"landmark_annotations,omitempty"`
+	LandmarkAnnotations []*EntityAnnotation `protobuf:"bytes,2,rep,name=landmark_annotations,json=landmarkAnnotations,proto3" json:"landmark_annotations,omitempty"`
 	// If present, logo detection has completed successfully.
-	LogoAnnotations []*EntityAnnotation `protobuf:"bytes,3,rep,name=logo_annotations,json=logoAnnotations" json:"logo_annotations,omitempty"`
+	LogoAnnotations []*EntityAnnotation `protobuf:"bytes,3,rep,name=logo_annotations,json=logoAnnotations,proto3" json:"logo_annotations,omitempty"`
 	// If present, label detection has completed successfully.
-	LabelAnnotations []*EntityAnnotation `protobuf:"bytes,4,rep,name=label_annotations,json=labelAnnotations" json:"label_annotations,omitempty"`
+	LabelAnnotations []*EntityAnnotation `protobuf:"bytes,4,rep,name=label_annotations,json=labelAnnotations,proto3" json:"label_annotations,omitempty"`
+	// If present, localized object detection has completed successfully.
+	// This will be sorted descending by confidence score.
+	LocalizedObjectAnnotations []*LocalizedObjectAnnotation `protobuf:"bytes,22,rep,name=localized_object_annotations,json=localizedObjectAnnotations,proto3" json:"localized_object_annotations,omitempty"`
 	// If present, text (OCR) detection has completed successfully.
-	TextAnnotations []*EntityAnnotation `protobuf:"bytes,5,rep,name=text_annotations,json=textAnnotations" json:"text_annotations,omitempty"`
+	TextAnnotations []*EntityAnnotation `protobuf:"bytes,5,rep,name=text_annotations,json=textAnnotations,proto3" json:"text_annotations,omitempty"`
 	// If present, text (OCR) detection or document (OCR) text detection has
 	// completed successfully.
 	// This annotation provides the structural hierarchy for the OCR detected
 	// text.
-	FullTextAnnotation *TextAnnotation `protobuf:"bytes,12,opt,name=full_text_annotation,json=fullTextAnnotation" json:"full_text_annotation,omitempty"`
+	FullTextAnnotation *TextAnnotation `protobuf:"bytes,12,opt,name=full_text_annotation,json=fullTextAnnotation,proto3" json:"full_text_annotation,omitempty"`
 	// If present, safe-search annotation has completed successfully.
-	SafeSearchAnnotation *SafeSearchAnnotation `protobuf:"bytes,6,opt,name=safe_search_annotation,json=safeSearchAnnotation" json:"safe_search_annotation,omitempty"`
+	SafeSearchAnnotation *SafeSearchAnnotation `protobuf:"bytes,6,opt,name=safe_search_annotation,json=safeSearchAnnotation,proto3" json:"safe_search_annotation,omitempty"`
 	// If present, image properties were extracted successfully.
-	ImagePropertiesAnnotation *ImageProperties `protobuf:"bytes,8,opt,name=image_properties_annotation,json=imagePropertiesAnnotation" json:"image_properties_annotation,omitempty"`
+	ImagePropertiesAnnotation *ImageProperties `protobuf:"bytes,8,opt,name=image_properties_annotation,json=imagePropertiesAnnotation,proto3" json:"image_properties_annotation,omitempty"`
 	// If present, crop hints have completed successfully.
-	CropHintsAnnotation *CropHintsAnnotation `protobuf:"bytes,11,opt,name=crop_hints_annotation,json=cropHintsAnnotation" json:"crop_hints_annotation,omitempty"`
+	CropHintsAnnotation *CropHintsAnnotation `protobuf:"bytes,11,opt,name=crop_hints_annotation,json=cropHintsAnnotation,proto3" json:"crop_hints_annotation,omitempty"`
 	// If present, web detection has completed successfully.
-	WebDetection *WebDetection `protobuf:"bytes,13,opt,name=web_detection,json=webDetection" json:"web_detection,omitempty"`
+	WebDetection *WebDetection `protobuf:"bytes,13,opt,name=web_detection,json=webDetection,proto3" json:"web_detection,omitempty"`
+	// If present, product search has completed successfully.
+	ProductSearchResults *ProductSearchResults `protobuf:"bytes,14,opt,name=product_search_results,json=productSearchResults,proto3" json:"product_search_results,omitempty"`
 	// If set, represents the error message for the operation.
 	// Note that filled-in image annotations are guaranteed to be
 	// correct, even when `error` is set.
-	Error *google_rpc.Status `protobuf:"bytes,9,opt,name=error" json:"error,omitempty"`
+	Error *status.Status `protobuf:"bytes,9,opt,name=error,proto3" json:"error,omitempty"`
+	// If present, contextual information is needed to understand where this image
+	// comes from.
+	Context              *ImageAnnotationContext `protobuf:"bytes,21,opt,name=context,proto3" json:"context,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     []byte                  `json:"-"`
+	XXX_sizecache        int32                   `json:"-"`
 }
 
-func (m *AnnotateImageResponse) Reset()                    { *m = AnnotateImageResponse{} }
-func (m *AnnotateImageResponse) String() string            { return proto.CompactTextString(m) }
-func (*AnnotateImageResponse) ProtoMessage()               {}
-func (*AnnotateImageResponse) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{18} }
+func (m *AnnotateImageResponse) Reset()         { *m = AnnotateImageResponse{} }
+func (m *AnnotateImageResponse) String() string { return proto.CompactTextString(m) }
+func (*AnnotateImageResponse) ProtoMessage()    {}
+func (*AnnotateImageResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{20}
+}
+
+func (m *AnnotateImageResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AnnotateImageResponse.Unmarshal(m, b)
+}
+func (m *AnnotateImageResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AnnotateImageResponse.Marshal(b, m, deterministic)
+}
+func (m *AnnotateImageResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AnnotateImageResponse.Merge(m, src)
+}
+func (m *AnnotateImageResponse) XXX_Size() int {
+	return xxx_messageInfo_AnnotateImageResponse.Size(m)
+}
+func (m *AnnotateImageResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AnnotateImageResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AnnotateImageResponse proto.InternalMessageInfo
 
 func (m *AnnotateImageResponse) GetFaceAnnotations() []*FaceAnnotation {
 	if m != nil {
@@ -1166,6 +1904,13 @@ func (m *AnnotateImageResponse) GetLogoAnnotations() []*EntityAnnotation {
 func (m *AnnotateImageResponse) GetLabelAnnotations() []*EntityAnnotation {
 	if m != nil {
 		return m.LabelAnnotations
+	}
+	return nil
+}
+
+func (m *AnnotateImageResponse) GetLocalizedObjectAnnotations() []*LocalizedObjectAnnotation {
+	if m != nil {
+		return m.LocalizedObjectAnnotations
 	}
 	return nil
 }
@@ -1212,23 +1957,73 @@ func (m *AnnotateImageResponse) GetWebDetection() *WebDetection {
 	return nil
 }
 
-func (m *AnnotateImageResponse) GetError() *google_rpc.Status {
+func (m *AnnotateImageResponse) GetProductSearchResults() *ProductSearchResults {
+	if m != nil {
+		return m.ProductSearchResults
+	}
+	return nil
+}
+
+func (m *AnnotateImageResponse) GetError() *status.Status {
 	if m != nil {
 		return m.Error
 	}
 	return nil
 }
 
-// Multiple image annotation requests are batched into a single service call.
-type BatchAnnotateImagesRequest struct {
-	// Individual image annotation requests for this batch.
-	Requests []*AnnotateImageRequest `protobuf:"bytes,1,rep,name=requests" json:"requests,omitempty"`
+func (m *AnnotateImageResponse) GetContext() *ImageAnnotationContext {
+	if m != nil {
+		return m.Context
+	}
+	return nil
 }
 
-func (m *BatchAnnotateImagesRequest) Reset()                    { *m = BatchAnnotateImagesRequest{} }
-func (m *BatchAnnotateImagesRequest) String() string            { return proto.CompactTextString(m) }
-func (*BatchAnnotateImagesRequest) ProtoMessage()               {}
-func (*BatchAnnotateImagesRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{19} }
+// Multiple image annotation requests are batched into a single service call.
+type BatchAnnotateImagesRequest struct {
+	// Required. Individual image annotation requests for this batch.
+	Requests []*AnnotateImageRequest `protobuf:"bytes,1,rep,name=requests,proto3" json:"requests,omitempty"`
+	// Optional. Target project and location to make a call.
+	//
+	// Format: `projects/{project-id}/locations/{location-id}`.
+	//
+	// If no parent is specified, a region will be chosen automatically.
+	//
+	// Supported location-ids:
+	//     `us`: USA country only,
+	//     `asia`: East asia areas, like Japan, Taiwan,
+	//     `eu`: The European Union.
+	//
+	// Example: `projects/project-A/locations/eu`.
+	Parent               string   `protobuf:"bytes,4,opt,name=parent,proto3" json:"parent,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *BatchAnnotateImagesRequest) Reset()         { *m = BatchAnnotateImagesRequest{} }
+func (m *BatchAnnotateImagesRequest) String() string { return proto.CompactTextString(m) }
+func (*BatchAnnotateImagesRequest) ProtoMessage()    {}
+func (*BatchAnnotateImagesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{21}
+}
+
+func (m *BatchAnnotateImagesRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BatchAnnotateImagesRequest.Unmarshal(m, b)
+}
+func (m *BatchAnnotateImagesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BatchAnnotateImagesRequest.Marshal(b, m, deterministic)
+}
+func (m *BatchAnnotateImagesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BatchAnnotateImagesRequest.Merge(m, src)
+}
+func (m *BatchAnnotateImagesRequest) XXX_Size() int {
+	return xxx_messageInfo_BatchAnnotateImagesRequest.Size(m)
+}
+func (m *BatchAnnotateImagesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_BatchAnnotateImagesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BatchAnnotateImagesRequest proto.InternalMessageInfo
 
 func (m *BatchAnnotateImagesRequest) GetRequests() []*AnnotateImageRequest {
 	if m != nil {
@@ -1237,16 +2032,46 @@ func (m *BatchAnnotateImagesRequest) GetRequests() []*AnnotateImageRequest {
 	return nil
 }
 
+func (m *BatchAnnotateImagesRequest) GetParent() string {
+	if m != nil {
+		return m.Parent
+	}
+	return ""
+}
+
 // Response to a batch image annotation request.
 type BatchAnnotateImagesResponse struct {
 	// Individual responses to image annotation requests within the batch.
-	Responses []*AnnotateImageResponse `protobuf:"bytes,1,rep,name=responses" json:"responses,omitempty"`
+	Responses            []*AnnotateImageResponse `protobuf:"bytes,1,rep,name=responses,proto3" json:"responses,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
+	XXX_unrecognized     []byte                   `json:"-"`
+	XXX_sizecache        int32                    `json:"-"`
 }
 
-func (m *BatchAnnotateImagesResponse) Reset()                    { *m = BatchAnnotateImagesResponse{} }
-func (m *BatchAnnotateImagesResponse) String() string            { return proto.CompactTextString(m) }
-func (*BatchAnnotateImagesResponse) ProtoMessage()               {}
-func (*BatchAnnotateImagesResponse) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{20} }
+func (m *BatchAnnotateImagesResponse) Reset()         { *m = BatchAnnotateImagesResponse{} }
+func (m *BatchAnnotateImagesResponse) String() string { return proto.CompactTextString(m) }
+func (*BatchAnnotateImagesResponse) ProtoMessage()    {}
+func (*BatchAnnotateImagesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{22}
+}
+
+func (m *BatchAnnotateImagesResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BatchAnnotateImagesResponse.Unmarshal(m, b)
+}
+func (m *BatchAnnotateImagesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BatchAnnotateImagesResponse.Marshal(b, m, deterministic)
+}
+func (m *BatchAnnotateImagesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BatchAnnotateImagesResponse.Merge(m, src)
+}
+func (m *BatchAnnotateImagesResponse) XXX_Size() int {
+	return xxx_messageInfo_BatchAnnotateImagesResponse.Size(m)
+}
+func (m *BatchAnnotateImagesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_BatchAnnotateImagesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BatchAnnotateImagesResponse proto.InternalMessageInfo
 
 func (m *BatchAnnotateImagesResponse) GetResponses() []*AnnotateImageResponse {
 	if m != nil {
@@ -1255,7 +2080,879 @@ func (m *BatchAnnotateImagesResponse) GetResponses() []*AnnotateImageResponse {
 	return nil
 }
 
+// A request to annotate one single file, e.g. a PDF, TIFF or GIF file.
+type AnnotateFileRequest struct {
+	// Required. Information about the input file.
+	InputConfig *InputConfig `protobuf:"bytes,1,opt,name=input_config,json=inputConfig,proto3" json:"input_config,omitempty"`
+	// Required. Requested features.
+	Features []*Feature `protobuf:"bytes,2,rep,name=features,proto3" json:"features,omitempty"`
+	// Additional context that may accompany the image(s) in the file.
+	ImageContext *ImageContext `protobuf:"bytes,3,opt,name=image_context,json=imageContext,proto3" json:"image_context,omitempty"`
+	// Pages of the file to perform image annotation.
+	//
+	// Pages starts from 1, we assume the first page of the file is page 1.
+	// At most 5 pages are supported per request. Pages can be negative.
+	//
+	// Page 1 means the first page.
+	// Page 2 means the second page.
+	// Page -1 means the last page.
+	// Page -2 means the second to the last page.
+	//
+	// If the file is GIF instead of PDF or TIFF, page refers to GIF frames.
+	//
+	// If this field is empty, by default the service performs image annotation
+	// for the first 5 pages of the file.
+	Pages                []int32  `protobuf:"varint,4,rep,packed,name=pages,proto3" json:"pages,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AnnotateFileRequest) Reset()         { *m = AnnotateFileRequest{} }
+func (m *AnnotateFileRequest) String() string { return proto.CompactTextString(m) }
+func (*AnnotateFileRequest) ProtoMessage()    {}
+func (*AnnotateFileRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{23}
+}
+
+func (m *AnnotateFileRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AnnotateFileRequest.Unmarshal(m, b)
+}
+func (m *AnnotateFileRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AnnotateFileRequest.Marshal(b, m, deterministic)
+}
+func (m *AnnotateFileRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AnnotateFileRequest.Merge(m, src)
+}
+func (m *AnnotateFileRequest) XXX_Size() int {
+	return xxx_messageInfo_AnnotateFileRequest.Size(m)
+}
+func (m *AnnotateFileRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AnnotateFileRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AnnotateFileRequest proto.InternalMessageInfo
+
+func (m *AnnotateFileRequest) GetInputConfig() *InputConfig {
+	if m != nil {
+		return m.InputConfig
+	}
+	return nil
+}
+
+func (m *AnnotateFileRequest) GetFeatures() []*Feature {
+	if m != nil {
+		return m.Features
+	}
+	return nil
+}
+
+func (m *AnnotateFileRequest) GetImageContext() *ImageContext {
+	if m != nil {
+		return m.ImageContext
+	}
+	return nil
+}
+
+func (m *AnnotateFileRequest) GetPages() []int32 {
+	if m != nil {
+		return m.Pages
+	}
+	return nil
+}
+
+// Response to a single file annotation request. A file may contain one or more
+// images, which individually have their own responses.
+type AnnotateFileResponse struct {
+	// Information about the file for which this response is generated.
+	InputConfig *InputConfig `protobuf:"bytes,1,opt,name=input_config,json=inputConfig,proto3" json:"input_config,omitempty"`
+	// Individual responses to images found within the file. This field will be
+	// empty if the `error` field is set.
+	Responses []*AnnotateImageResponse `protobuf:"bytes,2,rep,name=responses,proto3" json:"responses,omitempty"`
+	// This field gives the total number of pages in the file.
+	TotalPages int32 `protobuf:"varint,3,opt,name=total_pages,json=totalPages,proto3" json:"total_pages,omitempty"`
+	// If set, represents the error message for the failed request. The
+	// `responses` field will not be set in this case.
+	Error                *status.Status `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
+}
+
+func (m *AnnotateFileResponse) Reset()         { *m = AnnotateFileResponse{} }
+func (m *AnnotateFileResponse) String() string { return proto.CompactTextString(m) }
+func (*AnnotateFileResponse) ProtoMessage()    {}
+func (*AnnotateFileResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{24}
+}
+
+func (m *AnnotateFileResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AnnotateFileResponse.Unmarshal(m, b)
+}
+func (m *AnnotateFileResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AnnotateFileResponse.Marshal(b, m, deterministic)
+}
+func (m *AnnotateFileResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AnnotateFileResponse.Merge(m, src)
+}
+func (m *AnnotateFileResponse) XXX_Size() int {
+	return xxx_messageInfo_AnnotateFileResponse.Size(m)
+}
+func (m *AnnotateFileResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AnnotateFileResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AnnotateFileResponse proto.InternalMessageInfo
+
+func (m *AnnotateFileResponse) GetInputConfig() *InputConfig {
+	if m != nil {
+		return m.InputConfig
+	}
+	return nil
+}
+
+func (m *AnnotateFileResponse) GetResponses() []*AnnotateImageResponse {
+	if m != nil {
+		return m.Responses
+	}
+	return nil
+}
+
+func (m *AnnotateFileResponse) GetTotalPages() int32 {
+	if m != nil {
+		return m.TotalPages
+	}
+	return 0
+}
+
+func (m *AnnotateFileResponse) GetError() *status.Status {
+	if m != nil {
+		return m.Error
+	}
+	return nil
+}
+
+// A list of requests to annotate files using the BatchAnnotateFiles API.
+type BatchAnnotateFilesRequest struct {
+	// Required. The list of file annotation requests. Right now we support only one
+	// AnnotateFileRequest in BatchAnnotateFilesRequest.
+	Requests []*AnnotateFileRequest `protobuf:"bytes,1,rep,name=requests,proto3" json:"requests,omitempty"`
+	// Optional. Target project and location to make a call.
+	//
+	// Format: `projects/{project-id}/locations/{location-id}`.
+	//
+	// If no parent is specified, a region will be chosen automatically.
+	//
+	// Supported location-ids:
+	//     `us`: USA country only,
+	//     `asia`: East asia areas, like Japan, Taiwan,
+	//     `eu`: The European Union.
+	//
+	// Example: `projects/project-A/locations/eu`.
+	Parent               string   `protobuf:"bytes,3,opt,name=parent,proto3" json:"parent,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *BatchAnnotateFilesRequest) Reset()         { *m = BatchAnnotateFilesRequest{} }
+func (m *BatchAnnotateFilesRequest) String() string { return proto.CompactTextString(m) }
+func (*BatchAnnotateFilesRequest) ProtoMessage()    {}
+func (*BatchAnnotateFilesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{25}
+}
+
+func (m *BatchAnnotateFilesRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BatchAnnotateFilesRequest.Unmarshal(m, b)
+}
+func (m *BatchAnnotateFilesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BatchAnnotateFilesRequest.Marshal(b, m, deterministic)
+}
+func (m *BatchAnnotateFilesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BatchAnnotateFilesRequest.Merge(m, src)
+}
+func (m *BatchAnnotateFilesRequest) XXX_Size() int {
+	return xxx_messageInfo_BatchAnnotateFilesRequest.Size(m)
+}
+func (m *BatchAnnotateFilesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_BatchAnnotateFilesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BatchAnnotateFilesRequest proto.InternalMessageInfo
+
+func (m *BatchAnnotateFilesRequest) GetRequests() []*AnnotateFileRequest {
+	if m != nil {
+		return m.Requests
+	}
+	return nil
+}
+
+func (m *BatchAnnotateFilesRequest) GetParent() string {
+	if m != nil {
+		return m.Parent
+	}
+	return ""
+}
+
+// A list of file annotation responses.
+type BatchAnnotateFilesResponse struct {
+	// The list of file annotation responses, each response corresponding to each
+	// AnnotateFileRequest in BatchAnnotateFilesRequest.
+	Responses            []*AnnotateFileResponse `protobuf:"bytes,1,rep,name=responses,proto3" json:"responses,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     []byte                  `json:"-"`
+	XXX_sizecache        int32                   `json:"-"`
+}
+
+func (m *BatchAnnotateFilesResponse) Reset()         { *m = BatchAnnotateFilesResponse{} }
+func (m *BatchAnnotateFilesResponse) String() string { return proto.CompactTextString(m) }
+func (*BatchAnnotateFilesResponse) ProtoMessage()    {}
+func (*BatchAnnotateFilesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{26}
+}
+
+func (m *BatchAnnotateFilesResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BatchAnnotateFilesResponse.Unmarshal(m, b)
+}
+func (m *BatchAnnotateFilesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BatchAnnotateFilesResponse.Marshal(b, m, deterministic)
+}
+func (m *BatchAnnotateFilesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BatchAnnotateFilesResponse.Merge(m, src)
+}
+func (m *BatchAnnotateFilesResponse) XXX_Size() int {
+	return xxx_messageInfo_BatchAnnotateFilesResponse.Size(m)
+}
+func (m *BatchAnnotateFilesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_BatchAnnotateFilesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BatchAnnotateFilesResponse proto.InternalMessageInfo
+
+func (m *BatchAnnotateFilesResponse) GetResponses() []*AnnotateFileResponse {
+	if m != nil {
+		return m.Responses
+	}
+	return nil
+}
+
+// An offline file annotation request.
+type AsyncAnnotateFileRequest struct {
+	// Required. Information about the input file.
+	InputConfig *InputConfig `protobuf:"bytes,1,opt,name=input_config,json=inputConfig,proto3" json:"input_config,omitempty"`
+	// Required. Requested features.
+	Features []*Feature `protobuf:"bytes,2,rep,name=features,proto3" json:"features,omitempty"`
+	// Additional context that may accompany the image(s) in the file.
+	ImageContext *ImageContext `protobuf:"bytes,3,opt,name=image_context,json=imageContext,proto3" json:"image_context,omitempty"`
+	// Required. The desired output location and metadata (e.g. format).
+	OutputConfig         *OutputConfig `protobuf:"bytes,4,opt,name=output_config,json=outputConfig,proto3" json:"output_config,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
+}
+
+func (m *AsyncAnnotateFileRequest) Reset()         { *m = AsyncAnnotateFileRequest{} }
+func (m *AsyncAnnotateFileRequest) String() string { return proto.CompactTextString(m) }
+func (*AsyncAnnotateFileRequest) ProtoMessage()    {}
+func (*AsyncAnnotateFileRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{27}
+}
+
+func (m *AsyncAnnotateFileRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AsyncAnnotateFileRequest.Unmarshal(m, b)
+}
+func (m *AsyncAnnotateFileRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AsyncAnnotateFileRequest.Marshal(b, m, deterministic)
+}
+func (m *AsyncAnnotateFileRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AsyncAnnotateFileRequest.Merge(m, src)
+}
+func (m *AsyncAnnotateFileRequest) XXX_Size() int {
+	return xxx_messageInfo_AsyncAnnotateFileRequest.Size(m)
+}
+func (m *AsyncAnnotateFileRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AsyncAnnotateFileRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AsyncAnnotateFileRequest proto.InternalMessageInfo
+
+func (m *AsyncAnnotateFileRequest) GetInputConfig() *InputConfig {
+	if m != nil {
+		return m.InputConfig
+	}
+	return nil
+}
+
+func (m *AsyncAnnotateFileRequest) GetFeatures() []*Feature {
+	if m != nil {
+		return m.Features
+	}
+	return nil
+}
+
+func (m *AsyncAnnotateFileRequest) GetImageContext() *ImageContext {
+	if m != nil {
+		return m.ImageContext
+	}
+	return nil
+}
+
+func (m *AsyncAnnotateFileRequest) GetOutputConfig() *OutputConfig {
+	if m != nil {
+		return m.OutputConfig
+	}
+	return nil
+}
+
+// The response for a single offline file annotation request.
+type AsyncAnnotateFileResponse struct {
+	// The output location and metadata from AsyncAnnotateFileRequest.
+	OutputConfig         *OutputConfig `protobuf:"bytes,1,opt,name=output_config,json=outputConfig,proto3" json:"output_config,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
+}
+
+func (m *AsyncAnnotateFileResponse) Reset()         { *m = AsyncAnnotateFileResponse{} }
+func (m *AsyncAnnotateFileResponse) String() string { return proto.CompactTextString(m) }
+func (*AsyncAnnotateFileResponse) ProtoMessage()    {}
+func (*AsyncAnnotateFileResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{28}
+}
+
+func (m *AsyncAnnotateFileResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AsyncAnnotateFileResponse.Unmarshal(m, b)
+}
+func (m *AsyncAnnotateFileResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AsyncAnnotateFileResponse.Marshal(b, m, deterministic)
+}
+func (m *AsyncAnnotateFileResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AsyncAnnotateFileResponse.Merge(m, src)
+}
+func (m *AsyncAnnotateFileResponse) XXX_Size() int {
+	return xxx_messageInfo_AsyncAnnotateFileResponse.Size(m)
+}
+func (m *AsyncAnnotateFileResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AsyncAnnotateFileResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AsyncAnnotateFileResponse proto.InternalMessageInfo
+
+func (m *AsyncAnnotateFileResponse) GetOutputConfig() *OutputConfig {
+	if m != nil {
+		return m.OutputConfig
+	}
+	return nil
+}
+
+// Request for async image annotation for a list of images.
+type AsyncBatchAnnotateImagesRequest struct {
+	// Required. Individual image annotation requests for this batch.
+	Requests []*AnnotateImageRequest `protobuf:"bytes,1,rep,name=requests,proto3" json:"requests,omitempty"`
+	// Required. The desired output location and metadata (e.g. format).
+	OutputConfig *OutputConfig `protobuf:"bytes,2,opt,name=output_config,json=outputConfig,proto3" json:"output_config,omitempty"`
+	// Optional. Target project and location to make a call.
+	//
+	// Format: `projects/{project-id}/locations/{location-id}`.
+	//
+	// If no parent is specified, a region will be chosen automatically.
+	//
+	// Supported location-ids:
+	//     `us`: USA country only,
+	//     `asia`: East asia areas, like Japan, Taiwan,
+	//     `eu`: The European Union.
+	//
+	// Example: `projects/project-A/locations/eu`.
+	Parent               string   `protobuf:"bytes,4,opt,name=parent,proto3" json:"parent,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AsyncBatchAnnotateImagesRequest) Reset()         { *m = AsyncBatchAnnotateImagesRequest{} }
+func (m *AsyncBatchAnnotateImagesRequest) String() string { return proto.CompactTextString(m) }
+func (*AsyncBatchAnnotateImagesRequest) ProtoMessage()    {}
+func (*AsyncBatchAnnotateImagesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{29}
+}
+
+func (m *AsyncBatchAnnotateImagesRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AsyncBatchAnnotateImagesRequest.Unmarshal(m, b)
+}
+func (m *AsyncBatchAnnotateImagesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AsyncBatchAnnotateImagesRequest.Marshal(b, m, deterministic)
+}
+func (m *AsyncBatchAnnotateImagesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AsyncBatchAnnotateImagesRequest.Merge(m, src)
+}
+func (m *AsyncBatchAnnotateImagesRequest) XXX_Size() int {
+	return xxx_messageInfo_AsyncBatchAnnotateImagesRequest.Size(m)
+}
+func (m *AsyncBatchAnnotateImagesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AsyncBatchAnnotateImagesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AsyncBatchAnnotateImagesRequest proto.InternalMessageInfo
+
+func (m *AsyncBatchAnnotateImagesRequest) GetRequests() []*AnnotateImageRequest {
+	if m != nil {
+		return m.Requests
+	}
+	return nil
+}
+
+func (m *AsyncBatchAnnotateImagesRequest) GetOutputConfig() *OutputConfig {
+	if m != nil {
+		return m.OutputConfig
+	}
+	return nil
+}
+
+func (m *AsyncBatchAnnotateImagesRequest) GetParent() string {
+	if m != nil {
+		return m.Parent
+	}
+	return ""
+}
+
+// Response to an async batch image annotation request.
+type AsyncBatchAnnotateImagesResponse struct {
+	// The output location and metadata from AsyncBatchAnnotateImagesRequest.
+	OutputConfig         *OutputConfig `protobuf:"bytes,1,opt,name=output_config,json=outputConfig,proto3" json:"output_config,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
+}
+
+func (m *AsyncBatchAnnotateImagesResponse) Reset()         { *m = AsyncBatchAnnotateImagesResponse{} }
+func (m *AsyncBatchAnnotateImagesResponse) String() string { return proto.CompactTextString(m) }
+func (*AsyncBatchAnnotateImagesResponse) ProtoMessage()    {}
+func (*AsyncBatchAnnotateImagesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{30}
+}
+
+func (m *AsyncBatchAnnotateImagesResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AsyncBatchAnnotateImagesResponse.Unmarshal(m, b)
+}
+func (m *AsyncBatchAnnotateImagesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AsyncBatchAnnotateImagesResponse.Marshal(b, m, deterministic)
+}
+func (m *AsyncBatchAnnotateImagesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AsyncBatchAnnotateImagesResponse.Merge(m, src)
+}
+func (m *AsyncBatchAnnotateImagesResponse) XXX_Size() int {
+	return xxx_messageInfo_AsyncBatchAnnotateImagesResponse.Size(m)
+}
+func (m *AsyncBatchAnnotateImagesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AsyncBatchAnnotateImagesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AsyncBatchAnnotateImagesResponse proto.InternalMessageInfo
+
+func (m *AsyncBatchAnnotateImagesResponse) GetOutputConfig() *OutputConfig {
+	if m != nil {
+		return m.OutputConfig
+	}
+	return nil
+}
+
+// Multiple async file annotation requests are batched into a single service
+// call.
+type AsyncBatchAnnotateFilesRequest struct {
+	// Required. Individual async file annotation requests for this batch.
+	Requests []*AsyncAnnotateFileRequest `protobuf:"bytes,1,rep,name=requests,proto3" json:"requests,omitempty"`
+	// Optional. Target project and location to make a call.
+	//
+	// Format: `projects/{project-id}/locations/{location-id}`.
+	//
+	// If no parent is specified, a region will be chosen automatically.
+	//
+	// Supported location-ids:
+	//     `us`: USA country only,
+	//     `asia`: East asia areas, like Japan, Taiwan,
+	//     `eu`: The European Union.
+	//
+	// Example: `projects/project-A/locations/eu`.
+	Parent               string   `protobuf:"bytes,4,opt,name=parent,proto3" json:"parent,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AsyncBatchAnnotateFilesRequest) Reset()         { *m = AsyncBatchAnnotateFilesRequest{} }
+func (m *AsyncBatchAnnotateFilesRequest) String() string { return proto.CompactTextString(m) }
+func (*AsyncBatchAnnotateFilesRequest) ProtoMessage()    {}
+func (*AsyncBatchAnnotateFilesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{31}
+}
+
+func (m *AsyncBatchAnnotateFilesRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AsyncBatchAnnotateFilesRequest.Unmarshal(m, b)
+}
+func (m *AsyncBatchAnnotateFilesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AsyncBatchAnnotateFilesRequest.Marshal(b, m, deterministic)
+}
+func (m *AsyncBatchAnnotateFilesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AsyncBatchAnnotateFilesRequest.Merge(m, src)
+}
+func (m *AsyncBatchAnnotateFilesRequest) XXX_Size() int {
+	return xxx_messageInfo_AsyncBatchAnnotateFilesRequest.Size(m)
+}
+func (m *AsyncBatchAnnotateFilesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AsyncBatchAnnotateFilesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AsyncBatchAnnotateFilesRequest proto.InternalMessageInfo
+
+func (m *AsyncBatchAnnotateFilesRequest) GetRequests() []*AsyncAnnotateFileRequest {
+	if m != nil {
+		return m.Requests
+	}
+	return nil
+}
+
+func (m *AsyncBatchAnnotateFilesRequest) GetParent() string {
+	if m != nil {
+		return m.Parent
+	}
+	return ""
+}
+
+// Response to an async batch file annotation request.
+type AsyncBatchAnnotateFilesResponse struct {
+	// The list of file annotation responses, one for each request in
+	// AsyncBatchAnnotateFilesRequest.
+	Responses            []*AsyncAnnotateFileResponse `protobuf:"bytes,1,rep,name=responses,proto3" json:"responses,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
+	XXX_unrecognized     []byte                       `json:"-"`
+	XXX_sizecache        int32                        `json:"-"`
+}
+
+func (m *AsyncBatchAnnotateFilesResponse) Reset()         { *m = AsyncBatchAnnotateFilesResponse{} }
+func (m *AsyncBatchAnnotateFilesResponse) String() string { return proto.CompactTextString(m) }
+func (*AsyncBatchAnnotateFilesResponse) ProtoMessage()    {}
+func (*AsyncBatchAnnotateFilesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{32}
+}
+
+func (m *AsyncBatchAnnotateFilesResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AsyncBatchAnnotateFilesResponse.Unmarshal(m, b)
+}
+func (m *AsyncBatchAnnotateFilesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AsyncBatchAnnotateFilesResponse.Marshal(b, m, deterministic)
+}
+func (m *AsyncBatchAnnotateFilesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AsyncBatchAnnotateFilesResponse.Merge(m, src)
+}
+func (m *AsyncBatchAnnotateFilesResponse) XXX_Size() int {
+	return xxx_messageInfo_AsyncBatchAnnotateFilesResponse.Size(m)
+}
+func (m *AsyncBatchAnnotateFilesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AsyncBatchAnnotateFilesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AsyncBatchAnnotateFilesResponse proto.InternalMessageInfo
+
+func (m *AsyncBatchAnnotateFilesResponse) GetResponses() []*AsyncAnnotateFileResponse {
+	if m != nil {
+		return m.Responses
+	}
+	return nil
+}
+
+// The desired input location and metadata.
+type InputConfig struct {
+	// The Google Cloud Storage location to read the input from.
+	GcsSource *GcsSource `protobuf:"bytes,1,opt,name=gcs_source,json=gcsSource,proto3" json:"gcs_source,omitempty"`
+	// File content, represented as a stream of bytes.
+	// Note: As with all `bytes` fields, protobuffers use a pure binary
+	// representation, whereas JSON representations use base64.
+	//
+	// Currently, this field only works for BatchAnnotateFiles requests. It does
+	// not work for AsyncBatchAnnotateFiles requests.
+	Content []byte `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+	// The type of the file. Currently only "application/pdf", "image/tiff" and
+	// "image/gif" are supported. Wildcards are not supported.
+	MimeType             string   `protobuf:"bytes,2,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *InputConfig) Reset()         { *m = InputConfig{} }
+func (m *InputConfig) String() string { return proto.CompactTextString(m) }
+func (*InputConfig) ProtoMessage()    {}
+func (*InputConfig) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{33}
+}
+
+func (m *InputConfig) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_InputConfig.Unmarshal(m, b)
+}
+func (m *InputConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_InputConfig.Marshal(b, m, deterministic)
+}
+func (m *InputConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InputConfig.Merge(m, src)
+}
+func (m *InputConfig) XXX_Size() int {
+	return xxx_messageInfo_InputConfig.Size(m)
+}
+func (m *InputConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_InputConfig.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InputConfig proto.InternalMessageInfo
+
+func (m *InputConfig) GetGcsSource() *GcsSource {
+	if m != nil {
+		return m.GcsSource
+	}
+	return nil
+}
+
+func (m *InputConfig) GetContent() []byte {
+	if m != nil {
+		return m.Content
+	}
+	return nil
+}
+
+func (m *InputConfig) GetMimeType() string {
+	if m != nil {
+		return m.MimeType
+	}
+	return ""
+}
+
+// The desired output location and metadata.
+type OutputConfig struct {
+	// The Google Cloud Storage location to write the output(s) to.
+	GcsDestination *GcsDestination `protobuf:"bytes,1,opt,name=gcs_destination,json=gcsDestination,proto3" json:"gcs_destination,omitempty"`
+	// The max number of response protos to put into each output JSON file on
+	// Google Cloud Storage.
+	// The valid range is [1, 100]. If not specified, the default value is 20.
+	//
+	// For example, for one pdf file with 100 pages, 100 response protos will
+	// be generated. If `batch_size` = 20, then 5 json files each
+	// containing 20 response protos will be written under the prefix
+	// `gcs_destination`.`uri`.
+	//
+	// Currently, batch_size only applies to GcsDestination, with potential future
+	// support for other output configurations.
+	BatchSize            int32    `protobuf:"varint,2,opt,name=batch_size,json=batchSize,proto3" json:"batch_size,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *OutputConfig) Reset()         { *m = OutputConfig{} }
+func (m *OutputConfig) String() string { return proto.CompactTextString(m) }
+func (*OutputConfig) ProtoMessage()    {}
+func (*OutputConfig) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{34}
+}
+
+func (m *OutputConfig) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_OutputConfig.Unmarshal(m, b)
+}
+func (m *OutputConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_OutputConfig.Marshal(b, m, deterministic)
+}
+func (m *OutputConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_OutputConfig.Merge(m, src)
+}
+func (m *OutputConfig) XXX_Size() int {
+	return xxx_messageInfo_OutputConfig.Size(m)
+}
+func (m *OutputConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_OutputConfig.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_OutputConfig proto.InternalMessageInfo
+
+func (m *OutputConfig) GetGcsDestination() *GcsDestination {
+	if m != nil {
+		return m.GcsDestination
+	}
+	return nil
+}
+
+func (m *OutputConfig) GetBatchSize() int32 {
+	if m != nil {
+		return m.BatchSize
+	}
+	return 0
+}
+
+// The Google Cloud Storage location where the input will be read from.
+type GcsSource struct {
+	// Google Cloud Storage URI for the input file. This must only be a
+	// Google Cloud Storage object. Wildcards are not currently supported.
+	Uri                  string   `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GcsSource) Reset()         { *m = GcsSource{} }
+func (m *GcsSource) String() string { return proto.CompactTextString(m) }
+func (*GcsSource) ProtoMessage()    {}
+func (*GcsSource) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{35}
+}
+
+func (m *GcsSource) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GcsSource.Unmarshal(m, b)
+}
+func (m *GcsSource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GcsSource.Marshal(b, m, deterministic)
+}
+func (m *GcsSource) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GcsSource.Merge(m, src)
+}
+func (m *GcsSource) XXX_Size() int {
+	return xxx_messageInfo_GcsSource.Size(m)
+}
+func (m *GcsSource) XXX_DiscardUnknown() {
+	xxx_messageInfo_GcsSource.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GcsSource proto.InternalMessageInfo
+
+func (m *GcsSource) GetUri() string {
+	if m != nil {
+		return m.Uri
+	}
+	return ""
+}
+
+// The Google Cloud Storage location where the output will be written to.
+type GcsDestination struct {
+	// Google Cloud Storage URI prefix where the results will be stored. Results
+	// will be in JSON format and preceded by its corresponding input URI prefix.
+	// This field can either represent a gcs file prefix or gcs directory. In
+	// either case, the uri should be unique because in order to get all of the
+	// output files, you will need to do a wildcard gcs search on the uri prefix
+	// you provide.
+	//
+	// Examples:
+	//
+	// *    File Prefix: gs://bucket-name/here/filenameprefix   The output files
+	// will be created in gs://bucket-name/here/ and the names of the
+	// output files will begin with "filenameprefix".
+	//
+	// *    Directory Prefix: gs://bucket-name/some/location/   The output files
+	// will be created in gs://bucket-name/some/location/ and the names of the
+	// output files could be anything because there was no filename prefix
+	// specified.
+	//
+	// If multiple outputs, each response is still AnnotateFileResponse, each of
+	// which contains some subset of the full list of AnnotateImageResponse.
+	// Multiple outputs can happen if, for example, the output JSON is too large
+	// and overflows into multiple sharded files.
+	Uri                  string   `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GcsDestination) Reset()         { *m = GcsDestination{} }
+func (m *GcsDestination) String() string { return proto.CompactTextString(m) }
+func (*GcsDestination) ProtoMessage()    {}
+func (*GcsDestination) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{36}
+}
+
+func (m *GcsDestination) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GcsDestination.Unmarshal(m, b)
+}
+func (m *GcsDestination) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GcsDestination.Marshal(b, m, deterministic)
+}
+func (m *GcsDestination) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GcsDestination.Merge(m, src)
+}
+func (m *GcsDestination) XXX_Size() int {
+	return xxx_messageInfo_GcsDestination.Size(m)
+}
+func (m *GcsDestination) XXX_DiscardUnknown() {
+	xxx_messageInfo_GcsDestination.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GcsDestination proto.InternalMessageInfo
+
+func (m *GcsDestination) GetUri() string {
+	if m != nil {
+		return m.Uri
+	}
+	return ""
+}
+
+// Contains metadata for the BatchAnnotateImages operation.
+type OperationMetadata struct {
+	// Current state of the batch operation.
+	State OperationMetadata_State `protobuf:"varint,1,opt,name=state,proto3,enum=google.cloud.vision.v1.OperationMetadata_State" json:"state,omitempty"`
+	// The time when the batch request was received.
+	CreateTime *timestamp.Timestamp `protobuf:"bytes,5,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
+	// The time when the operation result was last updated.
+	UpdateTime           *timestamp.Timestamp `protobuf:"bytes,6,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
+}
+
+func (m *OperationMetadata) Reset()         { *m = OperationMetadata{} }
+func (m *OperationMetadata) String() string { return proto.CompactTextString(m) }
+func (*OperationMetadata) ProtoMessage()    {}
+func (*OperationMetadata) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49e74116a4d6fd69, []int{37}
+}
+
+func (m *OperationMetadata) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_OperationMetadata.Unmarshal(m, b)
+}
+func (m *OperationMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_OperationMetadata.Marshal(b, m, deterministic)
+}
+func (m *OperationMetadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_OperationMetadata.Merge(m, src)
+}
+func (m *OperationMetadata) XXX_Size() int {
+	return xxx_messageInfo_OperationMetadata.Size(m)
+}
+func (m *OperationMetadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_OperationMetadata.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_OperationMetadata proto.InternalMessageInfo
+
+func (m *OperationMetadata) GetState() OperationMetadata_State {
+	if m != nil {
+		return m.State
+	}
+	return OperationMetadata_STATE_UNSPECIFIED
+}
+
+func (m *OperationMetadata) GetCreateTime() *timestamp.Timestamp {
+	if m != nil {
+		return m.CreateTime
+	}
+	return nil
+}
+
+func (m *OperationMetadata) GetUpdateTime() *timestamp.Timestamp {
+	if m != nil {
+		return m.UpdateTime
+	}
+	return nil
+}
+
 func init() {
+	proto.RegisterEnum("google.cloud.vision.v1.Likelihood", Likelihood_name, Likelihood_value)
+	proto.RegisterEnum("google.cloud.vision.v1.Feature_Type", Feature_Type_name, Feature_Type_value)
+	proto.RegisterEnum("google.cloud.vision.v1.FaceAnnotation_Landmark_Type", FaceAnnotation_Landmark_Type_name, FaceAnnotation_Landmark_Type_value)
+	proto.RegisterEnum("google.cloud.vision.v1.OperationMetadata_State", OperationMetadata_State_name, OperationMetadata_State_value)
 	proto.RegisterType((*Feature)(nil), "google.cloud.vision.v1.Feature")
 	proto.RegisterType((*ImageSource)(nil), "google.cloud.vision.v1.ImageSource")
 	proto.RegisterType((*Image)(nil), "google.cloud.vision.v1.Image")
@@ -1264,6 +2961,7 @@ func init() {
 	proto.RegisterType((*LocationInfo)(nil), "google.cloud.vision.v1.LocationInfo")
 	proto.RegisterType((*Property)(nil), "google.cloud.vision.v1.Property")
 	proto.RegisterType((*EntityAnnotation)(nil), "google.cloud.vision.v1.EntityAnnotation")
+	proto.RegisterType((*LocalizedObjectAnnotation)(nil), "google.cloud.vision.v1.LocalizedObjectAnnotation")
 	proto.RegisterType((*SafeSearchAnnotation)(nil), "google.cloud.vision.v1.SafeSearchAnnotation")
 	proto.RegisterType((*LatLongRect)(nil), "google.cloud.vision.v1.LatLongRect")
 	proto.RegisterType((*ColorInfo)(nil), "google.cloud.vision.v1.ColorInfo")
@@ -1275,12 +2973,256 @@ func init() {
 	proto.RegisterType((*WebDetectionParams)(nil), "google.cloud.vision.v1.WebDetectionParams")
 	proto.RegisterType((*ImageContext)(nil), "google.cloud.vision.v1.ImageContext")
 	proto.RegisterType((*AnnotateImageRequest)(nil), "google.cloud.vision.v1.AnnotateImageRequest")
+	proto.RegisterType((*ImageAnnotationContext)(nil), "google.cloud.vision.v1.ImageAnnotationContext")
 	proto.RegisterType((*AnnotateImageResponse)(nil), "google.cloud.vision.v1.AnnotateImageResponse")
 	proto.RegisterType((*BatchAnnotateImagesRequest)(nil), "google.cloud.vision.v1.BatchAnnotateImagesRequest")
 	proto.RegisterType((*BatchAnnotateImagesResponse)(nil), "google.cloud.vision.v1.BatchAnnotateImagesResponse")
-	proto.RegisterEnum("google.cloud.vision.v1.Likelihood", Likelihood_name, Likelihood_value)
-	proto.RegisterEnum("google.cloud.vision.v1.Feature_Type", Feature_Type_name, Feature_Type_value)
-	proto.RegisterEnum("google.cloud.vision.v1.FaceAnnotation_Landmark_Type", FaceAnnotation_Landmark_Type_name, FaceAnnotation_Landmark_Type_value)
+	proto.RegisterType((*AnnotateFileRequest)(nil), "google.cloud.vision.v1.AnnotateFileRequest")
+	proto.RegisterType((*AnnotateFileResponse)(nil), "google.cloud.vision.v1.AnnotateFileResponse")
+	proto.RegisterType((*BatchAnnotateFilesRequest)(nil), "google.cloud.vision.v1.BatchAnnotateFilesRequest")
+	proto.RegisterType((*BatchAnnotateFilesResponse)(nil), "google.cloud.vision.v1.BatchAnnotateFilesResponse")
+	proto.RegisterType((*AsyncAnnotateFileRequest)(nil), "google.cloud.vision.v1.AsyncAnnotateFileRequest")
+	proto.RegisterType((*AsyncAnnotateFileResponse)(nil), "google.cloud.vision.v1.AsyncAnnotateFileResponse")
+	proto.RegisterType((*AsyncBatchAnnotateImagesRequest)(nil), "google.cloud.vision.v1.AsyncBatchAnnotateImagesRequest")
+	proto.RegisterType((*AsyncBatchAnnotateImagesResponse)(nil), "google.cloud.vision.v1.AsyncBatchAnnotateImagesResponse")
+	proto.RegisterType((*AsyncBatchAnnotateFilesRequest)(nil), "google.cloud.vision.v1.AsyncBatchAnnotateFilesRequest")
+	proto.RegisterType((*AsyncBatchAnnotateFilesResponse)(nil), "google.cloud.vision.v1.AsyncBatchAnnotateFilesResponse")
+	proto.RegisterType((*InputConfig)(nil), "google.cloud.vision.v1.InputConfig")
+	proto.RegisterType((*OutputConfig)(nil), "google.cloud.vision.v1.OutputConfig")
+	proto.RegisterType((*GcsSource)(nil), "google.cloud.vision.v1.GcsSource")
+	proto.RegisterType((*GcsDestination)(nil), "google.cloud.vision.v1.GcsDestination")
+	proto.RegisterType((*OperationMetadata)(nil), "google.cloud.vision.v1.OperationMetadata")
+}
+
+func init() {
+	proto.RegisterFile("google/cloud/vision/v1/image_annotator.proto", fileDescriptor_49e74116a4d6fd69)
+}
+
+var fileDescriptor_49e74116a4d6fd69 = []byte{
+	// 3561 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe4, 0x5a, 0xcb, 0x6f, 0x23, 0x47,
+	0x7a, 0x37, 0x49, 0x3d, 0xc8, 0x8f, 0x94, 0xd4, 0x2a, 0x4a, 0x32, 0x47, 0x33, 0xe3, 0x91, 0xdb,
+	0xf1, 0x7a, 0x76, 0x3c, 0x16, 0x77, 0x64, 0x7b, 0xd6, 0xb1, 0x67, 0x93, 0xa5, 0xa8, 0x96, 0xc4,
+	0x1d, 0x8a, 0xa4, 0x8b, 0x94, 0x67, 0xc7, 0xbb, 0x48, 0xa3, 0xd5, 0x2c, 0x72, 0xda, 0x6e, 0x76,
+	0x77, 0xba, 0x9b, 0x23, 0xc9, 0x8b, 0x0d, 0xf2, 0x00, 0x02, 0x04, 0x09, 0x72, 0xd8, 0x3d, 0x06,
+	0x08, 0x82, 0x04, 0x48, 0xfe, 0x81, 0xe4, 0x6f, 0x48, 0xe2, 0x5b, 0xb2, 0x87, 0x04, 0x7b, 0xca,
+	0x61, 0x0f, 0x01, 0x72, 0xce, 0x22, 0x40, 0x2e, 0x41, 0x3d, 0xba, 0x59, 0xcd, 0x87, 0x44, 0x39,
+	0x46, 0x10, 0x60, 0x4f, 0xec, 0xfa, 0x1e, 0xbf, 0xaa, 0xfa, 0xea, 0x7b, 0x75, 0xb1, 0xe1, 0x61,
+	0xdf, 0x75, 0xfb, 0x36, 0x29, 0x9b, 0xb6, 0x3b, 0xec, 0x96, 0x5f, 0x5a, 0x81, 0xe5, 0x3a, 0xe5,
+	0x97, 0x8f, 0xca, 0xd6, 0xc0, 0xe8, 0x13, 0xdd, 0x70, 0x1c, 0x37, 0x34, 0x42, 0xd7, 0xdf, 0xf5,
+	0x7c, 0x37, 0x74, 0xd1, 0x16, 0x97, 0xde, 0x65, 0xd2, 0xbb, 0x5c, 0x7a, 0xf7, 0xe5, 0xa3, 0xed,
+	0x3b, 0x02, 0xc5, 0xf0, 0xac, 0xb2, 0xd0, 0xb1, 0x5c, 0x27, 0xe0, 0x5a, 0xdb, 0xaf, 0x4a, 0x5c,
+	0xd3, 0xb6, 0x88, 0x13, 0x0a, 0xc6, 0x3d, 0x89, 0xd1, 0xb3, 0x88, 0xdd, 0xd5, 0xcf, 0xc8, 0x0b,
+	0xe3, 0xa5, 0x15, 0xcd, 0xb7, 0xfd, 0xe6, 0x8c, 0xd5, 0xf5, 0x89, 0x3b, 0x20, 0xa1, 0x7f, 0x29,
+	0xc4, 0xde, 0x9e, 0x21, 0xe6, 0xf9, 0x6e, 0x77, 0x68, 0x86, 0x7a, 0x40, 0x0c, 0xdf, 0x7c, 0x21,
+	0x84, 0x67, 0xed, 0x38, 0x24, 0x17, 0xa1, 0x3e, 0x5a, 0xbc, 0x90, 0x7e, 0x30, 0x43, 0xfa, 0x9c,
+	0x9c, 0xe9, 0x5d, 0x12, 0x12, 0x53, 0x92, 0x7d, 0x43, 0xc8, 0xda, 0xae, 0xd3, 0xf7, 0x87, 0x8e,
+	0x63, 0x39, 0xfd, 0xb2, 0xeb, 0x11, 0x3f, 0x61, 0x8c, 0x1d, 0x21, 0xc4, 0x46, 0x67, 0xc3, 0x9e,
+	0xd8, 0xf8, 0xc0, 0x08, 0x3e, 0x1f, 0xb3, 0x4a, 0x2c, 0x11, 0x5a, 0x03, 0x12, 0x84, 0xc6, 0xc0,
+	0x1b, 0xb3, 0xa7, 0xef, 0x99, 0xe5, 0x20, 0x34, 0xc2, 0xe1, 0xb8, 0xa1, 0xc3, 0x4b, 0x8f, 0x94,
+	0x4d, 0xd7, 0x8e, 0xed, 0x58, 0x92, 0x19, 0xb6, 0x11, 0xda, 0x4e, 0x9f, 0x73, 0xd4, 0xbf, 0xc8,
+	0xc0, 0xf2, 0x21, 0x31, 0xc2, 0xa1, 0x4f, 0xd0, 0x07, 0xb0, 0x40, 0x05, 0x4a, 0xa9, 0x9d, 0xd4,
+	0xfd, 0xd5, 0xbd, 0x5f, 0xdb, 0x9d, 0x7e, 0xd8, 0xbb, 0x42, 0x7c, 0xb7, 0x73, 0xe9, 0x11, 0xcc,
+	0x34, 0xd0, 0x3d, 0xc8, 0x0f, 0x8c, 0x0b, 0xdd, 0x27, 0xc1, 0xd0, 0x0e, 0x83, 0x52, 0x7a, 0x27,
+	0x75, 0x7f, 0x11, 0xc3, 0xc0, 0xb8, 0xc0, 0x9c, 0x82, 0x36, 0x60, 0x71, 0xe0, 0x76, 0x89, 0x5d,
+	0xca, 0xec, 0xa4, 0xee, 0xe7, 0x30, 0x1f, 0xa8, 0x7f, 0x95, 0x86, 0x05, 0x8a, 0x82, 0x36, 0x40,
+	0xe9, 0x3c, 0x6f, 0x69, 0xfa, 0x69, 0xa3, 0xdd, 0xd2, 0xaa, 0xb5, 0xc3, 0x9a, 0x76, 0xa0, 0xbc,
+	0x82, 0x10, 0xac, 0x1e, 0x56, 0xaa, 0x9a, 0x7e, 0xa0, 0x75, 0xb4, 0x6a, 0xa7, 0xd6, 0x6c, 0x28,
+	0x29, 0xb4, 0x05, 0xa8, 0x5e, 0x69, 0x1c, 0x9c, 0x54, 0xf0, 0x53, 0x89, 0x9e, 0xa6, 0xb2, 0xf5,
+	0xe6, 0x51, 0x53, 0xa2, 0x65, 0x50, 0x11, 0xd6, 0xea, 0x95, 0x7d, 0xad, 0x2e, 0x11, 0x17, 0xa8,
+	0x60, 0x47, 0xfb, 0x7e, 0x47, 0xa2, 0x2d, 0xa2, 0xdb, 0xf0, 0xea, 0x41, 0xb3, 0x7a, 0x7a, 0xa2,
+	0x35, 0x3a, 0xfa, 0x18, 0x33, 0x8f, 0x6e, 0xc1, 0x66, 0xbb, 0x72, 0xa8, 0xe9, 0x6d, 0xad, 0x82,
+	0xab, 0xc7, 0x12, 0x6b, 0x89, 0x2e, 0xbb, 0x76, 0x52, 0x39, 0xd2, 0xf4, 0x16, 0x6e, 0xb6, 0x34,
+	0xdc, 0xa9, 0x69, 0x6d, 0x65, 0x19, 0xad, 0x02, 0x54, 0x71, 0xb3, 0xa5, 0x1f, 0xd7, 0x1a, 0x9d,
+	0xb6, 0x92, 0x43, 0xeb, 0xb0, 0xf2, 0x4c, 0xdb, 0x97, 0x14, 0x81, 0x2e, 0xa2, 0x85, 0x9b, 0x07,
+	0xa7, 0xd5, 0x8e, 0x80, 0x55, 0x0a, 0xe8, 0x55, 0x28, 0x36, 0xf7, 0xbf, 0xa7, 0x55, 0x3b, 0x7a,
+	0xbd, 0x59, 0xad, 0xd4, 0x6b, 0x9f, 0x56, 0x98, 0x70, 0x51, 0x6d, 0x40, 0xbe, 0x46, 0xa3, 0xb1,
+	0xed, 0x0e, 0x7d, 0x93, 0x20, 0x15, 0x56, 0xfa, 0x66, 0xa0, 0xf3, 0x00, 0x1d, 0xfa, 0x16, 0x3b,
+	0xae, 0x1c, 0xce, 0xf7, 0xcd, 0x80, 0x89, 0x9d, 0xfa, 0x16, 0xba, 0x0d, 0xb9, 0x11, 0x3f, 0xcd,
+	0xf8, 0x59, 0x4b, 0x30, 0xd5, 0xdf, 0x82, 0x45, 0x26, 0x88, 0x4a, 0xb0, 0x6c, 0xba, 0x4e, 0x48,
+	0x9c, 0x90, 0x61, 0x14, 0x70, 0x34, 0x44, 0x1f, 0xc1, 0x52, 0xc0, 0x66, 0x63, 0xca, 0xf9, 0xbd,
+	0x37, 0x66, 0xf9, 0x82, 0xb4, 0x30, 0x2c, 0x54, 0xd4, 0x7f, 0x5a, 0x83, 0xd5, 0x43, 0xc3, 0x24,
+	0x95, 0x38, 0x96, 0x50, 0x0d, 0x56, 0xce, 0xdc, 0xa1, 0xd3, 0xb5, 0x9c, 0xbe, 0xee, 0xb9, 0xf6,
+	0x25, 0x9b, 0x2f, 0x3f, 0xdb, 0xc5, 0xf6, 0x85, 0x70, 0xcb, 0xb5, 0x2f, 0x71, 0xe1, 0x4c, 0x1a,
+	0xa1, 0x06, 0x28, 0xbd, 0xae, 0x9e, 0x44, 0x4b, 0xdf, 0x00, 0x6d, 0xb5, 0xd7, 0x95, 0xc7, 0xe8,
+	0x04, 0x72, 0xb6, 0xe1, 0x74, 0x07, 0x86, 0xff, 0x79, 0x50, 0xca, 0xec, 0x64, 0xee, 0xe7, 0xf7,
+	0xca, 0x33, 0x3d, 0x3f, 0xb1, 0xab, 0xdd, 0xba, 0xd0, 0xc3, 0x23, 0x04, 0x74, 0x17, 0xc0, 0x77,
+	0x6d, 0x5b, 0x37, 0x9c, 0xbe, 0x4d, 0x4a, 0x0b, 0x3b, 0xa9, 0xfb, 0x69, 0x9c, 0xa3, 0x94, 0x0a,
+	0x25, 0xd0, 0x83, 0xf1, 0x0c, 0x47, 0x70, 0x17, 0x19, 0x37, 0xeb, 0x19, 0x0e, 0x67, 0xde, 0x05,
+	0x08, 0x2d, 0x3b, 0x14, 0xdc, 0x25, 0xae, 0x4b, 0x29, 0x9c, 0xfd, 0x08, 0x36, 0xe2, 0x8c, 0xa3,
+	0x9b, 0xae, 0xd3, 0xb3, 0xba, 0xc4, 0x31, 0x49, 0x69, 0x99, 0x09, 0x16, 0x63, 0x5e, 0x35, 0x66,
+	0xa1, 0xf7, 0x61, 0x2b, 0x5a, 0x1a, 0x35, 0x96, 0xa4, 0x94, 0x65, 0x4a, 0x9b, 0x12, 0x57, 0x52,
+	0xab, 0xc1, 0xea, 0x67, 0xee, 0xa5, 0x6e, 0x5b, 0x9f, 0x13, 0xdb, 0x7a, 0xe1, 0xba, 0xdd, 0x52,
+	0x8e, 0xa5, 0x04, 0x75, 0x96, 0x61, 0xea, 0xb1, 0x24, 0x5e, 0xf9, 0xcc, 0xbd, 0x1c, 0x0d, 0x51,
+	0x13, 0xd6, 0x03, 0xd7, 0xf7, 0xdd, 0x73, 0x19, 0x0d, 0xe6, 0x46, 0x53, 0xb8, 0xb2, 0x04, 0x78,
+	0x02, 0x8a, 0xe1, 0xf4, 0x89, 0x2f, 0xe3, 0xe5, 0xe7, 0xc6, 0x5b, 0x63, 0xba, 0x12, 0x5c, 0x1b,
+	0x8a, 0xc1, 0xd0, 0xf7, 0x7c, 0x2b, 0x20, 0x32, 0x62, 0x61, 0x6e, 0x44, 0x14, 0xa9, 0x4b, 0xa0,
+	0x3f, 0x84, 0xd2, 0xd0, 0xe9, 0x12, 0x5f, 0x27, 0x17, 0x9e, 0x1b, 0x90, 0xae, 0x8c, 0xbc, 0x32,
+	0x37, 0xf2, 0x16, 0xc3, 0xd0, 0x38, 0x84, 0x84, 0xfe, 0x31, 0xa0, 0x33, 0x7b, 0xe8, 0xfb, 0x49,
+	0xdc, 0xd5, 0xb9, 0x71, 0xd7, 0x85, 0x76, 0xd2, 0x0a, 0x2f, 0x88, 0xd1, 0x3d, 0x27, 0x46, 0xc2,
+	0xae, 0x6b, 0xf3, 0x5b, 0x21, 0x52, 0x1f, 0xd1, 0xb6, 0xff, 0x71, 0x19, 0xb2, 0x51, 0x88, 0xa0,
+	0x63, 0x51, 0x5b, 0x32, 0x0c, 0xf2, 0xbd, 0x1b, 0x46, 0x98, 0x5c, 0x6b, 0x9e, 0x40, 0xd6, 0x73,
+	0x03, 0x8b, 0xf2, 0x59, 0x7c, 0xe5, 0xf7, 0x76, 0x66, 0xa1, 0xb5, 0x84, 0x1c, 0x8e, 0x35, 0xd4,
+	0xbf, 0x5d, 0x1a, 0x95, 0x9c, 0xd3, 0xc6, 0xd3, 0x46, 0xf3, 0x59, 0x43, 0x8f, 0x0a, 0x8a, 0xf2,
+	0x0a, 0x2a, 0x40, 0xb6, 0xae, 0x1d, 0x76, 0x74, 0xed, 0xb9, 0xa6, 0xa4, 0xd0, 0x0a, 0xe4, 0x70,
+	0xed, 0xe8, 0x98, 0x0f, 0xd3, 0xa8, 0x04, 0x1b, 0x8c, 0xd9, 0x3c, 0xd4, 0x23, 0xa1, 0x7d, 0xdc,
+	0x7c, 0xa6, 0x64, 0x68, 0x8d, 0xe0, 0x82, 0xe3, 0xac, 0x05, 0xca, 0x8a, 0x94, 0x62, 0x2c, 0xc6,
+	0x5a, 0x44, 0xdb, 0xb0, 0x15, 0x6b, 0x25, 0x79, 0x4b, 0x54, 0xed, 0xa4, 0x76, 0xd0, 0x6a, 0xd6,
+	0x1a, 0x1d, 0x7d, 0x5f, 0xeb, 0x3c, 0xd3, 0xb4, 0x06, 0xe5, 0xd2, 0xfa, 0x52, 0x80, 0x6c, 0xa3,
+	0xd9, 0xd6, 0xf4, 0x4e, 0xad, 0xa5, 0x64, 0xe9, 0x1a, 0x4f, 0x5b, 0x2d, 0x0d, 0xeb, 0xf5, 0x5a,
+	0x4b, 0xc9, 0xd1, 0x61, 0xbd, 0xf9, 0x4c, 0x0c, 0x81, 0xd6, 0xa2, 0x93, 0xe6, 0x69, 0xe7, 0x98,
+	0xad, 0x4a, 0xc9, 0xa3, 0x35, 0xc8, 0xf3, 0x31, 0x9b, 0x4f, 0x29, 0x20, 0x05, 0x0a, 0x9c, 0x50,
+	0xd5, 0x1a, 0x1d, 0x0d, 0x2b, 0x2b, 0x68, 0x13, 0xd6, 0x19, 0xfc, 0x7e, 0xb3, 0xd3, 0x69, 0x9e,
+	0x08, 0xc1, 0x55, 0x6a, 0x2f, 0x99, 0xcc, 0xf0, 0xd6, 0x68, 0x39, 0x96, 0xa9, 0x02, 0x44, 0x89,
+	0x77, 0xad, 0x3d, 0xd7, 0xf4, 0x4e, 0xb3, 0xa5, 0xef, 0x37, 0x4f, 0x1b, 0x07, 0x15, 0xfc, 0x5c,
+	0x59, 0x4f, 0xb0, 0xf8, 0xae, 0xab, 0x4d, 0xdc, 0xd0, 0xb0, 0x82, 0xd0, 0x1d, 0x28, 0xc5, 0x2c,
+	0x81, 0x18, 0x2b, 0x16, 0x63, 0xf3, 0x53, 0x2e, 0x7b, 0x10, 0x7a, 0x1b, 0x23, 0x43, 0x4e, 0x4c,
+	0xb7, 0x99, 0xe4, 0x25, 0xe6, 0xdb, 0x42, 0x77, 0xe1, 0xd6, 0x88, 0x37, 0x3e, 0xe1, 0xab, 0xa3,
+	0x53, 0x1d, 0x9f, 0xb1, 0x84, 0xee, 0xc1, 0x6d, 0xf9, 0x9c, 0x75, 0x7e, 0x04, 0xd1, 0x89, 0x29,
+	0xb7, 0xd0, 0x0e, 0xdc, 0x49, 0x1c, 0xe9, 0xb8, 0xc4, 0x36, 0x35, 0x28, 0x87, 0xa8, 0x60, 0xbd,
+	0x83, 0x2b, 0x47, 0xb4, 0xd8, 0xdf, 0xa6, 0xd6, 0x17, 0x7a, 0x12, 0xf9, 0x0e, 0x6b, 0x6f, 0xa2,
+	0xbd, 0xb7, 0x4e, 0x5b, 0xb5, 0xba, 0x72, 0x97, 0xb6, 0x37, 0xa3, 0xe5, 0x71, 0xe2, 0x6b, 0x54,
+	0xff, 0xb0, 0x89, 0xb5, 0x63, 0xad, 0x72, 0xa0, 0x1f, 0xb1, 0xee, 0xa7, 0x5e, 0x51, 0xee, 0xd1,
+	0x1e, 0xa4, 0x7a, 0x5c, 0x6b, 0xe8, 0x47, 0x8d, 0x4a, 0xe7, 0x98, 0x42, 0xee, 0xd0, 0xf9, 0x19,
+	0x89, 0xe1, 0x1e, 0x35, 0x1b, 0x94, 0xfa, 0x3a, 0xd5, 0x67, 0x54, 0x8e, 0x2c, 0xc8, 0xaa, 0xfa,
+	0x04, 0x0a, 0x75, 0xd7, 0x64, 0x41, 0x59, 0x73, 0x7a, 0x2e, 0x7a, 0x08, 0xcb, 0xb6, 0x11, 0xea,
+	0xb6, 0xd3, 0x17, 0xa5, 0xbc, 0x18, 0xc5, 0x20, 0x8d, 0xd1, 0xdd, 0xba, 0x11, 0xd6, 0x9d, 0x3e,
+	0x5e, 0xb2, 0xd9, 0xaf, 0xfa, 0x0c, 0xb2, 0x2d, 0x9f, 0x76, 0xc2, 0xe1, 0x25, 0x42, 0xb0, 0xe0,
+	0x18, 0x03, 0x22, 0xba, 0x16, 0xf6, 0x4c, 0xbb, 0xc3, 0x97, 0x86, 0x3d, 0x24, 0xa2, 0x55, 0xe1,
+	0x03, 0xf4, 0x3a, 0x14, 0x86, 0x96, 0x13, 0x3e, 0x7e, 0x4f, 0xe7, 0x4c, 0x9a, 0x3a, 0x16, 0x70,
+	0x9e, 0xd3, 0x3e, 0xa1, 0x24, 0xf5, 0x8f, 0x32, 0xa0, 0x68, 0x4e, 0x68, 0x85, 0x97, 0x52, 0xb3,
+	0xa1, 0x40, 0x66, 0x60, 0x75, 0xc5, 0x04, 0xf4, 0x11, 0x6d, 0xc1, 0x92, 0xed, 0x9a, 0x86, 0x1d,
+	0x4d, 0x20, 0x46, 0x68, 0x07, 0xf2, 0x5d, 0x12, 0x98, 0xbe, 0xe5, 0xb1, 0x6c, 0xc2, 0x7b, 0x53,
+	0x99, 0x44, 0x57, 0x16, 0x98, 0xae, 0x1f, 0x55, 0x72, 0x3e, 0x40, 0x2a, 0x80, 0x54, 0x4a, 0x59,
+	0x19, 0xdf, 0x4f, 0x97, 0x52, 0x58, 0xa2, 0xa2, 0xd7, 0x00, 0x42, 0xd7, 0xb3, 0x4c, 0xc3, 0xb6,
+	0xc2, 0x4b, 0x51, 0xcc, 0x25, 0xca, 0x64, 0x4b, 0xb4, 0xfc, 0x95, 0x5b, 0xa2, 0x7d, 0xc8, 0xd9,
+	0xe2, 0x70, 0x82, 0x52, 0x96, 0xb5, 0x30, 0x33, 0x61, 0xe4, 0x53, 0xc4, 0x23, 0x35, 0xf4, 0x5d,
+	0x00, 0x8f, 0x1f, 0x91, 0x45, 0x82, 0x52, 0x8e, 0x81, 0xcc, 0xce, 0xab, 0xe2, 0x30, 0xb1, 0xa4,
+	0xa3, 0xfe, 0x7d, 0x0a, 0x6e, 0x51, 0x74, 0xdb, 0xfa, 0x82, 0x74, 0x9b, 0x67, 0x9f, 0x11, 0x33,
+	0xbc, 0xf2, 0x50, 0xde, 0x80, 0x15, 0xdb, 0x70, 0xfa, 0x43, 0xda, 0xa6, 0x9a, 0x6e, 0x37, 0x3a,
+	0x9b, 0x42, 0x44, 0xac, 0xba, 0x5d, 0x12, 0x7b, 0x4b, 0x26, 0xe9, 0x2d, 0x53, 0xce, 0x64, 0xc2,
+	0x9e, 0x8b, 0x5f, 0xd5, 0x9e, 0xea, 0x3f, 0x2c, 0xc0, 0x46, 0xdb, 0xe8, 0x91, 0x36, 0x7b, 0x6d,
+	0x94, 0x36, 0xf1, 0x01, 0x2c, 0x1a, 0xdd, 0xa1, 0x1d, 0x8a, 0x37, 0xa4, 0x79, 0x0a, 0x23, 0x57,
+	0xa0, 0x9a, 0x81, 0xe7, 0xba, 0x3d, 0xb6, 0xc9, 0x39, 0x35, 0x99, 0x02, 0x7a, 0x02, 0xcb, 0x03,
+	0xd2, 0xa5, 0x5e, 0x23, 0x6a, 0xe7, 0x3c, 0xba, 0x91, 0x0a, 0xfa, 0x0d, 0xc8, 0xbe, 0xb4, 0x5c,
+	0x9b, 0xf9, 0xe9, 0xc2, 0xdc, 0xea, 0xb1, 0x0e, 0x7a, 0x0c, 0x0b, 0xbe, 0x61, 0x5e, 0xde, 0xa0,
+	0xff, 0x63, 0xf2, 0xe8, 0x9b, 0xa0, 0xb0, 0x8d, 0xcb, 0x2d, 0xa7, 0xc2, 0x8e, 0x6b, 0x8d, 0xd1,
+	0xa5, 0x66, 0xf3, 0x9b, 0xa0, 0xb0, 0x9d, 0xca, 0xa2, 0x88, 0x8b, 0x32, 0xba, 0x24, 0xfa, 0x0e,
+	0x20, 0xb1, 0x31, 0x59, 0x78, 0x83, 0x09, 0xaf, 0x0b, 0x8e, 0x24, 0x5e, 0x86, 0x62, 0xb4, 0x11,
+	0x59, 0x7e, 0x8b, 0xc9, 0xa3, 0x88, 0x25, 0x29, 0xbc, 0x05, 0x6b, 0x74, 0xf5, 0xb2, 0x70, 0x89,
+	0x09, 0xaf, 0x52, 0x72, 0x52, 0xd0, 0x09, 0x7a, 0xe7, 0xb2, 0xe0, 0x36, 0x17, 0xa4, 0xe4, 0x91,
+	0xa0, 0x7a, 0x0e, 0x79, 0x9a, 0x0b, 0x5d, 0xa7, 0x8f, 0x89, 0x19, 0xa2, 0x77, 0x21, 0x3f, 0xb0,
+	0x1c, 0x7d, 0x8e, 0xd4, 0x99, 0x1b, 0x58, 0x0e, 0x7f, 0x64, 0x4a, 0xc6, 0x45, 0xac, 0x94, 0xbe,
+	0x4a, 0xc9, 0xb8, 0xe0, 0x8f, 0xaa, 0x0f, 0xb9, 0xaa, 0x6b, 0xbb, 0x3e, 0xcb, 0xd6, 0xf7, 0x61,
+	0x91, 0xdd, 0x06, 0x88, 0x09, 0x51, 0x42, 0x97, 0x89, 0x61, 0x2e, 0x30, 0x8a, 0xad, 0xb4, 0x1c,
+	0x5b, 0x6f, 0xc2, 0xaa, 0x67, 0x5d, 0x10, 0x5b, 0xef, 0xf9, 0x86, 0x19, 0xa7, 0xca, 0x34, 0x5e,
+	0x61, 0xd4, 0x43, 0x41, 0x54, 0x4f, 0xa1, 0x74, 0xe0, 0x0e, 0x2c, 0xc7, 0x70, 0x42, 0x06, 0x1a,
+	0x48, 0xa1, 0xf3, 0xeb, 0xb0, 0xc4, 0x66, 0x08, 0x4a, 0x29, 0x96, 0x5b, 0x5e, 0x9f, 0xe5, 0x4a,
+	0xf1, 0xaa, 0xb1, 0x50, 0x50, 0x6d, 0x58, 0x63, 0xaf, 0x99, 0xad, 0x38, 0xd7, 0xa0, 0xe7, 0xb0,
+	0xd6, 0x15, 0x33, 0xe9, 0x31, 0x2c, 0xdd, 0xda, 0xb7, 0x66, 0xc1, 0xce, 0x5a, 0x18, 0x5e, 0xed,
+	0x26, 0x38, 0xea, 0x5f, 0xa7, 0x20, 0x5b, 0xf5, 0x5d, 0xef, 0xd8, 0x72, 0xc2, 0xaf, 0xf3, 0xbd,
+	0xf5, 0xb5, 0x44, 0xcd, 0xe0, 0xe6, 0x95, 0xeb, 0x45, 0x19, 0x8a, 0xd6, 0xc0, 0x73, 0xfd, 0xd0,
+	0xa0, 0xee, 0x3a, 0x66, 0x68, 0x34, 0x62, 0xc5, 0xd6, 0xfe, 0x04, 0x8a, 0xd1, 0x3a, 0x65, 0x43,
+	0xff, 0x26, 0x80, 0xe9, 0xbb, 0x9e, 0xfe, 0x82, 0xd2, 0x85, 0xb1, 0x67, 0x26, 0xf2, 0x08, 0x00,
+	0xe7, 0xcc, 0x08, 0x4a, 0x7d, 0x0c, 0x6b, 0x31, 0x6e, 0xcb, 0xf0, 0x8d, 0x41, 0x40, 0x53, 0xb5,
+	0x11, 0x78, 0xc4, 0x0c, 0x75, 0x76, 0x97, 0xc5, 0x61, 0xd3, 0xb8, 0xc0, 0x89, 0x98, 0xd1, 0xd4,
+	0x03, 0x40, 0xcf, 0xc8, 0xd9, 0x41, 0xf4, 0x16, 0x2a, 0x54, 0x77, 0xa1, 0x68, 0x39, 0xa6, 0x3d,
+	0xec, 0x12, 0xbd, 0x4f, 0xdc, 0xc4, 0x0d, 0x51, 0x16, 0xaf, 0x0b, 0xd6, 0x11, 0x71, 0xc5, 0x45,
+	0x91, 0xfa, 0x93, 0x0c, 0x14, 0xd8, 0x69, 0x57, 0x5d, 0x27, 0x24, 0x17, 0x21, 0x3a, 0xa2, 0x65,
+	0x22, 0xd4, 0x6d, 0xd7, 0xe9, 0xeb, 0x3e, 0x31, 0x43, 0x71, 0x04, 0x33, 0x6f, 0x24, 0xa4, 0x70,
+	0xc3, 0x79, 0x5b, 0x8a, 0xbd, 0x37, 0x61, 0x35, 0xae, 0x37, 0xdc, 0x38, 0xe9, 0x9d, 0xcc, 0xfd,
+	0x1c, 0x8e, 0xab, 0x10, 0xdb, 0x31, 0x6a, 0xc3, 0xfa, 0xc8, 0x7e, 0xba, 0xc7, 0x76, 0x21, 0xde,
+	0x33, 0xde, 0xba, 0xce, 0x8c, 0xc2, 0x5e, 0x78, 0xcd, 0x1c, 0x33, 0xa0, 0x0e, 0x9b, 0xc9, 0xbb,
+	0xc8, 0x08, 0x98, 0x17, 0xa9, 0xb7, 0xaf, 0x28, 0xb4, 0x54, 0x89, 0x17, 0x22, 0x01, 0x5e, 0xf4,
+	0x26, 0x89, 0xe8, 0x87, 0xb0, 0x91, 0xb8, 0x91, 0x8c, 0xf0, 0x97, 0x18, 0xfe, 0x83, 0x59, 0xf8,
+	0x93, 0x07, 0x86, 0xd1, 0xf9, 0x04, 0x4d, 0xfd, 0x59, 0x0a, 0x36, 0x84, 0x8b, 0x11, 0x76, 0x38,
+	0x98, 0xfc, 0xf6, 0x90, 0x04, 0x34, 0x9f, 0x2d, 0xb2, 0x6b, 0x25, 0x71, 0x28, 0x77, 0xaf, 0xbc,
+	0x26, 0xc2, 0x5c, 0x16, 0x7d, 0x04, 0xd9, 0x1e, 0xbf, 0x42, 0xe4, 0x47, 0x90, 0xdf, 0xbb, 0x77,
+	0xcd, 0x55, 0x23, 0x8e, 0x15, 0x68, 0x44, 0xf2, 0x9b, 0x2d, 0x93, 0xfb, 0x07, 0x0b, 0x90, 0x2b,
+	0x22, 0x52, 0xf6, 0x25, 0x5c, 0xb0, 0xa4, 0x91, 0xfa, 0x14, 0xb6, 0x18, 0x77, 0x14, 0x3c, 0x91,
+	0xcf, 0x29, 0x90, 0x19, 0x5d, 0xac, 0xd1, 0x47, 0x74, 0x0f, 0xf2, 0x1e, 0x9d, 0xd5, 0x19, 0x0e,
+	0xce, 0x88, 0x1f, 0x5d, 0x70, 0x52, 0x52, 0x83, 0x51, 0xd4, 0x7f, 0xcf, 0xc1, 0xe6, 0x98, 0x89,
+	0x02, 0xcf, 0x75, 0x02, 0x82, 0x3e, 0x06, 0xa5, 0x67, 0x98, 0x44, 0xba, 0x5a, 0x8e, 0xc2, 0xf2,
+	0x1b, 0xf3, 0xbd, 0x05, 0xe3, 0xb5, 0x5e, 0x62, 0x1c, 0xa0, 0x1f, 0xc0, 0x46, 0x74, 0x71, 0x93,
+	0x80, 0xe5, 0xd6, 0xbc, 0x3f, 0x0b, 0x76, 0xbc, 0x53, 0xc6, 0xc5, 0x08, 0x45, 0x06, 0x6f, 0x83,
+	0x62, 0xbb, 0x7d, 0x37, 0x01, 0x9c, 0xb9, 0x21, 0xf0, 0x1a, 0x45, 0x90, 0x41, 0x4f, 0x61, 0xdd,
+	0x36, 0xce, 0x88, 0x9d, 0x40, 0x5d, 0xb8, 0x21, 0xaa, 0xc2, 0x20, 0x64, 0xd8, 0x00, 0xee, 0xd8,
+	0x51, 0xcb, 0xa9, 0xbb, 0xac, 0xe7, 0x4c, 0xcc, 0xb0, 0xc5, 0x66, 0x78, 0x74, 0x55, 0x33, 0x3c,
+	0xb5, 0x5d, 0xc5, 0xdb, 0xf6, 0x2c, 0x16, 0x33, 0xd0, 0xd8, 0x7f, 0x05, 0x34, 0x8e, 0x6f, 0x68,
+	0x20, 0x8a, 0x20, 0x83, 0x7e, 0x1f, 0x36, 0x7a, 0x43, 0xdb, 0xd6, 0xc7, 0x90, 0xd9, 0x45, 0xd4,
+	0x15, 0x9e, 0xd2, 0x49, 0xc0, 0x60, 0x44, 0x31, 0x92, 0x34, 0x74, 0x06, 0x5b, 0x81, 0xd1, 0x23,
+	0x51, 0xe2, 0x91, 0xb0, 0x79, 0x72, 0x78, 0x38, 0x0b, 0x7b, 0x5a, 0x0b, 0x8c, 0x37, 0x82, 0x69,
+	0x8d, 0x71, 0x1f, 0x6e, 0xf3, 0xa8, 0x1c, 0xbd, 0x0f, 0xc8, 0x13, 0x65, 0xaf, 0x4e, 0x9f, 0x63,
+	0xd5, 0x1d, 0xdf, 0xb2, 0x92, 0x04, 0x69, 0x22, 0x1d, 0x36, 0xa5, 0xec, 0x2c, 0x4d, 0x91, 0xbf,
+	0x3a, 0x91, 0x4e, 0xa9, 0x94, 0xb8, 0x68, 0x4e, 0x29, 0x9f, 0x35, 0x58, 0x49, 0x24, 0x52, 0x76,
+	0x5f, 0x77, 0x45, 0x7e, 0x91, 0x33, 0x28, 0x2e, 0xc8, 0xb9, 0x93, 0x1a, 0x7e, 0x2c, 0xe9, 0x47,
+	0xd5, 0x6f, 0xf5, 0x6a, 0xc3, 0x27, 0xb2, 0xbe, 0x28, 0x8c, 0x78, 0xc3, 0x9b, 0x42, 0xa5, 0x9d,
+	0x1d, 0xf1, 0x7d, 0xd7, 0x67, 0x0d, 0xba, 0xd4, 0xd9, 0xf9, 0x9e, 0xb9, 0xdb, 0x66, 0x7f, 0x0d,
+	0x61, 0x2e, 0x80, 0x8e, 0xc5, 0x65, 0xff, 0x45, 0x58, 0xda, 0x64, 0xb2, 0xbb, 0x57, 0x1e, 0xc7,
+	0x44, 0x52, 0xc4, 0x91, 0xba, 0xfa, 0x07, 0x29, 0xd8, 0xde, 0x37, 0xc2, 0xd8, 0x01, 0x78, 0xbe,
+	0x0b, 0xa2, 0x9a, 0x70, 0x02, 0x59, 0x9f, 0x3f, 0x46, 0x79, 0x6e, 0xe6, 0x46, 0xa7, 0xd5, 0x94,
+	0xfd, 0xcc, 0xbf, 0x55, 0xd2, 0x38, 0x86, 0xa0, 0xef, 0xee, 0x9e, 0xe1, 0x13, 0x27, 0x64, 0x45,
+	0x38, 0x87, 0xc5, 0x48, 0xfd, 0x0c, 0x6e, 0x4f, 0x5d, 0x84, 0xc8, 0xba, 0x4f, 0x21, 0xe7, 0x8b,
+	0xe7, 0x68, 0x19, 0xef, 0xcc, 0xb9, 0x0c, 0xae, 0x85, 0x47, 0xfa, 0xea, 0x7f, 0xa7, 0xa0, 0x18,
+	0x09, 0x1d, 0x5a, 0x76, 0x5c, 0xfe, 0x0e, 0xa1, 0x60, 0x39, 0xde, 0x50, 0xbc, 0xe5, 0xf4, 0xaf,
+	0x6b, 0x4d, 0x6a, 0x54, 0x96, 0xbd, 0x1c, 0xf4, 0x71, 0xde, 0x1a, 0x0d, 0xfe, 0xbf, 0x54, 0x44,
+	0xda, 0xfd, 0xd3, 0x92, 0xc6, 0x33, 0xf3, 0x22, 0xe6, 0x03, 0xf5, 0x97, 0x52, 0xf5, 0xe7, 0xbb,
+	0x17, 0x36, 0xfe, 0xba, 0xb6, 0x9f, 0x38, 0xab, 0xf4, 0xff, 0xee, 0xac, 0x68, 0xa5, 0x0e, 0xdd,
+	0xd0, 0xb0, 0x75, 0xbe, 0x93, 0x0c, 0xaf, 0xd4, 0x8c, 0xd4, 0xa2, 0x94, 0x51, 0xc8, 0x2c, 0x5c,
+	0x13, 0x32, 0xea, 0xef, 0xa5, 0xe0, 0x56, 0xc2, 0xc7, 0xe8, 0xee, 0x63, 0x3f, 0xaf, 0x4f, 0xf8,
+	0xf9, 0xdb, 0xd7, 0x2d, 0x5a, 0xf2, 0x9d, 0xd9, 0x6e, 0x9e, 0x49, 0xb8, 0xf9, 0x8b, 0xb1, 0x58,
+	0x13, 0x4b, 0x10, 0x27, 0xf0, 0xbd, 0x49, 0x2f, 0x7f, 0x38, 0xdf, 0x22, 0x26, 0x9d, 0xfc, 0xef,
+	0xd2, 0x50, 0xaa, 0x04, 0x97, 0x8e, 0xf9, 0xab, 0xe0, 0xe9, 0x35, 0x58, 0x71, 0x87, 0xa1, 0xb4,
+	0xa1, 0x85, 0xab, 0xa1, 0x9a, 0x4c, 0x58, 0xec, 0xa8, 0xe0, 0x4a, 0x23, 0xb5, 0x07, 0xb7, 0xa6,
+	0x98, 0x4d, 0x1c, 0xd0, 0xc4, 0x3c, 0xa9, 0xaf, 0x3c, 0xcf, 0xbf, 0xa6, 0xe0, 0x1e, 0x9b, 0xe8,
+	0xff, 0x2e, 0xf7, 0x36, 0xc6, 0x57, 0x9f, 0x9e, 0x7f, 0xf5, 0x1c, 0x2b, 0xb1, 0x85, 0x99, 0xb9,
+	0x7c, 0x00, 0x3b, 0xb3, 0x77, 0xf6, 0xf5, 0x5b, 0xf2, 0x8f, 0x53, 0xf0, 0xda, 0xe4, 0x7c, 0x89,
+	0xe0, 0xfe, 0x78, 0xc2, 0x90, 0x33, 0x6f, 0x16, 0x66, 0xc5, 0xcc, 0xbc, 0x85, 0xcc, 0x9f, 0x76,
+	0xac, 0xc9, 0x30, 0x6f, 0x4e, 0x86, 0xf9, 0xa3, 0x1b, 0x2c, 0x67, 0x32, 0xd6, 0xff, 0x30, 0x05,
+	0x79, 0x29, 0x46, 0xd1, 0x77, 0x01, 0xfa, 0x66, 0xa0, 0x8b, 0xff, 0xfc, 0xb9, 0x65, 0x67, 0xde,
+	0xd0, 0x1c, 0x99, 0x81, 0xf8, 0xc7, 0x3f, 0xd7, 0x8f, 0x1e, 0xe5, 0x6f, 0x09, 0x32, 0xc9, 0x6f,
+	0x09, 0x6e, 0x43, 0x6e, 0x60, 0x0d, 0x88, 0xce, 0xfe, 0xfe, 0x13, 0xdf, 0x22, 0x50, 0x42, 0xe7,
+	0xd2, 0x23, 0xea, 0xef, 0x40, 0x41, 0x3e, 0x28, 0xd4, 0x84, 0x35, 0xba, 0x90, 0x2e, 0x09, 0x42,
+	0xcb, 0xe1, 0x9d, 0x5d, 0xea, 0xea, 0x0e, 0xf8, 0xc8, 0x0c, 0x0e, 0x46, 0xd2, 0x78, 0xb5, 0x9f,
+	0x18, 0xa3, 0xbb, 0x00, 0x67, 0xd4, 0xb0, 0x7a, 0x60, 0x7d, 0x41, 0xc4, 0x7b, 0x5b, 0x8e, 0x51,
+	0xda, 0xd6, 0x17, 0x44, 0xbd, 0x0b, 0xb9, 0x78, 0x3b, 0x93, 0xaf, 0x7d, 0xaa, 0x0a, 0xab, 0x49,
+	0xfc, 0x29, 0x32, 0x7f, 0x93, 0x86, 0xf5, 0x66, 0xf4, 0x95, 0xcf, 0x09, 0x09, 0x8d, 0xae, 0x11,
+	0x1a, 0x48, 0x83, 0xc5, 0x80, 0x9e, 0x80, 0xb8, 0x2a, 0x9e, 0xf9, 0x49, 0xc1, 0x84, 0x26, 0xab,
+	0x41, 0x04, 0x73, 0x6d, 0xf4, 0x11, 0xe4, 0x4d, 0x9f, 0x18, 0x21, 0xd1, 0x43, 0x6b, 0x40, 0xc4,
+	0x75, 0xc1, 0x76, 0x04, 0x16, 0x7d, 0x21, 0xb4, 0xdb, 0x89, 0xbe, 0x10, 0xc2, 0xc0, 0xc5, 0x29,
+	0x81, 0x2a, 0x0f, 0xbd, 0x6e, 0xac, 0xbc, 0x74, 0xbd, 0x32, 0x17, 0xa7, 0x04, 0xf5, 0x63, 0x58,
+	0x64, 0x2b, 0x41, 0x9b, 0xb0, 0xde, 0xee, 0x54, 0x3a, 0xe3, 0x1f, 0xe7, 0xe4, 0x61, 0xb9, 0x8a,
+	0xb5, 0x4a, 0x47, 0x3b, 0x50, 0x52, 0x74, 0x80, 0x4f, 0x1b, 0x8d, 0x5a, 0xe3, 0x48, 0x49, 0xa3,
+	0x2c, 0x2c, 0x1c, 0x34, 0x1b, 0x9a, 0x92, 0x41, 0x2b, 0x90, 0xab, 0x56, 0x1a, 0x55, 0xad, 0x5e,
+	0xd7, 0x0e, 0x94, 0x85, 0x07, 0x04, 0x40, 0xfa, 0xcf, 0x39, 0x0f, 0xcb, 0xe2, 0x0f, 0x58, 0xe5,
+	0x15, 0xb4, 0x0e, 0x2b, 0x9f, 0x68, 0xf8, 0xb9, 0x7e, 0xda, 0xa8, 0xd7, 0x9e, 0x6a, 0xf5, 0xe7,
+	0x4a, 0x0a, 0x15, 0x20, 0x1b, 0x8f, 0xd2, 0x74, 0xd4, 0x6a, 0xb6, 0xdb, 0xb5, 0xfd, 0x3a, 0x05,
+	0x06, 0x58, 0x12, 0x9c, 0x05, 0xb4, 0x06, 0x79, 0xa6, 0x2a, 0x08, 0x8b, 0x7b, 0xff, 0x09, 0xb0,
+	0x2a, 0xf7, 0xb0, 0xae, 0x8f, 0x7e, 0x9a, 0x86, 0xe2, 0x94, 0xe4, 0x82, 0xf6, 0x66, 0x5e, 0xe4,
+	0xcd, 0xcc, 0xb1, 0xdb, 0xef, 0xde, 0x48, 0x87, 0x47, 0x9c, 0xfa, 0x93, 0xd4, 0xcf, 0x2b, 0x71,
+	0x2a, 0xf8, 0xfd, 0x9f, 0xfd, 0xe2, 0xa7, 0xe9, 0xdf, 0x4d, 0xa9, 0xc5, 0xf8, 0x43, 0xbb, 0xe0,
+	0x43, 0xf1, 0x2a, 0x43, 0x3e, 0x4c, 0x3d, 0xf8, 0xf4, 0x03, 0xf5, 0x5d, 0xca, 0xf9, 0x11, 0x4f,
+	0x10, 0xdf, 0xf1, 0x7c, 0x97, 0xbe, 0x82, 0x06, 0xe5, 0x07, 0xe5, 0xf8, 0xff, 0x9a, 0xf2, 0x83,
+	0x1f, 0x4f, 0xd3, 0x7c, 0xa8, 0xbe, 0x35, 0x5d, 0x73, 0x9a, 0x34, 0xfa, 0x93, 0x34, 0xa0, 0xc9,
+	0xac, 0x83, 0x1e, 0xcd, 0xb5, 0x41, 0x39, 0x5d, 0x6e, 0xef, 0xdd, 0x44, 0x45, 0x98, 0xe4, 0x4f,
+	0x27, 0x4c, 0xf2, 0x63, 0x15, 0xd1, 0xd5, 0xf7, 0xa8, 0x58, 0x62, 0x5b, 0xdf, 0x56, 0xf7, 0xe6,
+	0x31, 0xc8, 0xa4, 0xe2, 0xdb, 0xea, 0x37, 0x66, 0xd9, 0x63, 0x42, 0x18, 0xfd, 0x47, 0xd4, 0x00,
+	0x4d, 0xf3, 0x94, 0x6f, 0x5f, 0x99, 0x6f, 0xaf, 0x70, 0x97, 0xf8, 0x4e, 0x4c, 0xfa, 0x2a, 0x70,
+	0x14, 0xf5, 0xea, 0x2f, 0x53, 0x5f, 0x56, 0xde, 0x9f, 0xa3, 0xfc, 0x4d, 0xa6, 0x98, 0x9f, 0x57,
+	0xb6, 0x22, 0xeb, 0x3d, 0x4c, 0x54, 0x46, 0x66, 0xcb, 0x3f, 0x4f, 0xa9, 0x77, 0x65, 0xf7, 0x9a,
+	0xc0, 0xa7, 0xe6, 0xd9, 0x57, 0xbf, 0x73, 0x13, 0x47, 0x9b, 0x8a, 0xf1, 0x58, 0x7d, 0x74, 0x9d,
+	0xcb, 0x4d, 0xd3, 0x43, 0xff, 0x92, 0x86, 0x57, 0x67, 0xd4, 0x3d, 0xf4, 0x78, 0x7e, 0x63, 0x27,
+	0xdc, 0xf0, 0x1a, 0x5b, 0xff, 0x22, 0xf5, 0x65, 0xe5, 0xbd, 0xeb, 0xab, 0xed, 0x34, 0x53, 0x27,
+	0x1d, 0xf5, 0xcf, 0x52, 0xea, 0x1d, 0xc9, 0x53, 0xa7, 0xda, 0xa5, 0xa2, 0x3e, 0xb9, 0x81, 0xcf,
+	0x4e, 0x85, 0x78, 0x5f, 0xfd, 0xd6, 0x35, 0xde, 0x3b, 0x4d, 0x6d, 0xfb, 0xe5, 0x97, 0x95, 0x4d,
+	0x61, 0x32, 0x6e, 0x0e, 0xc3, 0xb3, 0x82, 0x5d, 0xd3, 0x1d, 0xfc, 0x73, 0xe5, 0x07, 0x2f, 0xc2,
+	0xd0, 0x0b, 0x3e, 0x2c, 0x97, 0xcf, 0xcf, 0xcf, 0xc7, 0x98, 0x65, 0x63, 0x18, 0xbe, 0xe0, 0x9f,
+	0xb9, 0xbe, 0xe3, 0xd9, 0x46, 0xd8, 0x73, 0xfd, 0xc1, 0xc3, 0xf9, 0xc4, 0xf9, 0x64, 0xfb, 0x3f,
+	0x82, 0x6d, 0xd3, 0x1d, 0xcc, 0x38, 0xba, 0xfd, 0x62, 0x32, 0x25, 0xb7, 0x68, 0xf5, 0x69, 0xa5,
+	0x3e, 0x7d, 0x22, 0xc4, 0xfb, 0xae, 0x6d, 0x38, 0xfd, 0x5d, 0xd7, 0xef, 0x97, 0xfb, 0xc4, 0x61,
+	0xb5, 0xa9, 0x3c, 0x9a, 0x71, 0xfc, 0xf3, 0xdb, 0x8f, 0xf8, 0xd3, 0x7f, 0xa5, 0x52, 0x7f, 0x99,
+	0x5e, 0x38, 0xaa, 0x7e, 0xd2, 0x38, 0x5b, 0x62, 0x2a, 0xef, 0xfe, 0x4f, 0x00, 0x00, 0x00, 0xff,
+	0xff, 0x23, 0xe1, 0xe6, 0xad, 0xd0, 0x2c, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1291,11 +3233,37 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for ImageAnnotator service
-
+// ImageAnnotatorClient is the client API for ImageAnnotator service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ImageAnnotatorClient interface {
 	// Run image detection and annotation for a batch of images.
 	BatchAnnotateImages(ctx context.Context, in *BatchAnnotateImagesRequest, opts ...grpc.CallOption) (*BatchAnnotateImagesResponse, error)
+	// Service that performs image detection and annotation for a batch of files.
+	// Now only "application/pdf", "image/tiff" and "image/gif" are supported.
+	//
+	// This service will extract at most 5 (customers can specify which 5 in
+	// AnnotateFileRequest.pages) frames (gif) or pages (pdf or tiff) from each
+	// file provided and perform detection and annotation for each image
+	// extracted.
+	BatchAnnotateFiles(ctx context.Context, in *BatchAnnotateFilesRequest, opts ...grpc.CallOption) (*BatchAnnotateFilesResponse, error)
+	// Run asynchronous image detection and annotation for a list of images.
+	//
+	// Progress and results can be retrieved through the
+	// `google.longrunning.Operations` interface.
+	// `Operation.metadata` contains `OperationMetadata` (metadata).
+	// `Operation.response` contains `AsyncBatchAnnotateImagesResponse` (results).
+	//
+	// This service will write image annotation outputs to json files in customer
+	// GCS bucket, each json file containing BatchAnnotateImagesResponse proto.
+	AsyncBatchAnnotateImages(ctx context.Context, in *AsyncBatchAnnotateImagesRequest, opts ...grpc.CallOption) (*longrunning.Operation, error)
+	// Run asynchronous image detection and annotation for a list of generic
+	// files, such as PDF files, which may contain multiple pages and multiple
+	// images per page. Progress and results can be retrieved through the
+	// `google.longrunning.Operations` interface.
+	// `Operation.metadata` contains `OperationMetadata` (metadata).
+	// `Operation.response` contains `AsyncBatchAnnotateFilesResponse` (results).
+	AsyncBatchAnnotateFiles(ctx context.Context, in *AsyncBatchAnnotateFilesRequest, opts ...grpc.CallOption) (*longrunning.Operation, error)
 }
 
 type imageAnnotatorClient struct {
@@ -1308,18 +3276,86 @@ func NewImageAnnotatorClient(cc *grpc.ClientConn) ImageAnnotatorClient {
 
 func (c *imageAnnotatorClient) BatchAnnotateImages(ctx context.Context, in *BatchAnnotateImagesRequest, opts ...grpc.CallOption) (*BatchAnnotateImagesResponse, error) {
 	out := new(BatchAnnotateImagesResponse)
-	err := grpc.Invoke(ctx, "/google.cloud.vision.v1.ImageAnnotator/BatchAnnotateImages", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/google.cloud.vision.v1.ImageAnnotator/BatchAnnotateImages", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for ImageAnnotator service
+func (c *imageAnnotatorClient) BatchAnnotateFiles(ctx context.Context, in *BatchAnnotateFilesRequest, opts ...grpc.CallOption) (*BatchAnnotateFilesResponse, error) {
+	out := new(BatchAnnotateFilesResponse)
+	err := c.cc.Invoke(ctx, "/google.cloud.vision.v1.ImageAnnotator/BatchAnnotateFiles", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
 
+func (c *imageAnnotatorClient) AsyncBatchAnnotateImages(ctx context.Context, in *AsyncBatchAnnotateImagesRequest, opts ...grpc.CallOption) (*longrunning.Operation, error) {
+	out := new(longrunning.Operation)
+	err := c.cc.Invoke(ctx, "/google.cloud.vision.v1.ImageAnnotator/AsyncBatchAnnotateImages", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *imageAnnotatorClient) AsyncBatchAnnotateFiles(ctx context.Context, in *AsyncBatchAnnotateFilesRequest, opts ...grpc.CallOption) (*longrunning.Operation, error) {
+	out := new(longrunning.Operation)
+	err := c.cc.Invoke(ctx, "/google.cloud.vision.v1.ImageAnnotator/AsyncBatchAnnotateFiles", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ImageAnnotatorServer is the server API for ImageAnnotator service.
 type ImageAnnotatorServer interface {
 	// Run image detection and annotation for a batch of images.
 	BatchAnnotateImages(context.Context, *BatchAnnotateImagesRequest) (*BatchAnnotateImagesResponse, error)
+	// Service that performs image detection and annotation for a batch of files.
+	// Now only "application/pdf", "image/tiff" and "image/gif" are supported.
+	//
+	// This service will extract at most 5 (customers can specify which 5 in
+	// AnnotateFileRequest.pages) frames (gif) or pages (pdf or tiff) from each
+	// file provided and perform detection and annotation for each image
+	// extracted.
+	BatchAnnotateFiles(context.Context, *BatchAnnotateFilesRequest) (*BatchAnnotateFilesResponse, error)
+	// Run asynchronous image detection and annotation for a list of images.
+	//
+	// Progress and results can be retrieved through the
+	// `google.longrunning.Operations` interface.
+	// `Operation.metadata` contains `OperationMetadata` (metadata).
+	// `Operation.response` contains `AsyncBatchAnnotateImagesResponse` (results).
+	//
+	// This service will write image annotation outputs to json files in customer
+	// GCS bucket, each json file containing BatchAnnotateImagesResponse proto.
+	AsyncBatchAnnotateImages(context.Context, *AsyncBatchAnnotateImagesRequest) (*longrunning.Operation, error)
+	// Run asynchronous image detection and annotation for a list of generic
+	// files, such as PDF files, which may contain multiple pages and multiple
+	// images per page. Progress and results can be retrieved through the
+	// `google.longrunning.Operations` interface.
+	// `Operation.metadata` contains `OperationMetadata` (metadata).
+	// `Operation.response` contains `AsyncBatchAnnotateFilesResponse` (results).
+	AsyncBatchAnnotateFiles(context.Context, *AsyncBatchAnnotateFilesRequest) (*longrunning.Operation, error)
+}
+
+// UnimplementedImageAnnotatorServer can be embedded to have forward compatible implementations.
+type UnimplementedImageAnnotatorServer struct {
+}
+
+func (*UnimplementedImageAnnotatorServer) BatchAnnotateImages(ctx context.Context, req *BatchAnnotateImagesRequest) (*BatchAnnotateImagesResponse, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method BatchAnnotateImages not implemented")
+}
+func (*UnimplementedImageAnnotatorServer) BatchAnnotateFiles(ctx context.Context, req *BatchAnnotateFilesRequest) (*BatchAnnotateFilesResponse, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method BatchAnnotateFiles not implemented")
+}
+func (*UnimplementedImageAnnotatorServer) AsyncBatchAnnotateImages(ctx context.Context, req *AsyncBatchAnnotateImagesRequest) (*longrunning.Operation, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method AsyncBatchAnnotateImages not implemented")
+}
+func (*UnimplementedImageAnnotatorServer) AsyncBatchAnnotateFiles(ctx context.Context, req *AsyncBatchAnnotateFilesRequest) (*longrunning.Operation, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method AsyncBatchAnnotateFiles not implemented")
 }
 
 func RegisterImageAnnotatorServer(s *grpc.Server, srv ImageAnnotatorServer) {
@@ -1344,6 +3380,60 @@ func _ImageAnnotator_BatchAnnotateImages_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ImageAnnotator_BatchAnnotateFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchAnnotateFilesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ImageAnnotatorServer).BatchAnnotateFiles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/google.cloud.vision.v1.ImageAnnotator/BatchAnnotateFiles",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ImageAnnotatorServer).BatchAnnotateFiles(ctx, req.(*BatchAnnotateFilesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ImageAnnotator_AsyncBatchAnnotateImages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AsyncBatchAnnotateImagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ImageAnnotatorServer).AsyncBatchAnnotateImages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/google.cloud.vision.v1.ImageAnnotator/AsyncBatchAnnotateImages",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ImageAnnotatorServer).AsyncBatchAnnotateImages(ctx, req.(*AsyncBatchAnnotateImagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ImageAnnotator_AsyncBatchAnnotateFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AsyncBatchAnnotateFilesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ImageAnnotatorServer).AsyncBatchAnnotateFiles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/google.cloud.vision.v1.ImageAnnotator/AsyncBatchAnnotateFiles",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ImageAnnotatorServer).AsyncBatchAnnotateFiles(ctx, req.(*AsyncBatchAnnotateFilesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _ImageAnnotator_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "google.cloud.vision.v1.ImageAnnotator",
 	HandlerType: (*ImageAnnotatorServer)(nil),
@@ -1352,162 +3442,19 @@ var _ImageAnnotator_serviceDesc = grpc.ServiceDesc{
 			MethodName: "BatchAnnotateImages",
 			Handler:    _ImageAnnotator_BatchAnnotateImages_Handler,
 		},
+		{
+			MethodName: "BatchAnnotateFiles",
+			Handler:    _ImageAnnotator_BatchAnnotateFiles_Handler,
+		},
+		{
+			MethodName: "AsyncBatchAnnotateImages",
+			Handler:    _ImageAnnotator_AsyncBatchAnnotateImages_Handler,
+		},
+		{
+			MethodName: "AsyncBatchAnnotateFiles",
+			Handler:    _ImageAnnotator_AsyncBatchAnnotateFiles_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "google/cloud/vision/v1/image_annotator.proto",
-}
-
-func init() { proto.RegisterFile("google/cloud/vision/v1/image_annotator.proto", fileDescriptor1) }
-
-var fileDescriptor1 = []byte{
-	// 2382 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x59, 0x4f, 0x6f, 0xe3, 0xc6,
-	0x15, 0x8f, 0xe4, 0x7f, 0xd2, 0x93, 0x2c, 0xd1, 0x23, 0xaf, 0xa3, 0xf5, 0xee, 0x66, 0x1d, 0xa6,
-	0x69, 0x8d, 0x6d, 0x2a, 0x37, 0x4e, 0x1a, 0xa4, 0xc9, 0xa2, 0xad, 0x24, 0xd3, 0xb6, 0xb0, 0xb2,
-	0xa4, 0x8c, 0xe4, 0x38, 0x6e, 0x83, 0x12, 0x34, 0x35, 0xd2, 0x32, 0xa1, 0x38, 0x2c, 0x49, 0xed,
-	0xda, 0xd7, 0x02, 0xfd, 0x04, 0xbd, 0xf7, 0xd8, 0x7b, 0x80, 0x7e, 0x80, 0x5e, 0x7a, 0xe8, 0xb1,
-	0xc8, 0x57, 0xe8, 0x37, 0x28, 0x50, 0xf4, 0x58, 0xcc, 0x1f, 0x52, 0x43, 0xad, 0xb5, 0x2b, 0x17,
-	0x3d, 0x89, 0xf3, 0xde, 0xfb, 0xfd, 0xde, 0xcc, 0x9b, 0x79, 0x33, 0x6f, 0x46, 0xf0, 0xc1, 0x98,
-	0xd2, 0xb1, 0x4b, 0x0e, 0x6c, 0x97, 0x4e, 0x87, 0x07, 0x2f, 0x9c, 0xd0, 0xa1, 0xde, 0xc1, 0x8b,
-	0x0f, 0x0f, 0x9c, 0x89, 0x35, 0x26, 0xa6, 0xe5, 0x79, 0x34, 0xb2, 0x22, 0x1a, 0xd4, 0xfc, 0x80,
-	0x46, 0x14, 0xed, 0x08, 0xeb, 0x1a, 0xb7, 0xae, 0x09, 0xeb, 0xda, 0x8b, 0x0f, 0x77, 0x1f, 0x4a,
-	0x16, 0xcb, 0x77, 0x0e, 0x24, 0xc6, 0xa1, 0x5e, 0x28, 0x50, 0xbb, 0xef, 0x2f, 0xf0, 0x31, 0x26,
-	0x74, 0x42, 0xa2, 0xe0, 0x46, 0x9a, 0x2d, 0xea, 0x4a, 0x44, 0xae, 0x23, 0x73, 0xc6, 0x2a, 0xad,
-	0x9f, 0x2c, 0xb0, 0x7e, 0x49, 0xae, 0xcc, 0x21, 0x89, 0x88, 0xad, 0xd8, 0xbe, 0x2d, 0x6d, 0x03,
-	0xdf, 0x3e, 0x08, 0x23, 0x2b, 0x9a, 0x86, 0x73, 0x8a, 0xe8, 0xc6, 0x27, 0x07, 0x36, 0x75, 0xe3,
-	0x81, 0xee, 0x56, 0x55, 0x85, 0x6b, 0x45, 0xae, 0x37, 0x16, 0x1a, 0xfd, 0x5f, 0x59, 0xd8, 0x38,
-	0x26, 0x56, 0x34, 0x0d, 0x08, 0xfa, 0x14, 0x56, 0x99, 0x41, 0x35, 0xb3, 0x97, 0xd9, 0x2f, 0x1d,
-	0xfe, 0xa0, 0x76, 0x7b, 0x74, 0x6a, 0xd2, 0xbc, 0x36, 0xb8, 0xf1, 0x09, 0xe6, 0x08, 0xf4, 0x18,
-	0x0a, 0x13, 0xeb, 0xda, 0x0c, 0x48, 0x38, 0x75, 0xa3, 0xb0, 0x9a, 0xdd, 0xcb, 0xec, 0xaf, 0x61,
-	0x98, 0x58, 0xd7, 0x58, 0x48, 0xd0, 0x36, 0xac, 0x4d, 0xe8, 0x90, 0xb8, 0xd5, 0x95, 0xbd, 0xcc,
-	0x7e, 0x1e, 0x8b, 0x86, 0xfe, 0xef, 0x0c, 0xac, 0x32, 0x16, 0xb4, 0x0d, 0xda, 0xe0, 0xb2, 0x67,
-	0x98, 0xe7, 0x9d, 0x7e, 0xcf, 0x68, 0xb6, 0x8e, 0x5b, 0xc6, 0x91, 0xf6, 0x16, 0x42, 0x50, 0x3a,
-	0xae, 0x37, 0x0d, 0xf3, 0xc8, 0x18, 0x18, 0xcd, 0x41, 0xab, 0xdb, 0xd1, 0x32, 0x68, 0x07, 0x50,
-	0xbb, 0xde, 0x39, 0x3a, 0xab, 0xe3, 0x67, 0x8a, 0x3c, 0xcb, 0x6c, 0xdb, 0xdd, 0x93, 0xae, 0x22,
-	0x5b, 0x41, 0x15, 0x28, 0xb7, 0xeb, 0x0d, 0xa3, 0xad, 0x08, 0x57, 0x99, 0xe1, 0xc0, 0xf8, 0x6a,
-	0xa0, 0xc8, 0xd6, 0xd0, 0x03, 0x78, 0xfb, 0xa8, 0xdb, 0x3c, 0x3f, 0x33, 0x3a, 0x03, 0x73, 0x4e,
-	0x59, 0x40, 0xf7, 0xe1, 0x5e, 0xbf, 0x7e, 0x6c, 0x98, 0x7d, 0xa3, 0x8e, 0x9b, 0xa7, 0x8a, 0x6a,
-	0x9d, 0x75, 0xbb, 0x75, 0x56, 0x3f, 0x31, 0xcc, 0x1e, 0xee, 0xf6, 0x0c, 0x3c, 0x68, 0x19, 0x7d,
-	0x6d, 0x03, 0x95, 0x00, 0x9a, 0xb8, 0xdb, 0x33, 0x4f, 0x5b, 0x9d, 0x41, 0x5f, 0xcb, 0xa3, 0x2d,
-	0xd8, 0xbc, 0x30, 0x1a, 0x0a, 0x10, 0xf4, 0x0e, 0x14, 0x5a, 0x6c, 0x45, 0xf6, 0xe9, 0x34, 0xb0,
-	0x09, 0xd2, 0x61, 0x73, 0x6c, 0x87, 0xa6, 0x58, 0xa4, 0xd3, 0xc0, 0xe1, 0x33, 0x90, 0xc7, 0x85,
-	0xb1, 0x1d, 0x72, 0xb3, 0xf3, 0xc0, 0x41, 0x0f, 0x20, 0x3f, 0xd3, 0x67, 0xb9, 0x3e, 0xe7, 0x48,
-	0xa5, 0xfe, 0x5b, 0x58, 0xe3, 0x86, 0xa8, 0x0a, 0x1b, 0x36, 0xf5, 0x22, 0xe2, 0x45, 0x9c, 0xa3,
-	0x88, 0xe3, 0x26, 0xfa, 0x1c, 0xd6, 0x43, 0xee, 0x8d, 0x83, 0x0b, 0x87, 0xef, 0x2d, 0x9a, 0x5e,
-	0xa5, 0x63, 0x58, 0x42, 0xf4, 0x7f, 0x94, 0xa1, 0x74, 0x6c, 0xd9, 0xa4, 0x9e, 0x2c, 0x5b, 0xd4,
-	0x82, 0xcd, 0x2b, 0x3a, 0xf5, 0x86, 0x8e, 0x37, 0x36, 0x7d, 0xea, 0xde, 0x70, 0x7f, 0x85, 0xc5,
-	0xab, 0xa6, 0x21, 0x8d, 0x7b, 0xd4, 0xbd, 0xc1, 0xc5, 0x2b, 0xa5, 0x85, 0x3a, 0xa0, 0x8d, 0x86,
-	0x66, 0x9a, 0x2d, 0x7b, 0x07, 0xb6, 0xd2, 0x68, 0xa8, 0xb6, 0xd1, 0x19, 0xe4, 0x5d, 0xcb, 0x1b,
-	0x4e, 0xac, 0xe0, 0xdb, 0xb0, 0xba, 0xb2, 0xb7, 0xb2, 0x5f, 0x38, 0x3c, 0x58, 0xb8, 0x98, 0x53,
-	0xa3, 0xaa, 0xb5, 0x25, 0x0e, 0xcf, 0x18, 0xd0, 0x23, 0x80, 0x80, 0xba, 0xae, 0x69, 0x79, 0x63,
-	0x97, 0x54, 0x57, 0xf7, 0x32, 0xfb, 0x59, 0x9c, 0x67, 0x92, 0x3a, 0x13, 0xb0, 0x89, 0xf1, 0x2d,
-	0x4f, 0x6a, 0xd7, 0xb8, 0x36, 0xe7, 0x5b, 0x9e, 0x50, 0x3e, 0x02, 0x88, 0x1c, 0x37, 0x92, 0xda,
-	0x75, 0x81, 0x65, 0x12, 0xa1, 0xfe, 0x10, 0xb6, 0x93, 0xe4, 0x36, 0x6d, 0xea, 0x8d, 0x9c, 0x21,
-	0xf1, 0x6c, 0x52, 0xdd, 0xe0, 0x86, 0x95, 0x44, 0xd7, 0x4c, 0x54, 0xe8, 0x67, 0xb0, 0x13, 0x77,
-	0x8d, 0x05, 0x4b, 0x01, 0xe5, 0x38, 0xe8, 0x9e, 0xa2, 0x55, 0x60, 0x2d, 0x28, 0x7d, 0x43, 0x6f,
-	0x4c, 0xd7, 0xf9, 0x96, 0xb8, 0xce, 0x73, 0x4a, 0x87, 0xd5, 0x3c, 0xcf, 0x72, 0x7d, 0x51, 0x60,
-	0xda, 0x89, 0x25, 0xde, 0xfc, 0x86, 0xde, 0xcc, 0x9a, 0xa8, 0x0b, 0x5b, 0x21, 0x0d, 0x02, 0xfa,
-	0x52, 0x65, 0x83, 0xa5, 0xd9, 0x34, 0x01, 0x56, 0x08, 0xcf, 0x40, 0xb3, 0xbc, 0x31, 0x09, 0x54,
-	0xbe, 0xc2, 0xd2, 0x7c, 0x65, 0x8e, 0x55, 0xe8, 0xfa, 0x50, 0x09, 0xa7, 0x81, 0x1f, 0x38, 0x21,
-	0x51, 0x19, 0x8b, 0x4b, 0x33, 0xa2, 0x18, 0xae, 0x90, 0x7e, 0x0d, 0xd5, 0xa9, 0x37, 0x24, 0x81,
-	0x49, 0xae, 0x7d, 0x1a, 0x92, 0xa1, 0xca, 0xbc, 0xb9, 0x34, 0xf3, 0x0e, 0xe7, 0x30, 0x04, 0x85,
-	0xc2, 0xfe, 0x05, 0xa0, 0x2b, 0x77, 0x1a, 0x04, 0x69, 0xde, 0xd2, 0xd2, 0xbc, 0x5b, 0x12, 0x9d,
-	0x8e, 0xc2, 0x73, 0x62, 0x0d, 0x5f, 0x12, 0x2b, 0x15, 0xd7, 0xf2, 0xf2, 0x51, 0x88, 0xe1, 0x33,
-	0xd9, 0xee, 0xdf, 0x37, 0x20, 0x17, 0xa7, 0x08, 0x3a, 0x95, 0xc7, 0xc5, 0x0a, 0xa7, 0xfc, 0xf8,
-	0x8e, 0x19, 0xa6, 0x1e, 0x1f, 0x4f, 0x21, 0xe7, 0xd3, 0xd0, 0x61, 0x7a, 0x9e, 0x5f, 0x85, 0xc3,
-	0xbd, 0x45, 0x6c, 0x3d, 0x69, 0x87, 0x13, 0x84, 0xfe, 0x97, 0xf5, 0xd9, 0x29, 0x72, 0xde, 0x79,
-	0xd6, 0xe9, 0x5e, 0x74, 0xcc, 0xf8, 0x8c, 0xd0, 0xde, 0x42, 0x45, 0xc8, 0xb5, 0x8d, 0xe3, 0x81,
-	0x69, 0x5c, 0x1a, 0x5a, 0x06, 0x6d, 0x42, 0x1e, 0xb7, 0x4e, 0x4e, 0x45, 0x33, 0x8b, 0xaa, 0xb0,
-	0xcd, 0x95, 0xdd, 0x63, 0x33, 0x36, 0x6a, 0xe0, 0xee, 0x85, 0xb6, 0xc2, 0xb6, 0x7d, 0x61, 0x38,
-	0xaf, 0x5a, 0x65, 0xaa, 0x18, 0x94, 0x70, 0x71, 0xd5, 0x1a, 0xda, 0x85, 0x9d, 0x04, 0x95, 0xd6,
-	0xad, 0x33, 0xd8, 0x59, 0xeb, 0xa8, 0xd7, 0x6d, 0x75, 0x06, 0x66, 0xc3, 0x18, 0x5c, 0x18, 0x46,
-	0x87, 0x69, 0xd9, 0x91, 0x51, 0x84, 0x5c, 0xa7, 0xdb, 0x37, 0xcc, 0x41, 0xab, 0xa7, 0xe5, 0x58,
-	0x1f, 0xcf, 0x7b, 0x3d, 0x03, 0x9b, 0xed, 0x56, 0x4f, 0xcb, 0xb3, 0x66, 0xbb, 0x7b, 0x21, 0x9b,
-	0xc0, 0x8e, 0x97, 0xb3, 0xee, 0xf9, 0xe0, 0x94, 0xf7, 0x4a, 0x2b, 0xa0, 0x32, 0x14, 0x44, 0x9b,
-	0xfb, 0xd3, 0x8a, 0x48, 0x83, 0xa2, 0x10, 0x34, 0x8d, 0xce, 0xc0, 0xc0, 0xda, 0x26, 0xba, 0x07,
-	0x5b, 0x9c, 0xbe, 0xd1, 0x1d, 0x0c, 0xba, 0x67, 0xd2, 0xb0, 0xc4, 0xe2, 0xa5, 0x8a, 0x39, 0x5f,
-	0x99, 0x9d, 0xb0, 0xaa, 0x54, 0x92, 0x68, 0xc9, 0xa8, 0x8d, 0x4b, 0xc3, 0x1c, 0x74, 0x7b, 0x66,
-	0xa3, 0x7b, 0xde, 0x39, 0xaa, 0xe3, 0x4b, 0x6d, 0x2b, 0xa5, 0x12, 0xa3, 0x6e, 0x76, 0x71, 0xc7,
-	0xc0, 0x1a, 0x42, 0x0f, 0xa1, 0x9a, 0xa8, 0x24, 0x63, 0x02, 0xac, 0x24, 0xe1, 0x67, 0x5a, 0xfe,
-	0x21, 0x71, 0xdb, 0xb3, 0x40, 0xbe, 0xe2, 0xee, 0x5e, 0x5a, 0x97, 0xf2, 0xb7, 0x83, 0x1e, 0xc1,
-	0xfd, 0x99, 0x6e, 0xde, 0xe1, 0xdb, 0xb3, 0x59, 0x9d, 0xf7, 0x58, 0x45, 0x8f, 0xe1, 0x81, 0x3a,
-	0xcf, 0xa6, 0x98, 0x82, 0x78, 0xc6, 0xb4, 0xfb, 0x68, 0x0f, 0x1e, 0xa6, 0xa6, 0x74, 0xde, 0x62,
-	0x97, 0x05, 0x54, 0x50, 0xd4, 0xb1, 0x39, 0xc0, 0xf5, 0x13, 0x76, 0xd8, 0x3f, 0x60, 0xd1, 0x97,
-	0x38, 0x45, 0xfc, 0x90, 0x57, 0x2c, 0xf1, 0xd8, 0x7b, 0xe7, 0xbd, 0x56, 0x5b, 0x7b, 0xc4, 0x2a,
-	0x96, 0x59, 0xf7, 0x84, 0xf0, 0x1d, 0x86, 0x3f, 0xee, 0x62, 0xe3, 0xd4, 0xa8, 0x1f, 0x99, 0x27,
-	0xbc, 0xa0, 0x69, 0xd7, 0xb5, 0xc7, 0xac, 0xac, 0x68, 0x9e, 0xb6, 0x3a, 0xe6, 0x49, 0xa7, 0x3e,
-	0x38, 0x65, 0x94, 0x7b, 0xcc, 0x3f, 0x17, 0x71, 0xde, 0x93, 0x6e, 0x87, 0x49, 0xdf, 0x65, 0x78,
-	0x2e, 0x15, 0xcc, 0x52, 0xac, 0xeb, 0x4f, 0xa1, 0xd8, 0xa6, 0x36, 0x4f, 0xca, 0x96, 0x37, 0xa2,
-	0xe8, 0x03, 0xd8, 0x70, 0xad, 0xc8, 0x74, 0xbd, 0xb1, 0x3c, 0xca, 0x2b, 0x71, 0x0e, 0xb2, 0x1c,
-	0xad, 0xb5, 0xad, 0xa8, 0xed, 0x8d, 0xf1, 0xba, 0xcb, 0x7f, 0xf5, 0x0b, 0xc8, 0xf5, 0x02, 0xea,
-	0x93, 0x20, 0xba, 0x41, 0x08, 0x56, 0x3d, 0x6b, 0x42, 0x64, 0xd5, 0xc2, 0xbf, 0x59, 0xc1, 0xf7,
-	0xc2, 0x72, 0xa7, 0x44, 0x96, 0x2a, 0xa2, 0x81, 0xde, 0x85, 0xe2, 0xd4, 0xf1, 0xa2, 0x4f, 0x3e,
-	0x36, 0x85, 0x92, 0x6d, 0x1d, 0xab, 0xb8, 0x20, 0x64, 0x5f, 0x32, 0x91, 0xfe, 0x87, 0x15, 0xd0,
-	0x0c, 0x2f, 0x72, 0xa2, 0x1b, 0xa5, 0xd8, 0xd0, 0x60, 0x65, 0xe2, 0x0c, 0xa5, 0x03, 0xf6, 0x89,
-	0x76, 0x60, 0xdd, 0xa5, 0xb6, 0xe5, 0xc6, 0x0e, 0x64, 0x0b, 0xed, 0x41, 0x61, 0x48, 0x42, 0x3b,
-	0x70, 0x7c, 0xbe, 0x9b, 0x88, 0x72, 0x53, 0x15, 0xb1, 0x9e, 0x85, 0x36, 0x0d, 0xe2, 0x93, 0x5c,
-	0x34, 0xd0, 0x3b, 0x00, 0xca, 0x51, 0x2a, 0x8e, 0x71, 0x45, 0xc2, 0xf4, 0x11, 0xf5, 0x1d, 0xdb,
-	0x72, 0x9d, 0xe8, 0x46, 0x1e, 0xe4, 0x8a, 0xe4, 0xd5, 0x72, 0x68, 0xe3, 0x7f, 0x2e, 0x87, 0x1a,
-	0x90, 0x77, 0xe5, 0xc4, 0x84, 0xd5, 0x1c, 0x2f, 0x5f, 0x16, 0xd2, 0xa8, 0x33, 0x88, 0x67, 0x30,
-	0xf4, 0x2b, 0x00, 0x5f, 0x4c, 0x8f, 0x43, 0xc2, 0x6a, 0x9e, 0x93, 0x2c, 0xde, 0x53, 0xe5, 0x44,
-	0x62, 0x05, 0xa3, 0xff, 0x35, 0x0b, 0xdb, 0x7d, 0x6b, 0x44, 0xfa, 0xc4, 0x0a, 0xec, 0xe7, 0xca,
-	0x5c, 0x7c, 0x0a, 0x6b, 0xd6, 0x70, 0xea, 0x46, 0xf2, 0x9a, 0xb0, 0xcc, 0x51, 0x22, 0x00, 0x0c,
-	0x19, 0xfa, 0x94, 0x8e, 0xf8, 0x94, 0x2d, 0x89, 0xe4, 0x00, 0xf4, 0x14, 0x36, 0x26, 0x64, 0xc8,
-	0x62, 0x2d, 0x4f, 0x9b, 0x65, 0xb0, 0x31, 0x04, 0xfd, 0x02, 0x72, 0x2f, 0x1c, 0xea, 0xf2, 0x99,
-	0x5d, 0x5d, 0x1a, 0x9e, 0x60, 0xd0, 0x27, 0xb0, 0x1a, 0x58, 0xf6, 0xcd, 0x1d, 0x2a, 0x26, 0x6e,
-	0xaf, 0xbf, 0x84, 0x02, 0xcb, 0x1a, 0xea, 0x8d, 0x31, 0xb1, 0x23, 0xf4, 0x11, 0x14, 0x26, 0x8e,
-	0x67, 0x2e, 0x91, 0x64, 0xf9, 0x89, 0xe3, 0x89, 0x4f, 0x0e, 0xb2, 0xae, 0x13, 0x50, 0xf6, 0x75,
-	0x20, 0xeb, 0x5a, 0x7c, 0xea, 0x01, 0xe4, 0x9b, 0xec, 0xf6, 0xc7, 0xf3, 0x7a, 0x1f, 0xd6, 0xf8,
-	0x55, 0x50, 0x3a, 0x44, 0x29, 0x2c, 0x37, 0xc3, 0xc2, 0x60, 0x96, 0x19, 0x59, 0x35, 0x33, 0xde,
-	0x87, 0x92, 0xef, 0x5c, 0x13, 0xd7, 0x1c, 0x05, 0x96, 0x9d, 0x24, 0x55, 0x16, 0x6f, 0x72, 0xe9,
-	0xb1, 0x14, 0xea, 0xe7, 0x50, 0x3d, 0xa2, 0x13, 0xc7, 0xb3, 0xbc, 0x88, 0x93, 0x86, 0xca, 0x92,
-	0xf9, 0x39, 0xac, 0x73, 0x0f, 0x61, 0x35, 0xc3, 0x57, 0xe2, 0xbb, 0x8b, 0x42, 0x98, 0xf4, 0x1a,
-	0x4b, 0x80, 0xee, 0x42, 0x99, 0x5f, 0x48, 0x7a, 0xc9, 0xca, 0x44, 0x97, 0x50, 0x1e, 0x4a, 0x4f,
-	0x66, 0x42, 0xcb, 0x86, 0xf6, 0xd3, 0x45, 0xb4, 0x8b, 0x3a, 0x86, 0x4b, 0xc3, 0x94, 0x46, 0xff,
-	0x73, 0x06, 0x72, 0xcd, 0x80, 0xfa, 0xa7, 0x8e, 0x17, 0xfd, 0x3f, 0x6f, 0x38, 0xe9, 0xdd, 0x25,
-	0xfb, 0xca, 0xee, 0x72, 0x00, 0x15, 0x67, 0xe2, 0xd3, 0x20, 0xb2, 0x3c, 0x9b, 0xcc, 0x07, 0x1a,
-	0xcd, 0x54, 0x49, 0xb4, 0xbf, 0x84, 0x4a, 0xdc, 0x4f, 0x35, 0xd0, 0xbf, 0x04, 0xb0, 0x03, 0xea,
-	0x9b, 0xcf, 0x99, 0x5c, 0x06, 0x7b, 0x61, 0xda, 0xc7, 0x04, 0x38, 0x6f, 0xc7, 0x54, 0xfa, 0x27,
-	0x50, 0x4e, 0x78, 0x7b, 0x56, 0x60, 0x4d, 0x42, 0xf4, 0x1e, 0x6c, 0x5a, 0xa1, 0x4f, 0xec, 0xc8,
-	0x0c, 0x98, 0x13, 0x41, 0x9b, 0xc5, 0x45, 0x21, 0xc4, 0x5c, 0xa6, 0x1f, 0x01, 0xba, 0x20, 0x57,
-	0x47, 0xf1, 0x7d, 0x45, 0x42, 0x6b, 0x50, 0x71, 0x3c, 0xdb, 0x9d, 0x0e, 0x89, 0x39, 0x26, 0x34,
-	0xf5, 0x3c, 0x90, 0xc3, 0x5b, 0x52, 0x75, 0x42, 0xa8, 0x7c, 0x25, 0xd0, 0xbf, 0xcb, 0x42, 0x91,
-	0xcf, 0x76, 0x93, 0x5d, 0x5a, 0xaf, 0x23, 0x74, 0x02, 0x9b, 0x7c, 0xe5, 0x53, 0x6f, 0x6c, 0x06,
-	0xc4, 0x8e, 0xe4, 0x14, 0x2c, 0xbc, 0xbb, 0x2a, 0xe9, 0x86, 0x0b, 0xae, 0x92, 0x7b, 0xef, 0x43,
-	0xc9, 0xb5, 0xbc, 0xf1, 0x94, 0x5d, 0xa0, 0x45, 0x70, 0xb2, 0x7b, 0x2b, 0xfb, 0x79, 0xbc, 0x19,
-	0x4b, 0xf9, 0x88, 0x51, 0x1f, 0xb6, 0x66, 0xf1, 0x33, 0x7d, 0x3e, 0x0a, 0x59, 0x91, 0xfe, 0xe8,
-	0x4d, 0x61, 0x94, 0xf1, 0xc2, 0x65, 0x7b, 0x2e, 0x80, 0x5f, 0xc3, 0x76, 0xea, 0x15, 0x27, 0xe6,
-	0x5d, 0xe7, 0xbc, 0x4f, 0x16, 0xf1, 0xbe, 0x1a, 0x4f, 0x8c, 0x5e, 0xbe, 0x22, 0xd3, 0xbf, 0xcf,
-	0xc0, 0xb6, 0x5c, 0x01, 0x84, 0xc7, 0x0e, 0x93, 0xdf, 0x4d, 0x49, 0xc8, 0xb6, 0x9b, 0x35, 0xfe,
-	0x3e, 0x20, 0x63, 0xf6, 0xe8, 0xb5, 0xf7, 0x7d, 0x2c, 0x6c, 0xd1, 0xe7, 0x90, 0x1b, 0x89, 0xe7,
-	0x1d, 0x11, 0xa1, 0xc2, 0xe1, 0xe3, 0x37, 0x3c, 0x03, 0xe1, 0x04, 0xc0, 0x12, 0x46, 0x3c, 0x51,
-	0xd8, 0x62, 0xfa, 0xf8, 0xfa, 0x7d, 0x4d, 0xc2, 0xa8, 0x53, 0x8d, 0x8b, 0x8e, 0xd2, 0xd2, 0xff,
-	0xb6, 0x01, 0xf7, 0xe6, 0x46, 0x15, 0xfa, 0xd4, 0x0b, 0x09, 0xfa, 0x02, 0xb4, 0x91, 0x65, 0x13,
-	0xe5, 0x05, 0x2d, 0x5e, 0xe8, 0x3f, 0x5c, 0xee, 0x06, 0x82, 0xcb, 0xa3, 0x54, 0x3b, 0x44, 0xbf,
-	0x81, 0xed, 0xf8, 0xd2, 0x9c, 0xa2, 0x15, 0x01, 0xd8, 0x5f, 0x44, 0x3b, 0x5f, 0xa5, 0xe0, 0x4a,
-	0xcc, 0xa2, 0x92, 0xf7, 0x41, 0x73, 0xe9, 0x98, 0xa6, 0x88, 0x57, 0xee, 0x48, 0x5c, 0x66, 0x0c,
-	0x2a, 0xe9, 0x39, 0x6c, 0xb9, 0xd6, 0x15, 0x71, 0x53, 0xac, 0xab, 0x77, 0x64, 0xd5, 0x38, 0xc5,
-	0x5c, 0x5f, 0xe7, 0x5e, 0x27, 0xc3, 0xea, 0xda, 0x5d, 0xfb, 0xca, 0x18, 0x54, 0xd2, 0xaf, 0x60,
-	0x7b, 0x34, 0x75, 0x5d, 0x73, 0x8e, 0x99, 0xdf, 0xc7, 0x5f, 0x33, 0x69, 0x83, 0x14, 0x0d, 0x46,
-	0x8c, 0x23, 0x2d, 0x43, 0x57, 0xb0, 0x13, 0x5a, 0x23, 0x62, 0x86, 0xbc, 0x44, 0x51, 0xb9, 0x45,
-	0x6a, 0x7d, 0xb0, 0x88, 0xfb, 0xb6, 0xba, 0x06, 0x6f, 0x87, 0xb7, 0x55, 0x3b, 0x63, 0x78, 0x20,
-	0xd6, 0xf4, 0xac, 0x34, 0x52, 0x1d, 0xe5, 0x5e, 0xbf, 0x37, 0xcc, 0x1d, 0x5d, 0xf8, 0xbe, 0x93,
-	0x16, 0x28, 0x8e, 0x4c, 0xb8, 0xa7, 0x6c, 0x3d, 0x8a, 0x8b, 0x02, 0x77, 0xf1, 0xe3, 0x37, 0x6e,
-	0x3f, 0xea, 0x42, 0xb4, 0x6f, 0x39, 0x1b, 0x5a, 0xb0, 0x99, 0xda, 0x86, 0xf8, 0xb3, 0xc5, 0x6b,
-	0xb2, 0x53, 0xdd, 0x7f, 0x70, 0x51, 0xdd, 0x79, 0x58, 0x49, 0x41, 0x82, 0x80, 0x06, 0xbc, 0x22,
-	0x52, 0x4a, 0x8a, 0xc0, 0xb7, 0x6b, 0x7d, 0xfe, 0x20, 0x8d, 0x85, 0x81, 0x3e, 0x82, 0xdd, 0x86,
-	0x15, 0x25, 0x11, 0x15, 0xb9, 0x1c, 0xc6, 0x5b, 0xd4, 0x29, 0xe4, 0x02, 0xf1, 0x19, 0xe7, 0xf0,
-	0xc2, 0x29, 0xbb, 0x6d, 0x8b, 0xc3, 0x09, 0x5a, 0xff, 0x06, 0x1e, 0xdc, 0xea, 0x47, 0x6e, 0x1a,
-	0xcf, 0x20, 0x1f, 0xc8, 0xef, 0xd8, 0xd3, 0x4f, 0x96, 0xf4, 0x24, 0x50, 0x78, 0x86, 0x7f, 0x42,
-	0x00, 0x94, 0x77, 0x96, 0x02, 0x6c, 0xc8, 0x47, 0x07, 0xed, 0x2d, 0x76, 0x27, 0xfb, 0xd2, 0xc0,
-	0x97, 0xe6, 0x79, 0xa7, 0xdd, 0x7a, 0x66, 0xb4, 0x2f, 0xb5, 0x0c, 0xbb, 0xda, 0x27, 0xad, 0x2c,
-	0x6b, 0xf5, 0xba, 0xfd, 0x7e, 0xab, 0xd1, 0x36, 0xb4, 0x15, 0x04, 0xb0, 0x2e, 0x35, 0xab, 0xec,
-	0x1a, 0xcf, 0xa1, 0x52, 0xb0, 0x76, 0xf8, 0x5d, 0x06, 0x4a, 0xbc, 0x0f, 0xf5, 0xf8, 0x5f, 0x0b,
-	0xf4, 0xa7, 0x0c, 0x54, 0x6e, 0x19, 0x26, 0x3a, 0x5c, 0x58, 0x92, 0x2c, 0x8c, 0xfd, 0xee, 0x47,
-	0x77, 0xc2, 0x88, 0xb1, 0xeb, 0xef, 0xfc, 0xfe, 0xfb, 0x7f, 0xfe, 0x31, 0x5b, 0xd5, 0x2b, 0xc9,
-	0x7f, 0x2a, 0xe1, 0x67, 0x72, 0xa9, 0x92, 0xcf, 0x32, 0x4f, 0x1a, 0x11, 0xec, 0xda, 0x74, 0xb2,
-	0x80, 0xb9, 0x51, 0x49, 0x0f, 0xa7, 0x17, 0xd0, 0x88, 0xf6, 0x32, 0xbf, 0x7e, 0x2a, 0xcd, 0xc7,
-	0x94, 0x1d, 0xc6, 0x35, 0x1a, 0x8c, 0x0f, 0xc6, 0xc4, 0xe3, 0x7f, 0x4f, 0x1c, 0x08, 0x95, 0xe5,
-	0x3b, 0xe1, 0xfc, 0x3f, 0x23, 0x9f, 0x8b, 0xaf, 0xff, 0x64, 0x32, 0x57, 0xeb, 0xdc, 0xf6, 0xa3,
-	0xff, 0x06, 0x00, 0x00, 0xff, 0xff, 0xf4, 0xbf, 0x21, 0x35, 0xfd, 0x19, 0x00, 0x00,
 }

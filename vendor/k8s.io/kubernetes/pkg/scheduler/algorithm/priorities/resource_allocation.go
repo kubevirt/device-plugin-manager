@@ -19,52 +19,75 @@ package priorities
 import (
 	"fmt"
 
-	"github.com/golang/glog"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	"k8s.io/klog"
+	v1helper "k8s.io/kubernetes/pkg/apis/core/v1/helper"
+	"k8s.io/kubernetes/pkg/features"
 	priorityutil "k8s.io/kubernetes/pkg/scheduler/algorithm/priorities/util"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
-	"k8s.io/kubernetes/pkg/scheduler/schedulercache"
+	schedulernodeinfo "k8s.io/kubernetes/pkg/scheduler/nodeinfo"
 )
 
 // ResourceAllocationPriority contains information to calculate resource allocation priority.
 type ResourceAllocationPriority struct {
-	Name   string
-	scorer func(requested, allocable *schedulercache.Resource) int64
+	Name                string
+	scorer              func(requested, allocable ResourceToValueMap, includeVolumes bool, requestedVolumes int, allocatableVolumes int) int64
+	resourceToWeightMap ResourceToWeightMap
 }
+
+// ResourceToWeightMap contains resource name and weight.
+type ResourceToWeightMap map[v1.ResourceName]int64
+
+// ResourceToValueMap contains resource name and score.
+type ResourceToValueMap map[v1.ResourceName]int64
+
+// DefaultRequestedRatioResources is used to set default requestToWeight map for CPU and memory
+var DefaultRequestedRatioResources = ResourceToWeightMap{v1.ResourceMemory: 1, v1.ResourceCPU: 1}
 
 // PriorityMap priorities nodes according to the resource allocations on the node.
 // It will use `scorer` function to calculate the score.
 func (r *ResourceAllocationPriority) PriorityMap(
 	pod *v1.Pod,
 	meta interface{},
-	nodeInfo *schedulercache.NodeInfo) (schedulerapi.HostPriority, error) {
+	nodeInfo *schedulernodeinfo.NodeInfo) (schedulerapi.HostPriority, error) {
 	node := nodeInfo.Node()
 	if node == nil {
 		return schedulerapi.HostPriority{}, fmt.Errorf("node not found")
 	}
-	allocatable := nodeInfo.AllocatableResource()
-
-	var requested schedulercache.Resource
-	if priorityMeta, ok := meta.(*priorityMetadata); ok {
-		requested = *priorityMeta.nonZeroRequest
-	} else {
-		// We couldn't parse metadata - fallback to computing it.
-		requested = *getNonZeroRequests(pod)
+	if r.resourceToWeightMap == nil {
+		return schedulerapi.HostPriority{}, fmt.Errorf("resources not found")
 	}
+	requested := make(ResourceToValueMap, len(r.resourceToWeightMap))
+	allocatable := make(ResourceToValueMap, len(r.resourceToWeightMap))
+	for resource := range r.resourceToWeightMap {
+		allocatable[resource], requested[resource] = calculateResourceAllocatableRequest(nodeInfo, pod, resource)
+	}
+	var score int64
 
-	requested.MilliCPU += nodeInfo.NonZeroRequest().MilliCPU
-	requested.Memory += nodeInfo.NonZeroRequest().Memory
+	// Check if the pod has volumes and this could be added to scorer function for balanced resource allocation.
+	if len(pod.Spec.Volumes) >= 0 && utilfeature.DefaultFeatureGate.Enabled(features.BalanceAttachedNodeVolumes) && nodeInfo.TransientInfo != nil {
+		score = r.scorer(requested, allocatable, true, nodeInfo.TransientInfo.TransNodeInfo.RequestedVolumes, nodeInfo.TransientInfo.TransNodeInfo.AllocatableVolumesCount)
+	} else {
+		score = r.scorer(requested, allocatable, false, 0, 0)
+	}
+	if klog.V(10) {
+		if len(pod.Spec.Volumes) >= 0 && utilfeature.DefaultFeatureGate.Enabled(features.BalanceAttachedNodeVolumes) && nodeInfo.TransientInfo != nil {
+			klog.Infof(
+				"%v -> %v: %v, map of allocatable resources %v, map of requested resources %v , allocatable volumes %d, requested volumes %d, score %d",
+				pod.Name, node.Name, r.Name,
+				allocatable, requested, nodeInfo.TransientInfo.TransNodeInfo.AllocatableVolumesCount,
+				nodeInfo.TransientInfo.TransNodeInfo.RequestedVolumes,
+				score,
+			)
+		} else {
+			klog.Infof(
+				"%v -> %v: %v, map of allocatable resources %v, map of requested resources %v ,score %d,",
+				pod.Name, node.Name, r.Name,
+				allocatable, requested, score,
+			)
 
-	score := r.scorer(&requested, &allocatable)
-
-	if glog.V(10) {
-		glog.Infof(
-			"%v -> %v: %v, capacity %d millicores %d memory bytes, total request %d millicores %d memory bytes, score %d",
-			pod.Name, node.Name, r.Name,
-			allocatable.MilliCPU, allocatable.Memory,
-			requested.MilliCPU+allocatable.MilliCPU, requested.Memory+allocatable.Memory,
-			score,
-		)
+		}
 	}
 
 	return schedulerapi.HostPriority{
@@ -73,13 +96,47 @@ func (r *ResourceAllocationPriority) PriorityMap(
 	}, nil
 }
 
-func getNonZeroRequests(pod *v1.Pod) *schedulercache.Resource {
-	result := &schedulercache.Resource{}
+// calculateResourceAllocatableRequest returns resources Allocatable and Requested values
+func calculateResourceAllocatableRequest(nodeInfo *schedulernodeinfo.NodeInfo, pod *v1.Pod, resource v1.ResourceName) (int64, int64) {
+	allocatable := nodeInfo.AllocatableResource()
+	requested := nodeInfo.RequestedResource()
+	podRequest := calculatePodResourceRequest(pod, resource)
+	switch resource {
+	case v1.ResourceCPU:
+		return allocatable.MilliCPU, (nodeInfo.NonZeroRequest().MilliCPU + podRequest)
+	case v1.ResourceMemory:
+		return allocatable.Memory, (nodeInfo.NonZeroRequest().Memory + podRequest)
+
+	case v1.ResourceEphemeralStorage:
+		return allocatable.EphemeralStorage, (requested.EphemeralStorage + podRequest)
+	default:
+		if v1helper.IsScalarResourceName(resource) {
+			return allocatable.ScalarResources[resource], (requested.ScalarResources[resource] + podRequest)
+		}
+	}
+	if klog.V(10) {
+		klog.Infof("requested resource %v not considered for node score calculation",
+			resource,
+		)
+	}
+	return 0, 0
+}
+
+// calculatePodResourceRequest returns the total non-zero requests. If Overhead is defined for the pod and the
+// PodOverhead feature is enabled, the Overhead is added to the result.
+func calculatePodResourceRequest(pod *v1.Pod, resource v1.ResourceName) int64 {
+	var podRequest int64
 	for i := range pod.Spec.Containers {
 		container := &pod.Spec.Containers[i]
-		cpu, memory := priorityutil.GetNonzeroRequests(&container.Resources.Requests)
-		result.MilliCPU += cpu
-		result.Memory += memory
+		value := priorityutil.GetNonzeroRequestForResource(resource, &container.Resources.Requests)
+		podRequest += value
 	}
-	return result
+
+	// If Overhead is being utilized, add to the total requests for the pod
+	if pod.Spec.Overhead != nil && utilfeature.DefaultFeatureGate.Enabled(features.PodOverhead) {
+		if quantity, found := pod.Spec.Overhead[resource]; found {
+			podRequest += quantity.Value()
+		}
+	}
+	return podRequest
 }

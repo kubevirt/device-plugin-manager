@@ -221,6 +221,21 @@ var _ = Describe("Subcommand", func() {
 			})
 		})
 
+		Context("with an argument of the form: foo-test", func() {
+			It("should generate a test file named after the argument", func() {
+				session := startGinkgo(pkgPath, "generate", "baz-buzz-test")
+				Eventually(session).Should(gexec.Exit(0))
+				output := session.Out.Contents()
+
+				Ω(output).Should(ContainSubstring("baz_buzz_test.go"))
+
+				content, err := ioutil.ReadFile(filepath.Join(pkgPath, "baz_buzz_test.go"))
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(content).Should(ContainSubstring("package foo_bar_test"))
+				Ω(content).Should(ContainSubstring(`var _ = Describe("BazBuzz", func() {`))
+			})
+		})
+
 		Context("with an argument of the form: foo_test.go", func() {
 			It("should generate a test file named after the argument", func() {
 				session := startGinkgo(pkgPath, "generate", "baz_buzz_test.go")
@@ -406,7 +421,7 @@ var _ = Describe("Subcommand", func() {
 		It("should print out usage information", func() {
 			session := startGinkgo("", "help")
 			Eventually(session).Should(gexec.Exit(0))
-			output := string(session.Err.Contents())
+			output := string(session.Out.Contents())
 
 			Ω(output).Should(MatchRegexp(`Ginkgo Version \d+\.\d+\.\d+`))
 			Ω(output).Should(ContainSubstring("ginkgo watch"))

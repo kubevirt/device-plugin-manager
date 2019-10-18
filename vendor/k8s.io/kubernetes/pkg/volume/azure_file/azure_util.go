@@ -1,3 +1,5 @@
+// +build !providerless
+
 /*
 Copyright 2016 The Kubernetes Authors.
 
@@ -31,8 +33,8 @@ const (
 	dirMode         = "dir_mode"
 	gid             = "gid"
 	vers            = "vers"
-	defaultFileMode = "0755"
-	defaultDirMode  = "0755"
+	defaultFileMode = "0777"
+	defaultDirMode  = "0777"
 	defaultVers     = "3.0"
 )
 
@@ -66,6 +68,7 @@ func (s *azureSvc) GetAzureCredentials(host volume.VolumeHost, nameSpace, secret
 	if accountName == "" || accountKey == "" {
 		return "", "", fmt.Errorf("Invalid %v/%v, couldn't extract azurestorageaccountname or azurestorageaccountkey", nameSpace, secretName)
 	}
+	accountName = strings.TrimSpace(accountName)
 	return accountName, accountKey, nil
 }
 
