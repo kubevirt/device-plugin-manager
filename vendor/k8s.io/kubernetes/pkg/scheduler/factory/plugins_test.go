@@ -19,7 +19,9 @@ package factory
 import (
 	"testing"
 
-	"k8s.io/kubernetes/pkg/scheduler/algorithm"
+	"github.com/stretchr/testify/assert"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/kubernetes/pkg/scheduler/algorithm/priorities"
 	"k8s.io/kubernetes/pkg/scheduler/api"
 )
 
@@ -34,49 +36,103 @@ func TestAlgorithmNameValidation(t *testing.T) {
 		"Some,Alg:orithm",
 	}
 	for _, name := range algorithmNamesShouldValidate {
-		if !validName.MatchString(name) {
-			t.Errorf("%v should be a valid algorithm name but is not valid.", name)
-		}
+		t.Run(name, func(t *testing.T) {
+			if !validName.MatchString(name) {
+				t.Errorf("should be a valid algorithm name but is not valid.")
+			}
+		})
 	}
 	for _, name := range algorithmNamesShouldNotValidate {
-		if validName.MatchString(name) {
-			t.Errorf("%v should be an invalid algorithm name but is valid.", name)
-		}
+		t.Run(name, func(t *testing.T) {
+			if validName.MatchString(name) {
+				t.Errorf("should be an invalid algorithm name but is valid.")
+			}
+		})
 	}
 }
 
 func TestValidatePriorityConfigOverFlow(t *testing.T) {
 	tests := []struct {
 		description string
-		configs     []algorithm.PriorityConfig
+		configs     []priorities.PriorityConfig
 		expected    bool
 	}{
 		{
 			description: "one of the weights is MaxInt",
-			configs:     []algorithm.PriorityConfig{{Weight: api.MaxInt}, {Weight: 5}},
+			configs:     []priorities.PriorityConfig{{Weight: api.MaxInt}, {Weight: 5}},
 			expected:    true,
 		},
 		{
 			description: "after multiplication with MaxPriority the weight is larger than MaxWeight",
-			configs:     []algorithm.PriorityConfig{{Weight: api.MaxInt/api.MaxPriority + api.MaxPriority}, {Weight: 5}},
+			configs:     []priorities.PriorityConfig{{Weight: api.MaxInt/api.MaxPriority + api.MaxPriority}, {Weight: 5}},
 			expected:    true,
 		},
 		{
 			description: "normal weights",
-			configs:     []algorithm.PriorityConfig{{Weight: 10000}, {Weight: 5}},
+			configs:     []priorities.PriorityConfig{{Weight: 10000}, {Weight: 5}},
 			expected:    false,
 		},
 	}
 	for _, test := range tests {
-		err := validateSelectedConfigs(test.configs)
-		if test.expected {
-			if err == nil {
-				t.Errorf("Expected Overflow for %s", test.description)
+		t.Run(test.description, func(t *testing.T) {
+			err := validateSelectedConfigs(test.configs)
+			if test.expected {
+				if err == nil {
+					t.Errorf("Expected Overflow")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Did not expect an overflow")
+				}
 			}
-		} else {
-			if err != nil {
-				t.Errorf("Did not expect an overflow for %s", test.description)
-			}
-		}
+		})
 	}
+}
+
+func TestBuildScoringFunctionShapeFromRequestedToCapacityRatioArguments(t *testing.T) {
+	arguments := api.RequestedToCapacityRatioArguments{
+		UtilizationShape: []api.UtilizationShapePoint{
+			{Utilization: 10, Score: 1},
+			{Utilization: 30, Score: 5},
+			{Utilization: 70, Score: 2},
+		},
+		Resources: []api.ResourceSpec{
+			{Name: v1.ResourceCPU},
+			{Name: v1.ResourceMemory},
+		},
+	}
+	builtShape, resources := buildScoringFunctionShapeFromRequestedToCapacityRatioArguments(&arguments)
+	expectedShape, _ := priorities.NewFunctionShape([]priorities.FunctionShapePoint{
+		{Utilization: 10, Score: 1},
+		{Utilization: 30, Score: 5},
+		{Utilization: 70, Score: 2},
+	})
+	expectedResources := priorities.ResourceToWeightMap{
+		v1.ResourceCPU:    1,
+		v1.ResourceMemory: 1,
+	}
+	assert.Equal(t, expectedShape, builtShape)
+	assert.Equal(t, expectedResources, resources)
+}
+
+func TestBuildScoringFunctionShapeFromRequestedToCapacityRatioArgumentsNilResourceToWeightMap(t *testing.T) {
+	arguments := api.RequestedToCapacityRatioArguments{
+		UtilizationShape: []api.UtilizationShapePoint{
+			{Utilization: 10, Score: 1},
+			{Utilization: 30, Score: 5},
+			{Utilization: 70, Score: 2},
+		},
+	}
+	builtShape, resources := buildScoringFunctionShapeFromRequestedToCapacityRatioArguments(&arguments)
+	expectedShape, _ := priorities.NewFunctionShape([]priorities.FunctionShapePoint{
+		{Utilization: 10, Score: 1},
+		{Utilization: 30, Score: 5},
+		{Utilization: 70, Score: 2},
+	})
+	expectedResources := priorities.ResourceToWeightMap{
+		v1.ResourceCPU:    1,
+		v1.ResourceMemory: 1,
+	}
+	assert.Equal(t, expectedShape, builtShape)
+	assert.Equal(t, expectedResources, resources)
 }

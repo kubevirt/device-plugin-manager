@@ -1,3 +1,5 @@
+// +build !providerless
+
 /*
 Copyright 2018 The Kubernetes Authors.
 
@@ -17,10 +19,11 @@ limitations under the License.
 package ipam
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes/fake"
@@ -55,5 +58,28 @@ func TestBoundedRetries(t *testing.T) {
 	})
 	for hasNodeInProcessing(ca, nodeName) {
 		// wait for node to finish processing (should terminate and not time out)
+	}
+}
+
+func withinExpectedRange(got time.Duration, expected time.Duration) bool {
+	return got >= expected/2 && got <= 3*expected/2
+}
+
+func TestNodeUpdateRetryTimeout(t *testing.T) {
+	for _, tc := range []struct {
+		count int
+		want  time.Duration
+	}{
+		{count: 0, want: 250 * time.Millisecond},
+		{count: 1, want: 500 * time.Millisecond},
+		{count: 2, want: 1000 * time.Millisecond},
+		{count: 3, want: 2000 * time.Millisecond},
+		{count: 50, want: 5000 * time.Millisecond},
+	} {
+		t.Run(fmt.Sprintf("count %d", tc.count), func(t *testing.T) {
+			if got := nodeUpdateRetryTimeout(tc.count); !withinExpectedRange(got, tc.want) {
+				t.Errorf("nodeUpdateRetryTimeout(tc.count) = %v; want %v", got, tc.want)
+			}
+		})
 	}
 }

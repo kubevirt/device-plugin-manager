@@ -57,9 +57,9 @@ func Pods(pods []*v1.Pod) string {
 	return aggregatePods(pods, Pod)
 }
 
-// PodsWithDeletiontimestamps is the same as Pods. In addition, it prints the
+// PodsWithDeletionTimestamps is the same as Pods. In addition, it prints the
 // deletion timestamps of the pods if they are not nil.
-func PodsWithDeletiontimestamps(pods []*v1.Pod) string {
+func PodsWithDeletionTimestamps(pods []*v1.Pod) string {
 	return aggregatePods(pods, PodWithDeletionTimestamp)
 }
 
@@ -68,5 +68,5 @@ func aggregatePods(pods []*v1.Pod, handler podHandler) string {
 	for _, pod := range pods {
 		podStrings = append(podStrings, handler(pod))
 	}
-	return fmt.Sprintf(strings.Join(podStrings, ", "))
+	return strings.Join(podStrings, ", ")
 }

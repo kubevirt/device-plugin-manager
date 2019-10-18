@@ -19,12 +19,11 @@
 package status
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
 	"testing"
-
-	"github.com/golang/protobuf/ptypes/any"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
@@ -36,11 +35,25 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
+// errEqual is essentially a copy of testutils.StatusErrEqual(), to avoid a
+// cyclic dependency.
+func errEqual(err1, err2 error) bool {
+	status1, ok := FromError(err1)
+	if !ok {
+		return false
+	}
+	status2, ok := FromError(err2)
+	if !ok {
+		return false
+	}
+	return proto.Equal(status1.Proto(), status2.Proto())
+}
+
 func TestErrorsWithSameParameters(t *testing.T) {
 	const description = "some description"
 	e1 := Errorf(codes.AlreadyExists, description)
 	e2 := Errorf(codes.AlreadyExists, description)
-	if e1 == e2 || !reflect.DeepEqual(e1, e2) {
+	if e1 == e2 || !errEqual(e1, e2) {
 		t.Fatalf("Errors should be equivalent but unique - e1: %v, %v  e2: %p, %v", e1.(*statusError), e1, e2.(*statusError), e2)
 	}
 }
@@ -124,7 +137,7 @@ func TestFromErrorOK(t *testing.T) {
 type customError struct {
 	Code    codes.Code
 	Message string
-	Details []*any.Any
+	Details []*apb.Any
 }
 
 func (c customError) Error() string {
@@ -143,7 +156,7 @@ func (c customError) GRPCStatus() *Status {
 
 func TestFromErrorImplementsInterface(t *testing.T) {
 	code, message := codes.Internal, "test description"
-	details := []*any.Any{{
+	details := []*apb.Any{{
 		TypeUrl: "testUrl",
 		Value:   []byte("testValue"),
 	}}
@@ -157,7 +170,7 @@ func TestFromErrorImplementsInterface(t *testing.T) {
 		t.Fatalf("FromError(%v) = %v, %v; want <Code()=%s, Message()=%q, Err()!=nil>, true", err, s, ok, code, message)
 	}
 	pd := s.Proto().GetDetails()
-	if len(pd) != 1 || !reflect.DeepEqual(pd[0], details[0]) {
+	if len(pd) != 1 || !proto.Equal(pd[0], details[0]) {
 		t.Fatalf("s.Proto.GetDetails() = %v; want <Details()=%s>", pd, details)
 	}
 }
@@ -328,4 +341,22 @@ func mustMarshalAny(msg proto.Message) *apb.Any {
 		panic(fmt.Sprintf("ptypes.MarshalAny(%+v) failed: %v", msg, err))
 	}
 	return any
+}
+
+func TestFromContextError(t *testing.T) {
+	testCases := []struct {
+		in   error
+		want *Status
+	}{
+		{in: nil, want: New(codes.OK, "")},
+		{in: context.DeadlineExceeded, want: New(codes.DeadlineExceeded, context.DeadlineExceeded.Error())},
+		{in: context.Canceled, want: New(codes.Canceled, context.Canceled.Error())},
+		{in: errors.New("other"), want: New(codes.Unknown, "other")},
+	}
+	for _, tc := range testCases {
+		got := FromContextError(tc.in)
+		if got.Code() != tc.want.Code() || got.Message() != tc.want.Message() {
+			t.Errorf("FromContextError(%v) = %v; want %v", tc.in, got, tc.want)
+		}
+	}
 }

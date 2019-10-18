@@ -26,7 +26,6 @@ import (
 	mangen "github.com/cpuguy83/go-md2man/md2man"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	ccmapp "k8s.io/kubernetes/cmd/cloud-controller-manager/app"
 	"k8s.io/kubernetes/cmd/genutils"
 	apiservapp "k8s.io/kubernetes/cmd/kube-apiserver/app"
 	cmapp "k8s.io/kubernetes/cmd/kube-controller-manager/app"
@@ -35,7 +34,6 @@ import (
 	kubeadmapp "k8s.io/kubernetes/cmd/kubeadm/app/cmd"
 	kubeletapp "k8s.io/kubernetes/cmd/kubelet/app"
 	kubectlcmd "k8s.io/kubernetes/pkg/kubectl/cmd"
-	kubectlcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 )
 
 func main() {
@@ -75,13 +73,6 @@ func main() {
 		for _, c := range controllermanager.Commands() {
 			genMarkdown(c, "kube-controller-manager", outDir)
 		}
-	case "cloud-controller-manager":
-		//generate manpage for cloud-controller-manager
-		controllermanager := ccmapp.NewCloudControllerManagerCommand()
-		genMarkdown(controllermanager, "", outDir)
-		for _, c := range controllermanager.Commands() {
-			genMarkdown(c, "cloud-controller-manager", outDir)
-		}
 	case "kube-proxy":
 		// generate manpage for kube-proxy
 		proxy := proxyapp.NewProxyCommand()
@@ -106,7 +97,7 @@ func main() {
 	case "kubectl":
 		// generate manpage for kubectl
 		// TODO os.Stdin should really be something like ioutil.Discard, but a Reader
-		kubectl := kubectlcmd.NewKubectlCommand(kubectlcmdutil.NewFactory(nil), os.Stdin, ioutil.Discard, ioutil.Discard)
+		kubectl := kubectlcmd.NewKubectlCommand(os.Stdin, ioutil.Discard, ioutil.Discard)
 		genMarkdown(kubectl, "", outDir)
 		for _, c := range kubectl.Commands() {
 			genMarkdown(c, "kubectl", outDir)

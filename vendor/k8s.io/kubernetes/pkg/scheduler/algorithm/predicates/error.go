@@ -61,8 +61,8 @@ var (
 	ErrNodeUnderMemoryPressure = newPredicateFailureError("NodeUnderMemoryPressure", "node(s) had memory pressure")
 	// ErrNodeUnderDiskPressure is used for NodeUnderDiskPressure predicate error.
 	ErrNodeUnderDiskPressure = newPredicateFailureError("NodeUnderDiskPressure", "node(s) had disk pressure")
-	// ErrNodeOutOfDisk is used for NodeOutOfDisk predicate error.
-	ErrNodeOutOfDisk = newPredicateFailureError("NodeOutOfDisk", "node(s) were out of disk space")
+	// ErrNodeUnderPIDPressure is used for NodeUnderPIDPressure predicate error.
+	ErrNodeUnderPIDPressure = newPredicateFailureError("NodeUnderPIDPressure", "node(s) had pid pressure")
 	// ErrNodeNotReady is used for NodeNotReady predicate error.
 	ErrNodeNotReady = newPredicateFailureError("NodeNotReady", "node(s) were not ready")
 	// ErrNodeNetworkUnavailable is used for NodeNetworkUnavailable predicate error.
@@ -75,6 +75,8 @@ var (
 	ErrVolumeNodeConflict = newPredicateFailureError("VolumeNodeAffinityConflict", "node(s) had volume node affinity conflict")
 	// ErrVolumeBindConflict is used for VolumeBindingNoMatch predicate error.
 	ErrVolumeBindConflict = newPredicateFailureError("VolumeBindingNoMatch", "node(s) didn't find available persistent volumes to bind")
+	// ErrTopologySpreadConstraintsNotMatch is used for EvenPodsSpread predicate error.
+	ErrTopologySpreadConstraintsNotMatch = newPredicateFailureError("EvenPodsSpreadNotMatch", "node(s) didn't match pod topology spread constraints")
 	// ErrFakePredicate is used for test only. The fake predicates returning false also returns error
 	// as ErrFakePredicate.
 	ErrFakePredicate = newPredicateFailureError("FakePredicateError", "Nodes failed the fake predicate")
@@ -132,6 +134,11 @@ func (e *PredicateFailureError) Error() string {
 // GetReason returns the reason of the PredicateFailureError.
 func (e *PredicateFailureError) GetReason() string {
 	return e.PredicateDesc
+}
+
+// PredicateFailureReason interface represents the failure reason of a predicate.
+type PredicateFailureReason interface {
+	GetReason() string
 }
 
 // FailureReason describes a failure reason.

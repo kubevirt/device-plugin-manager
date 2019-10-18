@@ -38,7 +38,7 @@ To run the example, first start the server:
 $ go run examples/rpc_errors/server/main.go
 ```
 
-In a separate sesssion, run the client:
+In a separate session, run the client:
 
 ```
 $ go run examples/rpc_errors/client/main.go
@@ -65,4 +65,4 @@ exit status 1
 [details]:      https://godoc.org/google.golang.org/grpc/status#Status.Details
 [status-err]:   https://godoc.org/google.golang.org/grpc/status#Status.Err
 [status-error]: https://godoc.org/google.golang.org/grpc/status#Error
-[example]:      https://github.com/grpc/grpc-go/blob/master/examples/rpc_errors
+[example]:      https://github.com/grpc/grpc-go/tree/master/examples/features/errors

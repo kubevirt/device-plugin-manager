@@ -3,17 +3,20 @@
 
 package dialogflow
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import _ "google.golang.org/genproto/googleapis/api/annotations"
-import google_protobuf4 "github.com/golang/protobuf/ptypes/struct"
-import google_rpc "google.golang.org/genproto/googleapis/rpc/status"
-import google_type "google.golang.org/genproto/googleapis/type/latlng"
-
 import (
-	context "golang.org/x/net/context"
+	context "context"
+	fmt "fmt"
+	math "math"
+
+	proto "github.com/golang/protobuf/proto"
+	duration "github.com/golang/protobuf/ptypes/duration"
+	_struct "github.com/golang/protobuf/ptypes/struct"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
+	status "google.golang.org/genproto/googleapis/rpc/status"
+	latlng "google.golang.org/genproto/googleapis/type/latlng"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status1 "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -21,73 +24,48 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// Audio encoding of the audio content sent in the conversational query request.
-// Refer to the [Cloud Speech API documentation](/speech/docs/basics) for more
-// details.
-type AudioEncoding int32
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the proto package it is being compiled against.
+// A compilation error at this line likely means your copy of the
+// proto package needs to be updated.
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+
+// Represents the system's confidence that this knowledge answer is a good
+// match for this conversational query.
+type KnowledgeAnswers_Answer_MatchConfidenceLevel int32
 
 const (
 	// Not specified.
-	AudioEncoding_AUDIO_ENCODING_UNSPECIFIED AudioEncoding = 0
-	// Uncompressed 16-bit signed little-endian samples (Linear PCM).
-	AudioEncoding_AUDIO_ENCODING_LINEAR_16 AudioEncoding = 1
-	// [`FLAC`](https://xiph.org/flac/documentation.html) (Free Lossless Audio
-	// Codec) is the recommended encoding because it is lossless (therefore
-	// recognition is not compromised) and requires only about half the
-	// bandwidth of `LINEAR16`. `FLAC` stream encoding supports 16-bit and
-	// 24-bit samples, however, not all fields in `STREAMINFO` are supported.
-	AudioEncoding_AUDIO_ENCODING_FLAC AudioEncoding = 2
-	// 8-bit samples that compand 14-bit audio samples using G.711 PCMU/mu-law.
-	AudioEncoding_AUDIO_ENCODING_MULAW AudioEncoding = 3
-	// Adaptive Multi-Rate Narrowband codec. `sample_rate_hertz` must be 8000.
-	AudioEncoding_AUDIO_ENCODING_AMR AudioEncoding = 4
-	// Adaptive Multi-Rate Wideband codec. `sample_rate_hertz` must be 16000.
-	AudioEncoding_AUDIO_ENCODING_AMR_WB AudioEncoding = 5
-	// Opus encoded audio frames in Ogg container
-	// ([OggOpus](https://wiki.xiph.org/OggOpus)).
-	// `sample_rate_hertz` must be 16000.
-	AudioEncoding_AUDIO_ENCODING_OGG_OPUS AudioEncoding = 6
-	// Although the use of lossy encodings is not recommended, if a very low
-	// bitrate encoding is required, `OGG_OPUS` is highly preferred over
-	// Speex encoding. The [Speex](https://speex.org/) encoding supported by
-	// Dialogflow API has a header byte in each block, as in MIME type
-	// `audio/x-speex-with-header-byte`.
-	// It is a variant of the RTP Speex encoding defined in
-	// [RFC 5574](https://tools.ietf.org/html/rfc5574).
-	// The stream is a sequence of blocks, one block per RTP packet. Each block
-	// starts with a byte containing the length of the block, in bytes, followed
-	// by one or more frames of Speex data, padded to an integral number of
-	// bytes (octets) as specified in RFC 5574. In other words, each RTP header
-	// is replaced with a single byte containing the block length. Only Speex
-	// wideband is supported. `sample_rate_hertz` must be 16000.
-	AudioEncoding_AUDIO_ENCODING_SPEEX_WITH_HEADER_BYTE AudioEncoding = 7
+	KnowledgeAnswers_Answer_MATCH_CONFIDENCE_LEVEL_UNSPECIFIED KnowledgeAnswers_Answer_MatchConfidenceLevel = 0
+	// Indicates that the confidence is low.
+	KnowledgeAnswers_Answer_LOW KnowledgeAnswers_Answer_MatchConfidenceLevel = 1
+	// Indicates our confidence is medium.
+	KnowledgeAnswers_Answer_MEDIUM KnowledgeAnswers_Answer_MatchConfidenceLevel = 2
+	// Indicates our confidence is high.
+	KnowledgeAnswers_Answer_HIGH KnowledgeAnswers_Answer_MatchConfidenceLevel = 3
 )
 
-var AudioEncoding_name = map[int32]string{
-	0: "AUDIO_ENCODING_UNSPECIFIED",
-	1: "AUDIO_ENCODING_LINEAR_16",
-	2: "AUDIO_ENCODING_FLAC",
-	3: "AUDIO_ENCODING_MULAW",
-	4: "AUDIO_ENCODING_AMR",
-	5: "AUDIO_ENCODING_AMR_WB",
-	6: "AUDIO_ENCODING_OGG_OPUS",
-	7: "AUDIO_ENCODING_SPEEX_WITH_HEADER_BYTE",
-}
-var AudioEncoding_value = map[string]int32{
-	"AUDIO_ENCODING_UNSPECIFIED":            0,
-	"AUDIO_ENCODING_LINEAR_16":              1,
-	"AUDIO_ENCODING_FLAC":                   2,
-	"AUDIO_ENCODING_MULAW":                  3,
-	"AUDIO_ENCODING_AMR":                    4,
-	"AUDIO_ENCODING_AMR_WB":                 5,
-	"AUDIO_ENCODING_OGG_OPUS":               6,
-	"AUDIO_ENCODING_SPEEX_WITH_HEADER_BYTE": 7,
+var KnowledgeAnswers_Answer_MatchConfidenceLevel_name = map[int32]string{
+	0: "MATCH_CONFIDENCE_LEVEL_UNSPECIFIED",
+	1: "LOW",
+	2: "MEDIUM",
+	3: "HIGH",
 }
 
-func (x AudioEncoding) String() string {
-	return proto.EnumName(AudioEncoding_name, int32(x))
+var KnowledgeAnswers_Answer_MatchConfidenceLevel_value = map[string]int32{
+	"MATCH_CONFIDENCE_LEVEL_UNSPECIFIED": 0,
+	"LOW":                                1,
+	"MEDIUM":                             2,
+	"HIGH":                               3,
 }
-func (AudioEncoding) EnumDescriptor() ([]byte, []int) { return fileDescriptor4, []int{0} }
+
+func (x KnowledgeAnswers_Answer_MatchConfidenceLevel) String() string {
+	return proto.EnumName(KnowledgeAnswers_Answer_MatchConfidenceLevel_name, int32(x))
+}
+
+func (KnowledgeAnswers_Answer_MatchConfidenceLevel) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{5, 0, 0}
+}
 
 // Type of the response message.
 type StreamingRecognitionResult_MessageType int32
@@ -112,6 +90,7 @@ var StreamingRecognitionResult_MessageType_name = map[int32]string{
 	1: "TRANSCRIPT",
 	2: "END_OF_SINGLE_UTTERANCE",
 }
+
 var StreamingRecognitionResult_MessageType_value = map[string]int32{
 	"MESSAGE_TYPE_UNSPECIFIED": 0,
 	"TRANSCRIPT":               1,
@@ -121,20 +100,25 @@ var StreamingRecognitionResult_MessageType_value = map[string]int32{
 func (x StreamingRecognitionResult_MessageType) String() string {
 	return proto.EnumName(StreamingRecognitionResult_MessageType_name, int32(x))
 }
+
 func (StreamingRecognitionResult_MessageType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor4, []int{7, 0}
+	return fileDescriptor_40a53f854d709740, []int{8, 0}
 }
 
 // The request to detect user's intent.
 type DetectIntentRequest struct {
 	// Required. The name of the session this query is sent to. Format:
-	// `projects/<Project ID>/agent/sessions/<Session ID>`.
-	// It's up to the API caller to choose an appropriate session ID. It can be
-	// a random number or some type of user identifier (preferably hashed).
-	// The length of the session ID must not exceed 36 bytes.
-	Session string `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
+	// `projects/<Project ID>/agent/sessions/<Session ID>`, or
+	// `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+	// ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we assume
+	// default 'draft' environment. If `User ID` is not specified, we are using
+	// "-". It's up to the API caller to choose an appropriate `Session ID` and
+	// `User Id`. They can be a random number or some type of user and session
+	// identifiers (preferably hashed). The length of the `Session ID` and
+	// `User ID` must not exceed 36 characters.
+	Session string `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`
 	// Optional. The parameters of this query.
-	QueryParams *QueryParameters `protobuf:"bytes,2,opt,name=query_params,json=queryParams" json:"query_params,omitempty"`
+	QueryParams *QueryParameters `protobuf:"bytes,2,opt,name=query_params,json=queryParams,proto3" json:"query_params,omitempty"`
 	// Required. The input specification. It can be set to:
 	//
 	// 1.  an audio config
@@ -143,17 +127,44 @@ type DetectIntentRequest struct {
 	// 2.  a conversational query in the form of text, or
 	//
 	// 3.  an event that specifies which intent to trigger.
-	QueryInput *QueryInput `protobuf:"bytes,3,opt,name=query_input,json=queryInput" json:"query_input,omitempty"`
+	QueryInput *QueryInput `protobuf:"bytes,3,opt,name=query_input,json=queryInput,proto3" json:"query_input,omitempty"`
+	// Optional. Instructs the speech synthesizer how to generate the output
+	// audio. If this field is not set and agent-level speech synthesizer is not
+	// configured, no output audio is generated.
+	OutputAudioConfig *OutputAudioConfig `protobuf:"bytes,4,opt,name=output_audio_config,json=outputAudioConfig,proto3" json:"output_audio_config,omitempty"`
 	// Optional. The natural language speech audio to be processed. This field
 	// should be populated iff `query_input` is set to an input audio config.
 	// A single request can contain up to 1 minute of speech audio data.
-	InputAudio []byte `protobuf:"bytes,5,opt,name=input_audio,json=inputAudio,proto3" json:"input_audio,omitempty"`
+	InputAudio           []byte   `protobuf:"bytes,5,opt,name=input_audio,json=inputAudio,proto3" json:"input_audio,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *DetectIntentRequest) Reset()                    { *m = DetectIntentRequest{} }
-func (m *DetectIntentRequest) String() string            { return proto.CompactTextString(m) }
-func (*DetectIntentRequest) ProtoMessage()               {}
-func (*DetectIntentRequest) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{0} }
+func (m *DetectIntentRequest) Reset()         { *m = DetectIntentRequest{} }
+func (m *DetectIntentRequest) String() string { return proto.CompactTextString(m) }
+func (*DetectIntentRequest) ProtoMessage()    {}
+func (*DetectIntentRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{0}
+}
+
+func (m *DetectIntentRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DetectIntentRequest.Unmarshal(m, b)
+}
+func (m *DetectIntentRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DetectIntentRequest.Marshal(b, m, deterministic)
+}
+func (m *DetectIntentRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DetectIntentRequest.Merge(m, src)
+}
+func (m *DetectIntentRequest) XXX_Size() int {
+	return xxx_messageInfo_DetectIntentRequest.Size(m)
+}
+func (m *DetectIntentRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DetectIntentRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DetectIntentRequest proto.InternalMessageInfo
 
 func (m *DetectIntentRequest) GetSession() string {
 	if m != nil {
@@ -176,6 +187,13 @@ func (m *DetectIntentRequest) GetQueryInput() *QueryInput {
 	return nil
 }
 
+func (m *DetectIntentRequest) GetOutputAudioConfig() *OutputAudioConfig {
+	if m != nil {
+		return m.OutputAudioConfig
+	}
+	return nil
+}
+
 func (m *DetectIntentRequest) GetInputAudio() []byte {
 	if m != nil {
 		return m.InputAudio
@@ -187,18 +205,59 @@ func (m *DetectIntentRequest) GetInputAudio() []byte {
 type DetectIntentResponse struct {
 	// The unique identifier of the response. It can be used to
 	// locate a response in the training example set or for reporting issues.
-	ResponseId string `protobuf:"bytes,1,opt,name=response_id,json=responseId" json:"response_id,omitempty"`
-	// The results of the conversational query or event processing.
-	QueryResult *QueryResult `protobuf:"bytes,2,opt,name=query_result,json=queryResult" json:"query_result,omitempty"`
-	// Specifies the status of the webhook request. `webhook_status`
-	// is never populated in webhook requests.
-	WebhookStatus *google_rpc.Status `protobuf:"bytes,3,opt,name=webhook_status,json=webhookStatus" json:"webhook_status,omitempty"`
+	ResponseId string `protobuf:"bytes,1,opt,name=response_id,json=responseId,proto3" json:"response_id,omitempty"`
+	// The selected results of the conversational query or event processing.
+	// See `alternative_query_results` for additional potential results.
+	QueryResult *QueryResult `protobuf:"bytes,2,opt,name=query_result,json=queryResult,proto3" json:"query_result,omitempty"`
+	// If Knowledge Connectors are enabled, there could be more than one result
+	// returned for a given query or event, and this field will contain all
+	// results except for the top one, which is captured in query_result. The
+	// alternative results are ordered by decreasing
+	// `QueryResult.intent_detection_confidence`. If Knowledge Connectors are
+	// disabled, this field will be empty until multiple responses for regular
+	// intents are supported, at which point those additional results will be
+	// surfaced here.
+	AlternativeQueryResults []*QueryResult `protobuf:"bytes,5,rep,name=alternative_query_results,json=alternativeQueryResults,proto3" json:"alternative_query_results,omitempty"`
+	// Specifies the status of the webhook request.
+	WebhookStatus *status.Status `protobuf:"bytes,3,opt,name=webhook_status,json=webhookStatus,proto3" json:"webhook_status,omitempty"`
+	// The audio data bytes encoded as specified in the request.
+	// Note: The output audio is generated based on the values of default platform
+	// text responses found in the `query_result.fulfillment_messages` field. If
+	// multiple default text responses exist, they will be concatenated when
+	// generating audio. If no default platform text responses exist, the
+	// generated audio content will be empty.
+	OutputAudio []byte `protobuf:"bytes,4,opt,name=output_audio,json=outputAudio,proto3" json:"output_audio,omitempty"`
+	// The config used by the speech synthesizer to generate the output audio.
+	OutputAudioConfig    *OutputAudioConfig `protobuf:"bytes,6,opt,name=output_audio_config,json=outputAudioConfig,proto3" json:"output_audio_config,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
 }
 
-func (m *DetectIntentResponse) Reset()                    { *m = DetectIntentResponse{} }
-func (m *DetectIntentResponse) String() string            { return proto.CompactTextString(m) }
-func (*DetectIntentResponse) ProtoMessage()               {}
-func (*DetectIntentResponse) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{1} }
+func (m *DetectIntentResponse) Reset()         { *m = DetectIntentResponse{} }
+func (m *DetectIntentResponse) String() string { return proto.CompactTextString(m) }
+func (*DetectIntentResponse) ProtoMessage()    {}
+func (*DetectIntentResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{1}
+}
+
+func (m *DetectIntentResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DetectIntentResponse.Unmarshal(m, b)
+}
+func (m *DetectIntentResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DetectIntentResponse.Marshal(b, m, deterministic)
+}
+func (m *DetectIntentResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DetectIntentResponse.Merge(m, src)
+}
+func (m *DetectIntentResponse) XXX_Size() int {
+	return xxx_messageInfo_DetectIntentResponse.Size(m)
+}
+func (m *DetectIntentResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DetectIntentResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DetectIntentResponse proto.InternalMessageInfo
 
 func (m *DetectIntentResponse) GetResponseId() string {
 	if m != nil {
@@ -214,9 +273,30 @@ func (m *DetectIntentResponse) GetQueryResult() *QueryResult {
 	return nil
 }
 
-func (m *DetectIntentResponse) GetWebhookStatus() *google_rpc.Status {
+func (m *DetectIntentResponse) GetAlternativeQueryResults() []*QueryResult {
+	if m != nil {
+		return m.AlternativeQueryResults
+	}
+	return nil
+}
+
+func (m *DetectIntentResponse) GetWebhookStatus() *status.Status {
 	if m != nil {
 		return m.WebhookStatus
+	}
+	return nil
+}
+
+func (m *DetectIntentResponse) GetOutputAudio() []byte {
+	if m != nil {
+		return m.OutputAudio
+	}
+	return nil
+}
+
+func (m *DetectIntentResponse) GetOutputAudioConfig() *OutputAudioConfig {
+	if m != nil {
+		return m.OutputAudioConfig
 	}
 	return nil
 }
@@ -227,28 +307,60 @@ type QueryParameters struct {
 	// [time zone database](https://www.iana.org/time-zones), e.g.,
 	// America/New_York, Europe/Paris. If not provided, the time zone specified in
 	// agent settings is used.
-	TimeZone string `protobuf:"bytes,1,opt,name=time_zone,json=timeZone" json:"time_zone,omitempty"`
+	TimeZone string `protobuf:"bytes,1,opt,name=time_zone,json=timeZone,proto3" json:"time_zone,omitempty"`
 	// Optional. The geo location of this conversational query.
-	GeoLocation *google_type.LatLng `protobuf:"bytes,2,opt,name=geo_location,json=geoLocation" json:"geo_location,omitempty"`
+	GeoLocation *latlng.LatLng `protobuf:"bytes,2,opt,name=geo_location,json=geoLocation,proto3" json:"geo_location,omitempty"`
 	// Optional. The collection of contexts to be activated before this query is
 	// executed.
-	Contexts []*Context `protobuf:"bytes,3,rep,name=contexts" json:"contexts,omitempty"`
+	Contexts []*Context `protobuf:"bytes,3,rep,name=contexts,proto3" json:"contexts,omitempty"`
 	// Optional. Specifies whether to delete all contexts in the current session
 	// before the new ones are activated.
-	ResetContexts bool `protobuf:"varint,4,opt,name=reset_contexts,json=resetContexts" json:"reset_contexts,omitempty"`
-	// Optional. The collection of session entity types to replace or extend
-	// developer entities with for this query only. The entity synonyms apply
-	// to all languages.
-	SessionEntityTypes []*SessionEntityType `protobuf:"bytes,5,rep,name=session_entity_types,json=sessionEntityTypes" json:"session_entity_types,omitempty"`
+	ResetContexts bool `protobuf:"varint,4,opt,name=reset_contexts,json=resetContexts,proto3" json:"reset_contexts,omitempty"`
+	// Optional. Additional session entity types to replace or extend developer
+	// entity types with. The entity synonyms apply to all languages and persist
+	// for the session of this query.
+	SessionEntityTypes []*SessionEntityType `protobuf:"bytes,5,rep,name=session_entity_types,json=sessionEntityTypes,proto3" json:"session_entity_types,omitempty"`
 	// Optional. This field can be used to pass custom data into the webhook
 	// associated with the agent. Arbitrary JSON objects are supported.
-	Payload *google_protobuf4.Struct `protobuf:"bytes,6,opt,name=payload" json:"payload,omitempty"`
+	Payload *_struct.Struct `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
+	// Optional. KnowledgeBases to get alternative results from. If not set, the
+	// KnowledgeBases enabled in the agent (through UI) will be used.
+	// Format:  `projects/<Project ID>/knowledgeBases/<Knowledge Base ID>`.
+	KnowledgeBaseNames []string `protobuf:"bytes,12,rep,name=knowledge_base_names,json=knowledgeBaseNames,proto3" json:"knowledge_base_names,omitempty"`
+	// Optional. Configures the type of sentiment analysis to perform. If not
+	// provided, sentiment analysis is not performed.
+	// Note: Sentiment Analysis is only currently available for Enterprise Edition
+	// agents.
+	SentimentAnalysisRequestConfig *SentimentAnalysisRequestConfig `protobuf:"bytes,10,opt,name=sentiment_analysis_request_config,json=sentimentAnalysisRequestConfig,proto3" json:"sentiment_analysis_request_config,omitempty"`
+	XXX_NoUnkeyedLiteral           struct{}                        `json:"-"`
+	XXX_unrecognized               []byte                          `json:"-"`
+	XXX_sizecache                  int32                           `json:"-"`
 }
 
-func (m *QueryParameters) Reset()                    { *m = QueryParameters{} }
-func (m *QueryParameters) String() string            { return proto.CompactTextString(m) }
-func (*QueryParameters) ProtoMessage()               {}
-func (*QueryParameters) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{2} }
+func (m *QueryParameters) Reset()         { *m = QueryParameters{} }
+func (m *QueryParameters) String() string { return proto.CompactTextString(m) }
+func (*QueryParameters) ProtoMessage()    {}
+func (*QueryParameters) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{2}
+}
+
+func (m *QueryParameters) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_QueryParameters.Unmarshal(m, b)
+}
+func (m *QueryParameters) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_QueryParameters.Marshal(b, m, deterministic)
+}
+func (m *QueryParameters) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryParameters.Merge(m, src)
+}
+func (m *QueryParameters) XXX_Size() int {
+	return xxx_messageInfo_QueryParameters.Size(m)
+}
+func (m *QueryParameters) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryParameters.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryParameters proto.InternalMessageInfo
 
 func (m *QueryParameters) GetTimeZone() string {
 	if m != nil {
@@ -257,7 +369,7 @@ func (m *QueryParameters) GetTimeZone() string {
 	return ""
 }
 
-func (m *QueryParameters) GetGeoLocation() *google_type.LatLng {
+func (m *QueryParameters) GetGeoLocation() *latlng.LatLng {
 	if m != nil {
 		return m.GeoLocation
 	}
@@ -285,9 +397,23 @@ func (m *QueryParameters) GetSessionEntityTypes() []*SessionEntityType {
 	return nil
 }
 
-func (m *QueryParameters) GetPayload() *google_protobuf4.Struct {
+func (m *QueryParameters) GetPayload() *_struct.Struct {
 	if m != nil {
 		return m.Payload
+	}
+	return nil
+}
+
+func (m *QueryParameters) GetKnowledgeBaseNames() []string {
+	if m != nil {
+		return m.KnowledgeBaseNames
+	}
+	return nil
+}
+
+func (m *QueryParameters) GetSentimentAnalysisRequestConfig() *SentimentAnalysisRequestConfig {
+	if m != nil {
+		return m.SentimentAnalysisRequestConfig
 	}
 	return nil
 }
@@ -297,7 +423,7 @@ func (m *QueryParameters) GetPayload() *google_protobuf4.Struct {
 // 1.  An audio config which
 //     instructs the speech recognizer how to process the speech audio.
 //
-// 2.  A conversational query in the form of text,.
+// 2.  A conversational query in the form of text.
 //
 // 3.  An event that specifies which intent to trigger.
 type QueryInput struct {
@@ -307,31 +433,58 @@ type QueryInput struct {
 	//	*QueryInput_AudioConfig
 	//	*QueryInput_Text
 	//	*QueryInput_Event
-	Input isQueryInput_Input `protobuf_oneof:"input"`
+	Input                isQueryInput_Input `protobuf_oneof:"input"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
 }
 
-func (m *QueryInput) Reset()                    { *m = QueryInput{} }
-func (m *QueryInput) String() string            { return proto.CompactTextString(m) }
-func (*QueryInput) ProtoMessage()               {}
-func (*QueryInput) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{3} }
+func (m *QueryInput) Reset()         { *m = QueryInput{} }
+func (m *QueryInput) String() string { return proto.CompactTextString(m) }
+func (*QueryInput) ProtoMessage()    {}
+func (*QueryInput) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{3}
+}
+
+func (m *QueryInput) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_QueryInput.Unmarshal(m, b)
+}
+func (m *QueryInput) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_QueryInput.Marshal(b, m, deterministic)
+}
+func (m *QueryInput) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryInput.Merge(m, src)
+}
+func (m *QueryInput) XXX_Size() int {
+	return xxx_messageInfo_QueryInput.Size(m)
+}
+func (m *QueryInput) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryInput.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryInput proto.InternalMessageInfo
 
 type isQueryInput_Input interface {
 	isQueryInput_Input()
 }
 
 type QueryInput_AudioConfig struct {
-	AudioConfig *InputAudioConfig `protobuf:"bytes,1,opt,name=audio_config,json=audioConfig,oneof"`
+	AudioConfig *InputAudioConfig `protobuf:"bytes,1,opt,name=audio_config,json=audioConfig,proto3,oneof"`
 }
+
 type QueryInput_Text struct {
-	Text *TextInput `protobuf:"bytes,2,opt,name=text,oneof"`
+	Text *TextInput `protobuf:"bytes,2,opt,name=text,proto3,oneof"`
 }
+
 type QueryInput_Event struct {
-	Event *EventInput `protobuf:"bytes,3,opt,name=event,oneof"`
+	Event *EventInput `protobuf:"bytes,3,opt,name=event,proto3,oneof"`
 }
 
 func (*QueryInput_AudioConfig) isQueryInput_Input() {}
-func (*QueryInput_Text) isQueryInput_Input()        {}
-func (*QueryInput_Event) isQueryInput_Input()       {}
+
+func (*QueryInput_Text) isQueryInput_Input() {}
+
+func (*QueryInput_Event) isQueryInput_Input() {}
 
 func (m *QueryInput) GetInput() isQueryInput_Input {
 	if m != nil {
@@ -361,164 +514,121 @@ func (m *QueryInput) GetEvent() *EventInput {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*QueryInput) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _QueryInput_OneofMarshaler, _QueryInput_OneofUnmarshaler, _QueryInput_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*QueryInput) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*QueryInput_AudioConfig)(nil),
 		(*QueryInput_Text)(nil),
 		(*QueryInput_Event)(nil),
 	}
 }
 
-func _QueryInput_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*QueryInput)
-	// input
-	switch x := m.Input.(type) {
-	case *QueryInput_AudioConfig:
-		b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.AudioConfig); err != nil {
-			return err
-		}
-	case *QueryInput_Text:
-		b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Text); err != nil {
-			return err
-		}
-	case *QueryInput_Event:
-		b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Event); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("QueryInput.Input has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _QueryInput_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*QueryInput)
-	switch tag {
-	case 1: // input.audio_config
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(InputAudioConfig)
-		err := b.DecodeMessage(msg)
-		m.Input = &QueryInput_AudioConfig{msg}
-		return true, err
-	case 2: // input.text
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TextInput)
-		err := b.DecodeMessage(msg)
-		m.Input = &QueryInput_Text{msg}
-		return true, err
-	case 3: // input.event
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(EventInput)
-		err := b.DecodeMessage(msg)
-		m.Input = &QueryInput_Event{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _QueryInput_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*QueryInput)
-	// input
-	switch x := m.Input.(type) {
-	case *QueryInput_AudioConfig:
-		s := proto.Size(x.AudioConfig)
-		n += proto.SizeVarint(1<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *QueryInput_Text:
-		s := proto.Size(x.Text)
-		n += proto.SizeVarint(2<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *QueryInput_Event:
-		s := proto.Size(x.Event)
-		n += proto.SizeVarint(3<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
-}
-
 // Represents the result of conversational query or event processing.
 type QueryResult struct {
 	// The original conversational query text:
+	//
 	// - If natural language text was provided as input, `query_text` contains
 	//   a copy of the input.
 	// - If natural language speech audio was provided as input, `query_text`
 	//   contains the speech recognition result. If speech recognizer produced
 	//   multiple alternatives, a particular one is picked.
-	// - If an event was provided as input, `query_text` is not set.
-	QueryText string `protobuf:"bytes,1,opt,name=query_text,json=queryText" json:"query_text,omitempty"`
+	// - If automatic spell correction is enabled, `query_text` will contain the
+	//   corrected user input.
+	QueryText string `protobuf:"bytes,1,opt,name=query_text,json=queryText,proto3" json:"query_text,omitempty"`
 	// The language that was triggered during intent detection.
-	// See [Language Support](https://dialogflow.com/docs/reference/language)
+	// See [Language
+	// Support](https://cloud.google.com/dialogflow/docs/reference/language)
 	// for a list of the currently supported language codes.
-	LanguageCode string `protobuf:"bytes,15,opt,name=language_code,json=languageCode" json:"language_code,omitempty"`
+	LanguageCode string `protobuf:"bytes,15,opt,name=language_code,json=languageCode,proto3" json:"language_code,omitempty"`
 	// The Speech recognition confidence between 0.0 and 1.0. A higher number
 	// indicates an estimated greater likelihood that the recognized words are
 	// correct. The default of 0.0 is a sentinel value indicating that confidence
 	// was not set.
 	//
-	// You should not rely on this field as it isn't guaranteed to be accurate, or
-	// even set. In particular this field isn't set in Webhook calls and for
-	// StreamingDetectIntent since the streaming endpoint has separate confidence
-	// estimates per portion of the audio in StreamingRecognitionResult.
-	SpeechRecognitionConfidence float32 `protobuf:"fixed32,2,opt,name=speech_recognition_confidence,json=speechRecognitionConfidence" json:"speech_recognition_confidence,omitempty"`
+	// This field is not guaranteed to be accurate or set. In particular this
+	// field isn't set for StreamingDetectIntent since the streaming endpoint has
+	// separate confidence estimates per portion of the audio in
+	// StreamingRecognitionResult.
+	SpeechRecognitionConfidence float32 `protobuf:"fixed32,2,opt,name=speech_recognition_confidence,json=speechRecognitionConfidence,proto3" json:"speech_recognition_confidence,omitempty"`
 	// The action name from the matched intent.
-	Action string `protobuf:"bytes,3,opt,name=action" json:"action,omitempty"`
+	Action string `protobuf:"bytes,3,opt,name=action,proto3" json:"action,omitempty"`
 	// The collection of extracted parameters.
-	Parameters *google_protobuf4.Struct `protobuf:"bytes,4,opt,name=parameters" json:"parameters,omitempty"`
+	Parameters *_struct.Struct `protobuf:"bytes,4,opt,name=parameters,proto3" json:"parameters,omitempty"`
 	// This field is set to:
+	//
 	// - `false` if the matched intent has required parameters and not all of
 	//    the required parameter values have been collected.
 	// - `true` if all required parameter values have been collected, or if the
 	//    matched intent doesn't contain any required parameters.
-	AllRequiredParamsPresent bool `protobuf:"varint,5,opt,name=all_required_params_present,json=allRequiredParamsPresent" json:"all_required_params_present,omitempty"`
+	AllRequiredParamsPresent bool `protobuf:"varint,5,opt,name=all_required_params_present,json=allRequiredParamsPresent,proto3" json:"all_required_params_present,omitempty"`
 	// The text to be pronounced to the user or shown on the screen.
-	FulfillmentText string `protobuf:"bytes,6,opt,name=fulfillment_text,json=fulfillmentText" json:"fulfillment_text,omitempty"`
+	// Note: This is a legacy field, `fulfillment_messages` should be preferred.
+	FulfillmentText string `protobuf:"bytes,6,opt,name=fulfillment_text,json=fulfillmentText,proto3" json:"fulfillment_text,omitempty"`
 	// The collection of rich messages to present to the user.
-	FulfillmentMessages []*Intent_Message `protobuf:"bytes,7,rep,name=fulfillment_messages,json=fulfillmentMessages" json:"fulfillment_messages,omitempty"`
+	FulfillmentMessages []*Intent_Message `protobuf:"bytes,7,rep,name=fulfillment_messages,json=fulfillmentMessages,proto3" json:"fulfillment_messages,omitempty"`
 	// If the query was fulfilled by a webhook call, this field is set to the
 	// value of the `source` field returned in the webhook response.
-	WebhookSource string `protobuf:"bytes,8,opt,name=webhook_source,json=webhookSource" json:"webhook_source,omitempty"`
+	WebhookSource string `protobuf:"bytes,8,opt,name=webhook_source,json=webhookSource,proto3" json:"webhook_source,omitempty"`
 	// If the query was fulfilled by a webhook call, this field is set to the
 	// value of the `payload` field returned in the webhook response.
-	WebhookPayload *google_protobuf4.Struct `protobuf:"bytes,9,opt,name=webhook_payload,json=webhookPayload" json:"webhook_payload,omitempty"`
+	WebhookPayload *_struct.Struct `protobuf:"bytes,9,opt,name=webhook_payload,json=webhookPayload,proto3" json:"webhook_payload,omitempty"`
 	// The collection of output contexts. If applicable,
 	// `output_contexts.parameters` contains entries with name
 	// `<parameter name>.original` containing the original parameter values
 	// before the query.
-	OutputContexts []*Context `protobuf:"bytes,10,rep,name=output_contexts,json=outputContexts" json:"output_contexts,omitempty"`
+	OutputContexts []*Context `protobuf:"bytes,10,rep,name=output_contexts,json=outputContexts,proto3" json:"output_contexts,omitempty"`
 	// The intent that matched the conversational query. Some, not
 	// all fields are filled in this message, including but not limited to:
-	// `name`, `display_name` and `webhook_state`.
-	Intent *Intent `protobuf:"bytes,11,opt,name=intent" json:"intent,omitempty"`
+	// `name`, `display_name`, `end_interaction` and `is_fallback`.
+	Intent *Intent `protobuf:"bytes,11,opt,name=intent,proto3" json:"intent,omitempty"`
 	// The intent detection confidence. Values range from 0.0
 	// (completely uncertain) to 1.0 (completely certain).
-	IntentDetectionConfidence float32 `protobuf:"fixed32,12,opt,name=intent_detection_confidence,json=intentDetectionConfidence" json:"intent_detection_confidence,omitempty"`
-	// The free-form diagnostic info. For example, this field
-	// could contain webhook call latency.
-	DiagnosticInfo *google_protobuf4.Struct `protobuf:"bytes,14,opt,name=diagnostic_info,json=diagnosticInfo" json:"diagnostic_info,omitempty"`
+	// This value is for informational purpose only and is only used to
+	// help match the best intent within the classification threshold.
+	// This value may change for the same end-user expression at any time due to a
+	// model retraining or change in implementation.
+	// If there are `multiple knowledge_answers` messages, this value is set to
+	// the greatest `knowledgeAnswers.match_confidence` value in the list.
+	IntentDetectionConfidence float32 `protobuf:"fixed32,12,opt,name=intent_detection_confidence,json=intentDetectionConfidence,proto3" json:"intent_detection_confidence,omitempty"`
+	// The free-form diagnostic info. For example, this field could contain
+	// webhook call latency. The string keys of the Struct's fields map can change
+	// without notice.
+	DiagnosticInfo *_struct.Struct `protobuf:"bytes,14,opt,name=diagnostic_info,json=diagnosticInfo,proto3" json:"diagnostic_info,omitempty"`
+	// The sentiment analysis result, which depends on the
+	// `sentiment_analysis_request_config` specified in the request.
+	SentimentAnalysisResult *SentimentAnalysisResult `protobuf:"bytes,17,opt,name=sentiment_analysis_result,json=sentimentAnalysisResult,proto3" json:"sentiment_analysis_result,omitempty"`
+	// The result from Knowledge Connector (if any), ordered by decreasing
+	// `KnowledgeAnswers.match_confidence`.
+	KnowledgeAnswers     *KnowledgeAnswers `protobuf:"bytes,18,opt,name=knowledge_answers,json=knowledgeAnswers,proto3" json:"knowledge_answers,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
 }
 
-func (m *QueryResult) Reset()                    { *m = QueryResult{} }
-func (m *QueryResult) String() string            { return proto.CompactTextString(m) }
-func (*QueryResult) ProtoMessage()               {}
-func (*QueryResult) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{4} }
+func (m *QueryResult) Reset()         { *m = QueryResult{} }
+func (m *QueryResult) String() string { return proto.CompactTextString(m) }
+func (*QueryResult) ProtoMessage()    {}
+func (*QueryResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{4}
+}
+
+func (m *QueryResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_QueryResult.Unmarshal(m, b)
+}
+func (m *QueryResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_QueryResult.Marshal(b, m, deterministic)
+}
+func (m *QueryResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryResult.Merge(m, src)
+}
+func (m *QueryResult) XXX_Size() int {
+	return xxx_messageInfo_QueryResult.Size(m)
+}
+func (m *QueryResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryResult proto.InternalMessageInfo
 
 func (m *QueryResult) GetQueryText() string {
 	if m != nil {
@@ -548,7 +658,7 @@ func (m *QueryResult) GetAction() string {
 	return ""
 }
 
-func (m *QueryResult) GetParameters() *google_protobuf4.Struct {
+func (m *QueryResult) GetParameters() *_struct.Struct {
 	if m != nil {
 		return m.Parameters
 	}
@@ -583,7 +693,7 @@ func (m *QueryResult) GetWebhookSource() string {
 	return ""
 }
 
-func (m *QueryResult) GetWebhookPayload() *google_protobuf4.Struct {
+func (m *QueryResult) GetWebhookPayload() *_struct.Struct {
 	if m != nil {
 		return m.WebhookPayload
 	}
@@ -611,35 +721,202 @@ func (m *QueryResult) GetIntentDetectionConfidence() float32 {
 	return 0
 }
 
-func (m *QueryResult) GetDiagnosticInfo() *google_protobuf4.Struct {
+func (m *QueryResult) GetDiagnosticInfo() *_struct.Struct {
 	if m != nil {
 		return m.DiagnosticInfo
 	}
 	return nil
 }
 
+func (m *QueryResult) GetSentimentAnalysisResult() *SentimentAnalysisResult {
+	if m != nil {
+		return m.SentimentAnalysisResult
+	}
+	return nil
+}
+
+func (m *QueryResult) GetKnowledgeAnswers() *KnowledgeAnswers {
+	if m != nil {
+		return m.KnowledgeAnswers
+	}
+	return nil
+}
+
+// Represents the result of querying a Knowledge base.
+type KnowledgeAnswers struct {
+	// A list of answers from Knowledge Connector.
+	Answers              []*KnowledgeAnswers_Answer `protobuf:"bytes,1,rep,name=answers,proto3" json:"answers,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
+	XXX_unrecognized     []byte                     `json:"-"`
+	XXX_sizecache        int32                      `json:"-"`
+}
+
+func (m *KnowledgeAnswers) Reset()         { *m = KnowledgeAnswers{} }
+func (m *KnowledgeAnswers) String() string { return proto.CompactTextString(m) }
+func (*KnowledgeAnswers) ProtoMessage()    {}
+func (*KnowledgeAnswers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{5}
+}
+
+func (m *KnowledgeAnswers) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_KnowledgeAnswers.Unmarshal(m, b)
+}
+func (m *KnowledgeAnswers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_KnowledgeAnswers.Marshal(b, m, deterministic)
+}
+func (m *KnowledgeAnswers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_KnowledgeAnswers.Merge(m, src)
+}
+func (m *KnowledgeAnswers) XXX_Size() int {
+	return xxx_messageInfo_KnowledgeAnswers.Size(m)
+}
+func (m *KnowledgeAnswers) XXX_DiscardUnknown() {
+	xxx_messageInfo_KnowledgeAnswers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_KnowledgeAnswers proto.InternalMessageInfo
+
+func (m *KnowledgeAnswers) GetAnswers() []*KnowledgeAnswers_Answer {
+	if m != nil {
+		return m.Answers
+	}
+	return nil
+}
+
+// An answer from Knowledge Connector.
+type KnowledgeAnswers_Answer struct {
+	// Indicates which Knowledge Document this answer was extracted from.
+	// Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
+	// ID>/documents/<Document ID>`.
+	Source string `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
+	// The corresponding FAQ question if the answer was extracted from a FAQ
+	// Document, empty otherwise.
+	FaqQuestion string `protobuf:"bytes,2,opt,name=faq_question,json=faqQuestion,proto3" json:"faq_question,omitempty"`
+	// The piece of text from the `source` knowledge base document that answers
+	// this conversational query.
+	Answer string `protobuf:"bytes,3,opt,name=answer,proto3" json:"answer,omitempty"`
+	// The system's confidence level that this knowledge answer is a good match
+	// for this conversational query.
+	// NOTE: The confidence level for a given `<query, answer>` pair may change
+	// without notice, as it depends on models that are constantly being
+	// improved. However, it will change less frequently than the confidence
+	// score below, and should be preferred for referencing the quality of an
+	// answer.
+	MatchConfidenceLevel KnowledgeAnswers_Answer_MatchConfidenceLevel `protobuf:"varint,4,opt,name=match_confidence_level,json=matchConfidenceLevel,proto3,enum=google.cloud.dialogflow.v2beta1.KnowledgeAnswers_Answer_MatchConfidenceLevel" json:"match_confidence_level,omitempty"`
+	// The system's confidence score that this Knowledge answer is a good match
+	// for this conversational query.
+	// The range is from 0.0 (completely uncertain) to 1.0 (completely certain).
+	// Note: The confidence score is likely to vary somewhat (possibly even for
+	// identical requests), as the underlying model is under constant
+	// improvement. It may be deprecated in the future. We recommend using
+	// `match_confidence_level` which should be generally more stable.
+	MatchConfidence      float32  `protobuf:"fixed32,5,opt,name=match_confidence,json=matchConfidence,proto3" json:"match_confidence,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *KnowledgeAnswers_Answer) Reset()         { *m = KnowledgeAnswers_Answer{} }
+func (m *KnowledgeAnswers_Answer) String() string { return proto.CompactTextString(m) }
+func (*KnowledgeAnswers_Answer) ProtoMessage()    {}
+func (*KnowledgeAnswers_Answer) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{5, 0}
+}
+
+func (m *KnowledgeAnswers_Answer) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_KnowledgeAnswers_Answer.Unmarshal(m, b)
+}
+func (m *KnowledgeAnswers_Answer) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_KnowledgeAnswers_Answer.Marshal(b, m, deterministic)
+}
+func (m *KnowledgeAnswers_Answer) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_KnowledgeAnswers_Answer.Merge(m, src)
+}
+func (m *KnowledgeAnswers_Answer) XXX_Size() int {
+	return xxx_messageInfo_KnowledgeAnswers_Answer.Size(m)
+}
+func (m *KnowledgeAnswers_Answer) XXX_DiscardUnknown() {
+	xxx_messageInfo_KnowledgeAnswers_Answer.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_KnowledgeAnswers_Answer proto.InternalMessageInfo
+
+func (m *KnowledgeAnswers_Answer) GetSource() string {
+	if m != nil {
+		return m.Source
+	}
+	return ""
+}
+
+func (m *KnowledgeAnswers_Answer) GetFaqQuestion() string {
+	if m != nil {
+		return m.FaqQuestion
+	}
+	return ""
+}
+
+func (m *KnowledgeAnswers_Answer) GetAnswer() string {
+	if m != nil {
+		return m.Answer
+	}
+	return ""
+}
+
+func (m *KnowledgeAnswers_Answer) GetMatchConfidenceLevel() KnowledgeAnswers_Answer_MatchConfidenceLevel {
+	if m != nil {
+		return m.MatchConfidenceLevel
+	}
+	return KnowledgeAnswers_Answer_MATCH_CONFIDENCE_LEVEL_UNSPECIFIED
+}
+
+func (m *KnowledgeAnswers_Answer) GetMatchConfidence() float32 {
+	if m != nil {
+		return m.MatchConfidence
+	}
+	return 0
+}
+
 // The top-level message sent by the client to the
-// `StreamingDetectIntent` method.
+// [StreamingDetectIntent][] method.
 //
 // Multiple request messages should be sent in order:
 //
-// 1.  The first message must contain `session`, `query_input` plus optionally
-//     `query_params` and/or `single_utterance`. The message must not contain
-//     `input_audio`.
+// 1.  The first message must contain [StreamingDetectIntentRequest.session][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.session],
+//     [StreamingDetectIntentRequest.query_input] plus optionally
+//     [StreamingDetectIntentRequest.query_params]. If the client wants to
+//     receive an audio response, it should also contain
+//     [StreamingDetectIntentRequest.output_audio_config][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.output_audio_config]. The message
+//     must not contain [StreamingDetectIntentRequest.input_audio][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.input_audio].
+// 2.  If [StreamingDetectIntentRequest.query_input][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.query_input] was set to
+//     [StreamingDetectIntentRequest.query_input.audio_config][], all subsequent
+//     messages must contain [StreamingDetectIntentRequest.input_audio] to
+//     continue with Speech recognition.
+//     If you decide to rather detect an intent from text input after you
+//     already started Speech recognition, please send a message with
+//     [StreamingDetectIntentRequest.query_input.text][].
 //
-// 2.  If `query_input` was set to a streaming input audio config,
-//     all subsequent messages must contain only `input_audio`.
-//     Otherwise, finish the request stream.
+//     However, note that:
+//
+//     * Dialogflow will bill you for the audio duration so far.
+//     * Dialogflow discards all Speech recognition results in favor of the
+//       input text.
+//     * Dialogflow will use the language code from the first message.
+//
+// After you sent all input, you must half-close or abort the request stream.
 type StreamingDetectIntentRequest struct {
 	// Required. The name of the session the query is sent to.
 	// Format of the session name:
-	// `projects/<Project ID>/agent/sessions/<Session ID>`.
-	// It’s up to the API caller to choose an appropriate <Session ID>. It can be
-	// a random number or some type of user identifier (preferably hashed).
-	// The length of the session ID must not exceed 36 characters.
-	Session string `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
+	// `projects/<Project ID>/agent/sessions/<Session ID>`, or
+	// `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+	// ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we assume
+	// default 'draft' environment. If `User ID` is not specified, we are using
+	// "-". It's up to the API caller to choose an appropriate `Session ID` and
+	// `User Id`. They can be a random number or some type of user and session
+	// identifiers (preferably hashed). The length of the `Session ID` and
+	// `User ID` must not exceed 36 characters.
+	Session string `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`
 	// Optional. The parameters of this query.
-	QueryParams *QueryParameters `protobuf:"bytes,2,opt,name=query_params,json=queryParams" json:"query_params,omitempty"`
+	QueryParams *QueryParameters `protobuf:"bytes,2,opt,name=query_params,json=queryParams,proto3" json:"query_params,omitempty"`
 	// Required. The input specification. It can be set to:
 	//
 	// 1.  an audio config which instructs the speech recognizer how to process
@@ -648,22 +925,54 @@ type StreamingDetectIntentRequest struct {
 	// 2.  a conversational query in the form of text, or
 	//
 	// 3.  an event that specifies which intent to trigger.
-	QueryInput *QueryInput `protobuf:"bytes,3,opt,name=query_input,json=queryInput" json:"query_input,omitempty"`
-	// Optional. If `true`, the recognizer will detect a single spoken utterance
-	// in input audio. When it detects that the user has paused or stopped
-	// speaking, it will cease recognition. This setting is ignored when
-	// `query_input` is a piece of text or an event.
-	SingleUtterance bool `protobuf:"varint,4,opt,name=single_utterance,json=singleUtterance" json:"single_utterance,omitempty"`
+	QueryInput *QueryInput `protobuf:"bytes,3,opt,name=query_input,json=queryInput,proto3" json:"query_input,omitempty"`
+	// DEPRECATED. Please use [InputAudioConfig.single_utterance][google.cloud.dialogflow.v2beta1.InputAudioConfig.single_utterance] instead.
+	// Optional. If `false` (default), recognition does not cease until the
+	// client closes the stream.
+	// If `true`, the recognizer will detect a single spoken utterance in input
+	// audio. Recognition ceases when it detects the audio's voice has
+	// stopped or paused. In this case, once a detected intent is received, the
+	// client should close the stream and start a new request with a new stream as
+	// needed.
+	// This setting is ignored when `query_input` is a piece of text or an event.
+	SingleUtterance bool `protobuf:"varint,4,opt,name=single_utterance,json=singleUtterance,proto3" json:"single_utterance,omitempty"`
+	// Optional. Instructs the speech synthesizer how to generate the output
+	// audio. If this field is not set and agent-level speech synthesizer is not
+	// configured, no output audio is generated.
+	OutputAudioConfig *OutputAudioConfig `protobuf:"bytes,5,opt,name=output_audio_config,json=outputAudioConfig,proto3" json:"output_audio_config,omitempty"`
 	// Optional. The input audio content to be recognized. Must be sent if
 	// `query_input` was set to a streaming input audio config. The complete audio
 	// over all streaming messages must not exceed 1 minute.
-	InputAudio []byte `protobuf:"bytes,6,opt,name=input_audio,json=inputAudio,proto3" json:"input_audio,omitempty"`
+	InputAudio           []byte   `protobuf:"bytes,6,opt,name=input_audio,json=inputAudio,proto3" json:"input_audio,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *StreamingDetectIntentRequest) Reset()                    { *m = StreamingDetectIntentRequest{} }
-func (m *StreamingDetectIntentRequest) String() string            { return proto.CompactTextString(m) }
-func (*StreamingDetectIntentRequest) ProtoMessage()               {}
-func (*StreamingDetectIntentRequest) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{5} }
+func (m *StreamingDetectIntentRequest) Reset()         { *m = StreamingDetectIntentRequest{} }
+func (m *StreamingDetectIntentRequest) String() string { return proto.CompactTextString(m) }
+func (*StreamingDetectIntentRequest) ProtoMessage()    {}
+func (*StreamingDetectIntentRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{6}
+}
+
+func (m *StreamingDetectIntentRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_StreamingDetectIntentRequest.Unmarshal(m, b)
+}
+func (m *StreamingDetectIntentRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_StreamingDetectIntentRequest.Marshal(b, m, deterministic)
+}
+func (m *StreamingDetectIntentRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StreamingDetectIntentRequest.Merge(m, src)
+}
+func (m *StreamingDetectIntentRequest) XXX_Size() int {
+	return xxx_messageInfo_StreamingDetectIntentRequest.Size(m)
+}
+func (m *StreamingDetectIntentRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_StreamingDetectIntentRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_StreamingDetectIntentRequest proto.InternalMessageInfo
 
 func (m *StreamingDetectIntentRequest) GetSession() string {
 	if m != nil {
@@ -693,6 +1002,13 @@ func (m *StreamingDetectIntentRequest) GetSingleUtterance() bool {
 	return false
 }
 
+func (m *StreamingDetectIntentRequest) GetOutputAudioConfig() *OutputAudioConfig {
+	if m != nil {
+		return m.OutputAudioConfig
+	}
+	return nil
+}
+
 func (m *StreamingDetectIntentRequest) GetInputAudio() []byte {
 	if m != nil {
 		return m.InputAudio
@@ -710,24 +1026,71 @@ func (m *StreamingDetectIntentRequest) GetInputAudio() []byte {
 //     complete transcript of what the user said. The last `recognition_result`
 //     has `is_final` set to `true`.
 //
-// 2.  The next message contains `response_id`, `query_result`
-//     and optionally `webhook_status` if a WebHook was called.
+// 2.  The next message contains `response_id`, `query_result`,
+//     `alternative_query_results` and optionally `webhook_status` if a WebHook
+//     was called.
+//
+// 3.  If `output_audio_config` was specified in the request or agent-level
+//     speech synthesizer is configured, all subsequent messages contain
+//     `output_audio` and `output_audio_config`.
 type StreamingDetectIntentResponse struct {
 	// The unique identifier of the response. It can be used to
 	// locate a response in the training example set or for reporting issues.
-	ResponseId string `protobuf:"bytes,1,opt,name=response_id,json=responseId" json:"response_id,omitempty"`
+	ResponseId string `protobuf:"bytes,1,opt,name=response_id,json=responseId,proto3" json:"response_id,omitempty"`
 	// The result of speech recognition.
-	RecognitionResult *StreamingRecognitionResult `protobuf:"bytes,2,opt,name=recognition_result,json=recognitionResult" json:"recognition_result,omitempty"`
-	// The result of the conversational query or event processing.
-	QueryResult *QueryResult `protobuf:"bytes,3,opt,name=query_result,json=queryResult" json:"query_result,omitempty"`
+	RecognitionResult *StreamingRecognitionResult `protobuf:"bytes,2,opt,name=recognition_result,json=recognitionResult,proto3" json:"recognition_result,omitempty"`
+	// The selected results of the conversational query or event processing.
+	// See `alternative_query_results` for additional potential results.
+	QueryResult *QueryResult `protobuf:"bytes,3,opt,name=query_result,json=queryResult,proto3" json:"query_result,omitempty"`
+	// If Knowledge Connectors are enabled, there could be more than one result
+	// returned for a given query or event, and this field will contain all
+	// results except for the top one, which is captured in query_result. The
+	// alternative results are ordered by decreasing
+	// `QueryResult.intent_detection_confidence`. If Knowledge Connectors are
+	// disabled, this field will be empty until multiple responses for regular
+	// intents are supported, at which point those additional results will be
+	// surfaced here.
+	AlternativeQueryResults []*QueryResult `protobuf:"bytes,7,rep,name=alternative_query_results,json=alternativeQueryResults,proto3" json:"alternative_query_results,omitempty"`
 	// Specifies the status of the webhook request.
-	WebhookStatus *google_rpc.Status `protobuf:"bytes,4,opt,name=webhook_status,json=webhookStatus" json:"webhook_status,omitempty"`
+	WebhookStatus *status.Status `protobuf:"bytes,4,opt,name=webhook_status,json=webhookStatus,proto3" json:"webhook_status,omitempty"`
+	// The audio data bytes encoded as specified in the request.
+	// Note: The output audio is generated based on the values of default platform
+	// text responses found in the `query_result.fulfillment_messages` field. If
+	// multiple default text responses exist, they will be concatenated when
+	// generating audio. If no default platform text responses exist, the
+	// generated audio content will be empty.
+	OutputAudio []byte `protobuf:"bytes,5,opt,name=output_audio,json=outputAudio,proto3" json:"output_audio,omitempty"`
+	// The config used by the speech synthesizer to generate the output audio.
+	OutputAudioConfig    *OutputAudioConfig `protobuf:"bytes,6,opt,name=output_audio_config,json=outputAudioConfig,proto3" json:"output_audio_config,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
 }
 
-func (m *StreamingDetectIntentResponse) Reset()                    { *m = StreamingDetectIntentResponse{} }
-func (m *StreamingDetectIntentResponse) String() string            { return proto.CompactTextString(m) }
-func (*StreamingDetectIntentResponse) ProtoMessage()               {}
-func (*StreamingDetectIntentResponse) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{6} }
+func (m *StreamingDetectIntentResponse) Reset()         { *m = StreamingDetectIntentResponse{} }
+func (m *StreamingDetectIntentResponse) String() string { return proto.CompactTextString(m) }
+func (*StreamingDetectIntentResponse) ProtoMessage()    {}
+func (*StreamingDetectIntentResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{7}
+}
+
+func (m *StreamingDetectIntentResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_StreamingDetectIntentResponse.Unmarshal(m, b)
+}
+func (m *StreamingDetectIntentResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_StreamingDetectIntentResponse.Marshal(b, m, deterministic)
+}
+func (m *StreamingDetectIntentResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StreamingDetectIntentResponse.Merge(m, src)
+}
+func (m *StreamingDetectIntentResponse) XXX_Size() int {
+	return xxx_messageInfo_StreamingDetectIntentResponse.Size(m)
+}
+func (m *StreamingDetectIntentResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_StreamingDetectIntentResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_StreamingDetectIntentResponse proto.InternalMessageInfo
 
 func (m *StreamingDetectIntentResponse) GetResponseId() string {
 	if m != nil {
@@ -750,9 +1113,30 @@ func (m *StreamingDetectIntentResponse) GetQueryResult() *QueryResult {
 	return nil
 }
 
-func (m *StreamingDetectIntentResponse) GetWebhookStatus() *google_rpc.Status {
+func (m *StreamingDetectIntentResponse) GetAlternativeQueryResults() []*QueryResult {
+	if m != nil {
+		return m.AlternativeQueryResults
+	}
+	return nil
+}
+
+func (m *StreamingDetectIntentResponse) GetWebhookStatus() *status.Status {
 	if m != nil {
 		return m.WebhookStatus
+	}
+	return nil
+}
+
+func (m *StreamingDetectIntentResponse) GetOutputAudio() []byte {
+	if m != nil {
+		return m.OutputAudio
+	}
+	return nil
+}
+
+func (m *StreamingDetectIntentResponse) GetOutputAudioConfig() *OutputAudioConfig {
+	if m != nil {
+		return m.OutputAudioConfig
 	}
 	return nil
 }
@@ -776,7 +1160,7 @@ func (m *StreamingDetectIntentResponse) GetWebhookStatus() *google_rpc.Status {
 //
 // 6.  transcript: " that is"
 //
-// 7.  recognition_event_type: `RECOGNITION_EVENT_END_OF_SINGLE_UTTERANCE`
+// 7.  message_type: `END_OF_SINGLE_UTTERANCE`
 //
 // 8.  transcript: " that is the question"
 //     is_final: true
@@ -787,21 +1171,20 @@ func (m *StreamingDetectIntentResponse) GetWebhookStatus() *google_rpc.Status {
 //
 // In each response we populate:
 //
-// *  for `MESSAGE_TYPE_TRANSCRIPT`: `transcript` and possibly `is_final`.
+// *  for `TRANSCRIPT`: `transcript` and possibly `is_final`.
 //
-// *  for `MESSAGE_TYPE_END_OF_SINGLE_UTTERANCE`: only `event_type`.
+// *  for `END_OF_SINGLE_UTTERANCE`: only `message_type`.
 type StreamingRecognitionResult struct {
 	// Type of the result message.
-	MessageType StreamingRecognitionResult_MessageType `protobuf:"varint,1,opt,name=message_type,json=messageType,enum=google.cloud.dialogflow.v2beta1.StreamingRecognitionResult_MessageType" json:"message_type,omitempty"`
+	MessageType StreamingRecognitionResult_MessageType `protobuf:"varint,1,opt,name=message_type,json=messageType,proto3,enum=google.cloud.dialogflow.v2beta1.StreamingRecognitionResult_MessageType" json:"message_type,omitempty"`
 	// Transcript text representing the words that the user spoke.
-	// Populated if and only if `event_type` = `RECOGNITION_EVENT_TRANSCRIPT`.
-	Transcript string `protobuf:"bytes,2,opt,name=transcript" json:"transcript,omitempty"`
-	// The default of 0.0 is a sentinel value indicating `confidence` was not set.
+	// Populated if and only if `message_type` = `TRANSCRIPT`.
+	Transcript string `protobuf:"bytes,2,opt,name=transcript,proto3" json:"transcript,omitempty"`
 	// If `false`, the `StreamingRecognitionResult` represents an
 	// interim result that may change. If `true`, the recognizer will not return
 	// any further hypotheses about this piece of the audio. May only be populated
-	// for `event_type` = `RECOGNITION_EVENT_TRANSCRIPT`.
-	IsFinal bool `protobuf:"varint,3,opt,name=is_final,json=isFinal" json:"is_final,omitempty"`
+	// for `message_type` = `TRANSCRIPT`.
+	IsFinal bool `protobuf:"varint,3,opt,name=is_final,json=isFinal,proto3" json:"is_final,omitempty"`
 	// The Speech confidence between 0.0 and 1.0 for the current portion of audio.
 	// A higher number indicates an estimated greater likelihood that the
 	// recognized words are correct. The default of 0.0 is a sentinel value
@@ -809,13 +1192,51 @@ type StreamingRecognitionResult struct {
 	//
 	// This field is typically only provided if `is_final` is true and you should
 	// not rely on it being accurate or even set.
-	Confidence float32 `protobuf:"fixed32,4,opt,name=confidence" json:"confidence,omitempty"`
+	Confidence float32 `protobuf:"fixed32,4,opt,name=confidence,proto3" json:"confidence,omitempty"`
+	// An estimate of the likelihood that the speech recognizer will
+	// not change its guess about this interim recognition result:
+	// * If the value is unspecified or 0.0, Dialogflow didn't compute the
+	//   stability. In particular, Dialogflow will only provide stability for
+	//   `TRANSCRIPT` results with `is_final = false`.
+	// * Otherwise, the value is in (0.0, 1.0] where 0.0 means completely
+	//   unstable and 1.0 means completely stable.
+	Stability float32 `protobuf:"fixed32,6,opt,name=stability,proto3" json:"stability,omitempty"`
+	// Word-specific information for the words recognized by Speech in
+	// [transcript][google.cloud.dialogflow.v2beta1.StreamingRecognitionResult.transcript]. Populated if and only if `message_type` = `TRANSCRIPT` and
+	// [InputAudioConfig.enable_word_info] is set.
+	SpeechWordInfo []*SpeechWordInfo `protobuf:"bytes,7,rep,name=speech_word_info,json=speechWordInfo,proto3" json:"speech_word_info,omitempty"`
+	// Time offset of the end of this Speech recognition result relative to the
+	// beginning of the audio. Only populated for `message_type` = `TRANSCRIPT`.
+	SpeechEndOffset      *duration.Duration `protobuf:"bytes,8,opt,name=speech_end_offset,json=speechEndOffset,proto3" json:"speech_end_offset,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
 }
 
-func (m *StreamingRecognitionResult) Reset()                    { *m = StreamingRecognitionResult{} }
-func (m *StreamingRecognitionResult) String() string            { return proto.CompactTextString(m) }
-func (*StreamingRecognitionResult) ProtoMessage()               {}
-func (*StreamingRecognitionResult) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{7} }
+func (m *StreamingRecognitionResult) Reset()         { *m = StreamingRecognitionResult{} }
+func (m *StreamingRecognitionResult) String() string { return proto.CompactTextString(m) }
+func (*StreamingRecognitionResult) ProtoMessage()    {}
+func (*StreamingRecognitionResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{8}
+}
+
+func (m *StreamingRecognitionResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_StreamingRecognitionResult.Unmarshal(m, b)
+}
+func (m *StreamingRecognitionResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_StreamingRecognitionResult.Marshal(b, m, deterministic)
+}
+func (m *StreamingRecognitionResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StreamingRecognitionResult.Merge(m, src)
+}
+func (m *StreamingRecognitionResult) XXX_Size() int {
+	return xxx_messageInfo_StreamingRecognitionResult.Size(m)
+}
+func (m *StreamingRecognitionResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_StreamingRecognitionResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_StreamingRecognitionResult proto.InternalMessageInfo
 
 func (m *StreamingRecognitionResult) GetMessageType() StreamingRecognitionResult_MessageType {
 	if m != nil {
@@ -845,56 +1266,23 @@ func (m *StreamingRecognitionResult) GetConfidence() float32 {
 	return 0
 }
 
-// Instructs the speech recognizer how to process the audio content.
-type InputAudioConfig struct {
-	// Required. Audio encoding of the audio content to process.
-	AudioEncoding AudioEncoding `protobuf:"varint,1,opt,name=audio_encoding,json=audioEncoding,enum=google.cloud.dialogflow.v2beta1.AudioEncoding" json:"audio_encoding,omitempty"`
-	// Required. Sample rate (in Hertz) of the audio content sent in the query.
-	// Refer to [Cloud Speech API documentation](/speech/docs/basics) for more
-	// details.
-	SampleRateHertz int32 `protobuf:"varint,2,opt,name=sample_rate_hertz,json=sampleRateHertz" json:"sample_rate_hertz,omitempty"`
-	// Required. The language of the supplied audio. Dialogflow does not do
-	// translations. See [Language
-	// Support](https://dialogflow.com/docs/languages) for a list of the
-	// currently supported language codes. Note that queries in the same session
-	// do not necessarily need to specify the same language.
-	LanguageCode string `protobuf:"bytes,3,opt,name=language_code,json=languageCode" json:"language_code,omitempty"`
-	// Optional. The collection of phrase hints which are used to boost accuracy
-	// of speech recognition.
-	// Refer to [Cloud Speech API documentation](/speech/docs/basics#phrase-hints)
-	// for more details.
-	PhraseHints []string `protobuf:"bytes,4,rep,name=phrase_hints,json=phraseHints" json:"phrase_hints,omitempty"`
-}
-
-func (m *InputAudioConfig) Reset()                    { *m = InputAudioConfig{} }
-func (m *InputAudioConfig) String() string            { return proto.CompactTextString(m) }
-func (*InputAudioConfig) ProtoMessage()               {}
-func (*InputAudioConfig) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{8} }
-
-func (m *InputAudioConfig) GetAudioEncoding() AudioEncoding {
+func (m *StreamingRecognitionResult) GetStability() float32 {
 	if m != nil {
-		return m.AudioEncoding
-	}
-	return AudioEncoding_AUDIO_ENCODING_UNSPECIFIED
-}
-
-func (m *InputAudioConfig) GetSampleRateHertz() int32 {
-	if m != nil {
-		return m.SampleRateHertz
+		return m.Stability
 	}
 	return 0
 }
 
-func (m *InputAudioConfig) GetLanguageCode() string {
+func (m *StreamingRecognitionResult) GetSpeechWordInfo() []*SpeechWordInfo {
 	if m != nil {
-		return m.LanguageCode
+		return m.SpeechWordInfo
 	}
-	return ""
+	return nil
 }
 
-func (m *InputAudioConfig) GetPhraseHints() []string {
+func (m *StreamingRecognitionResult) GetSpeechEndOffset() *duration.Duration {
 	if m != nil {
-		return m.PhraseHints
+		return m.SpeechEndOffset
 	}
 	return nil
 }
@@ -902,19 +1290,42 @@ func (m *InputAudioConfig) GetPhraseHints() []string {
 // Represents the natural language text to be processed.
 type TextInput struct {
 	// Required. The UTF-8 encoded natural language text to be processed.
-	// Text length must not exceed 256 bytes.
-	Text string `protobuf:"bytes,1,opt,name=text" json:"text,omitempty"`
+	// Text length must not exceed 256 characters.
+	Text string `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
 	// Required. The language of this conversational query. See [Language
-	// Support](https://dialogflow.com/docs/languages) for a list of the
-	// currently supported language codes. Note that queries in the same session
-	// do not necessarily need to specify the same language.
-	LanguageCode string `protobuf:"bytes,2,opt,name=language_code,json=languageCode" json:"language_code,omitempty"`
+	// Support](https://cloud.google.com/dialogflow/docs/reference/language)
+	// for a list of the currently supported language codes. Note that queries in
+	// the same session do not necessarily need to specify the same language.
+	LanguageCode         string   `protobuf:"bytes,2,opt,name=language_code,json=languageCode,proto3" json:"language_code,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *TextInput) Reset()                    { *m = TextInput{} }
-func (m *TextInput) String() string            { return proto.CompactTextString(m) }
-func (*TextInput) ProtoMessage()               {}
-func (*TextInput) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{9} }
+func (m *TextInput) Reset()         { *m = TextInput{} }
+func (m *TextInput) String() string { return proto.CompactTextString(m) }
+func (*TextInput) ProtoMessage()    {}
+func (*TextInput) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{9}
+}
+
+func (m *TextInput) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_TextInput.Unmarshal(m, b)
+}
+func (m *TextInput) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_TextInput.Marshal(b, m, deterministic)
+}
+func (m *TextInput) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TextInput.Merge(m, src)
+}
+func (m *TextInput) XXX_Size() int {
+	return xxx_messageInfo_TextInput.Size(m)
+}
+func (m *TextInput) XXX_DiscardUnknown() {
+	xxx_messageInfo_TextInput.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_TextInput proto.InternalMessageInfo
 
 func (m *TextInput) GetText() string {
 	if m != nil {
@@ -931,26 +1342,49 @@ func (m *TextInput) GetLanguageCode() string {
 }
 
 // Events allow for matching intents by event name instead of the natural
-// language input. For instance, input `<event: { name: “welcome_event”,
-// parameters: { name: “Sam” } }>` can trigger a personalized welcome response.
+// language input. For instance, input `<event: { name: "welcome_event",
+// parameters: { name: "Sam" } }>` can trigger a personalized welcome response.
 // The parameter `name` may be used by the agent in the response:
-// `“Hello #welcome_event.name! What can I do for you today?”`.
+// `"Hello #welcome_event.name! What can I do for you today?"`.
 type EventInput struct {
 	// Required. The unique identifier of the event.
-	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Optional. The collection of parameters associated with the event.
-	Parameters *google_protobuf4.Struct `protobuf:"bytes,2,opt,name=parameters" json:"parameters,omitempty"`
+	Parameters *_struct.Struct `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty"`
 	// Required. The language of this query. See [Language
-	// Support](https://dialogflow.com/docs/languages) for a list of the
-	// currently supported language codes. Note that queries in the same session
-	// do not necessarily need to specify the same language.
-	LanguageCode string `protobuf:"bytes,3,opt,name=language_code,json=languageCode" json:"language_code,omitempty"`
+	// Support](https://cloud.google.com/dialogflow/docs/reference/language)
+	// for a list of the currently supported language codes. Note that queries in
+	// the same session do not necessarily need to specify the same language.
+	LanguageCode         string   `protobuf:"bytes,3,opt,name=language_code,json=languageCode,proto3" json:"language_code,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *EventInput) Reset()                    { *m = EventInput{} }
-func (m *EventInput) String() string            { return proto.CompactTextString(m) }
-func (*EventInput) ProtoMessage()               {}
-func (*EventInput) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{10} }
+func (m *EventInput) Reset()         { *m = EventInput{} }
+func (m *EventInput) String() string { return proto.CompactTextString(m) }
+func (*EventInput) ProtoMessage()    {}
+func (*EventInput) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{10}
+}
+
+func (m *EventInput) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_EventInput.Unmarshal(m, b)
+}
+func (m *EventInput) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_EventInput.Marshal(b, m, deterministic)
+}
+func (m *EventInput) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EventInput.Merge(m, src)
+}
+func (m *EventInput) XXX_Size() int {
+	return xxx_messageInfo_EventInput.Size(m)
+}
+func (m *EventInput) XXX_DiscardUnknown() {
+	xxx_messageInfo_EventInput.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EventInput proto.InternalMessageInfo
 
 func (m *EventInput) GetName() string {
 	if m != nil {
@@ -959,7 +1393,7 @@ func (m *EventInput) GetName() string {
 	return ""
 }
 
-func (m *EventInput) GetParameters() *google_protobuf4.Struct {
+func (m *EventInput) GetParameters() *_struct.Struct {
 	if m != nil {
 		return m.Parameters
 	}
@@ -973,20 +1407,301 @@ func (m *EventInput) GetLanguageCode() string {
 	return ""
 }
 
+// Configures the types of sentiment analysis to perform.
+type SentimentAnalysisRequestConfig struct {
+	// Optional. Instructs the service to perform sentiment analysis on
+	// `query_text`. If not provided, sentiment analysis is not performed on
+	// `query_text`.
+	AnalyzeQueryTextSentiment bool     `protobuf:"varint,1,opt,name=analyze_query_text_sentiment,json=analyzeQueryTextSentiment,proto3" json:"analyze_query_text_sentiment,omitempty"`
+	XXX_NoUnkeyedLiteral      struct{} `json:"-"`
+	XXX_unrecognized          []byte   `json:"-"`
+	XXX_sizecache             int32    `json:"-"`
+}
+
+func (m *SentimentAnalysisRequestConfig) Reset()         { *m = SentimentAnalysisRequestConfig{} }
+func (m *SentimentAnalysisRequestConfig) String() string { return proto.CompactTextString(m) }
+func (*SentimentAnalysisRequestConfig) ProtoMessage()    {}
+func (*SentimentAnalysisRequestConfig) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{11}
+}
+
+func (m *SentimentAnalysisRequestConfig) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SentimentAnalysisRequestConfig.Unmarshal(m, b)
+}
+func (m *SentimentAnalysisRequestConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SentimentAnalysisRequestConfig.Marshal(b, m, deterministic)
+}
+func (m *SentimentAnalysisRequestConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SentimentAnalysisRequestConfig.Merge(m, src)
+}
+func (m *SentimentAnalysisRequestConfig) XXX_Size() int {
+	return xxx_messageInfo_SentimentAnalysisRequestConfig.Size(m)
+}
+func (m *SentimentAnalysisRequestConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_SentimentAnalysisRequestConfig.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SentimentAnalysisRequestConfig proto.InternalMessageInfo
+
+func (m *SentimentAnalysisRequestConfig) GetAnalyzeQueryTextSentiment() bool {
+	if m != nil {
+		return m.AnalyzeQueryTextSentiment
+	}
+	return false
+}
+
+// The result of sentiment analysis as configured by
+// `sentiment_analysis_request_config`.
+type SentimentAnalysisResult struct {
+	// The sentiment analysis result for `query_text`.
+	QueryTextSentiment   *Sentiment `protobuf:"bytes,1,opt,name=query_text_sentiment,json=queryTextSentiment,proto3" json:"query_text_sentiment,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
+}
+
+func (m *SentimentAnalysisResult) Reset()         { *m = SentimentAnalysisResult{} }
+func (m *SentimentAnalysisResult) String() string { return proto.CompactTextString(m) }
+func (*SentimentAnalysisResult) ProtoMessage()    {}
+func (*SentimentAnalysisResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{12}
+}
+
+func (m *SentimentAnalysisResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SentimentAnalysisResult.Unmarshal(m, b)
+}
+func (m *SentimentAnalysisResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SentimentAnalysisResult.Marshal(b, m, deterministic)
+}
+func (m *SentimentAnalysisResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SentimentAnalysisResult.Merge(m, src)
+}
+func (m *SentimentAnalysisResult) XXX_Size() int {
+	return xxx_messageInfo_SentimentAnalysisResult.Size(m)
+}
+func (m *SentimentAnalysisResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_SentimentAnalysisResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SentimentAnalysisResult proto.InternalMessageInfo
+
+func (m *SentimentAnalysisResult) GetQueryTextSentiment() *Sentiment {
+	if m != nil {
+		return m.QueryTextSentiment
+	}
+	return nil
+}
+
+// The sentiment, such as positive/negative feeling or association, for a unit
+// of analysis, such as the query text.
+type Sentiment struct {
+	// Sentiment score between -1.0 (negative sentiment) and 1.0 (positive
+	// sentiment).
+	Score float32 `protobuf:"fixed32,1,opt,name=score,proto3" json:"score,omitempty"`
+	// A non-negative number in the [0, +inf) range, which represents the absolute
+	// magnitude of sentiment, regardless of score (positive or negative).
+	Magnitude            float32  `protobuf:"fixed32,2,opt,name=magnitude,proto3" json:"magnitude,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Sentiment) Reset()         { *m = Sentiment{} }
+func (m *Sentiment) String() string { return proto.CompactTextString(m) }
+func (*Sentiment) ProtoMessage()    {}
+func (*Sentiment) Descriptor() ([]byte, []int) {
+	return fileDescriptor_40a53f854d709740, []int{13}
+}
+
+func (m *Sentiment) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Sentiment.Unmarshal(m, b)
+}
+func (m *Sentiment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Sentiment.Marshal(b, m, deterministic)
+}
+func (m *Sentiment) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Sentiment.Merge(m, src)
+}
+func (m *Sentiment) XXX_Size() int {
+	return xxx_messageInfo_Sentiment.Size(m)
+}
+func (m *Sentiment) XXX_DiscardUnknown() {
+	xxx_messageInfo_Sentiment.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Sentiment proto.InternalMessageInfo
+
+func (m *Sentiment) GetScore() float32 {
+	if m != nil {
+		return m.Score
+	}
+	return 0
+}
+
+func (m *Sentiment) GetMagnitude() float32 {
+	if m != nil {
+		return m.Magnitude
+	}
+	return 0
+}
+
 func init() {
+	proto.RegisterEnum("google.cloud.dialogflow.v2beta1.KnowledgeAnswers_Answer_MatchConfidenceLevel", KnowledgeAnswers_Answer_MatchConfidenceLevel_name, KnowledgeAnswers_Answer_MatchConfidenceLevel_value)
+	proto.RegisterEnum("google.cloud.dialogflow.v2beta1.StreamingRecognitionResult_MessageType", StreamingRecognitionResult_MessageType_name, StreamingRecognitionResult_MessageType_value)
 	proto.RegisterType((*DetectIntentRequest)(nil), "google.cloud.dialogflow.v2beta1.DetectIntentRequest")
 	proto.RegisterType((*DetectIntentResponse)(nil), "google.cloud.dialogflow.v2beta1.DetectIntentResponse")
 	proto.RegisterType((*QueryParameters)(nil), "google.cloud.dialogflow.v2beta1.QueryParameters")
 	proto.RegisterType((*QueryInput)(nil), "google.cloud.dialogflow.v2beta1.QueryInput")
 	proto.RegisterType((*QueryResult)(nil), "google.cloud.dialogflow.v2beta1.QueryResult")
+	proto.RegisterType((*KnowledgeAnswers)(nil), "google.cloud.dialogflow.v2beta1.KnowledgeAnswers")
+	proto.RegisterType((*KnowledgeAnswers_Answer)(nil), "google.cloud.dialogflow.v2beta1.KnowledgeAnswers.Answer")
 	proto.RegisterType((*StreamingDetectIntentRequest)(nil), "google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest")
 	proto.RegisterType((*StreamingDetectIntentResponse)(nil), "google.cloud.dialogflow.v2beta1.StreamingDetectIntentResponse")
 	proto.RegisterType((*StreamingRecognitionResult)(nil), "google.cloud.dialogflow.v2beta1.StreamingRecognitionResult")
-	proto.RegisterType((*InputAudioConfig)(nil), "google.cloud.dialogflow.v2beta1.InputAudioConfig")
 	proto.RegisterType((*TextInput)(nil), "google.cloud.dialogflow.v2beta1.TextInput")
 	proto.RegisterType((*EventInput)(nil), "google.cloud.dialogflow.v2beta1.EventInput")
-	proto.RegisterEnum("google.cloud.dialogflow.v2beta1.AudioEncoding", AudioEncoding_name, AudioEncoding_value)
-	proto.RegisterEnum("google.cloud.dialogflow.v2beta1.StreamingRecognitionResult_MessageType", StreamingRecognitionResult_MessageType_name, StreamingRecognitionResult_MessageType_value)
+	proto.RegisterType((*SentimentAnalysisRequestConfig)(nil), "google.cloud.dialogflow.v2beta1.SentimentAnalysisRequestConfig")
+	proto.RegisterType((*SentimentAnalysisResult)(nil), "google.cloud.dialogflow.v2beta1.SentimentAnalysisResult")
+	proto.RegisterType((*Sentiment)(nil), "google.cloud.dialogflow.v2beta1.Sentiment")
+}
+
+func init() {
+	proto.RegisterFile("google/cloud/dialogflow/v2beta1/session.proto", fileDescriptor_40a53f854d709740)
+}
+
+var fileDescriptor_40a53f854d709740 = []byte{
+	// 2087 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x59, 0xcd, 0x73, 0x1b, 0x49,
+	0x15, 0x8f, 0x24, 0x7f, 0xc8, 0x4f, 0x8a, 0xad, 0x74, 0xcc, 0x46, 0x76, 0x9c, 0x2f, 0x05, 0x76,
+	0xbd, 0xd9, 0xac, 0x94, 0x98, 0xaf, 0xdd, 0xa4, 0xb2, 0x89, 0x2c, 0x29, 0x8e, 0x0a, 0xf9, 0x23,
+	0x2d, 0x27, 0x21, 0x29, 0xd8, 0xa9, 0xf6, 0x4c, 0x6b, 0x3c, 0xc9, 0x68, 0x5a, 0x9e, 0xee, 0xb1,
+	0xe3, 0xa5, 0xe0, 0x00, 0x27, 0xe0, 0x08, 0x47, 0x4e, 0xdc, 0x58, 0xae, 0xfc, 0x15, 0x14, 0x17,
+	0xd8, 0x7f, 0x81, 0x3f, 0x81, 0x2a, 0xa8, 0xad, 0xda, 0x82, 0x9a, 0xee, 0x1e, 0x69, 0x2c, 0x4b,
+	0x96, 0x1c, 0x48, 0x51, 0x7b, 0xb2, 0xfa, 0xf5, 0x7b, 0xbf, 0xee, 0x7e, 0xef, 0xf5, 0xaf, 0xdf,
+	0x1b, 0xc3, 0x87, 0x36, 0x63, 0xb6, 0x4b, 0x4b, 0xa6, 0xcb, 0x02, 0xab, 0x64, 0x39, 0xc4, 0x65,
+	0x76, 0xcb, 0x65, 0x07, 0xa5, 0xfd, 0x95, 0x1d, 0x2a, 0xc8, 0xed, 0x12, 0xa7, 0x9c, 0x3b, 0xcc,
+	0x2b, 0x76, 0x7c, 0x26, 0x18, 0xba, 0xa2, 0xd4, 0x8b, 0x52, 0xbd, 0xd8, 0x53, 0x2f, 0x6a, 0xf5,
+	0xc5, 0x25, 0x8d, 0x47, 0x3a, 0x4e, 0x89, 0x78, 0x1e, 0x13, 0x44, 0x38, 0xcc, 0xe3, 0xca, 0x7c,
+	0xf1, 0x4a, 0x6c, 0xb6, 0xe5, 0x50, 0xd7, 0x32, 0x76, 0xe8, 0x2e, 0xd9, 0x77, 0x98, 0xaf, 0x15,
+	0x16, 0x62, 0x0a, 0x3e, 0xe5, 0x2c, 0xf0, 0x4d, 0xaa, 0xa7, 0x3e, 0x18, 0xb5, 0x53, 0x62, 0x53,
+	0x4f, 0x68, 0xe5, 0x95, 0x91, 0xca, 0x81, 0xe5, 0x30, 0xc3, 0x64, 0x5e, 0xcb, 0xb1, 0xb5, 0xcd,
+	0x48, 0x57, 0x98, 0xcc, 0x13, 0xf4, 0x75, 0xb4, 0xc4, 0xcd, 0x51, 0xea, 0x8e, 0x27, 0x7a, 0x1b,
+	0xfa, 0x78, 0x4c, 0x3f, 0x1b, 0xd4, 0x13, 0x8e, 0x38, 0x34, 0xc4, 0x61, 0x27, 0x3a, 0xf8, 0x65,
+	0x6d, 0x2a, 0x47, 0x3b, 0x41, 0xab, 0x64, 0x05, 0xbe, 0xf4, 0xaa, 0x9e, 0x5f, 0xea, 0x9f, 0xe7,
+	0xc2, 0x0f, 0xcc, 0x68, 0xe1, 0x0b, 0x7a, 0xd6, 0xef, 0x98, 0x25, 0x2e, 0x88, 0x08, 0xa2, 0x58,
+	0xe4, 0xf5, 0x44, 0xb8, 0x52, 0xc9, 0x25, 0xc2, 0xf5, 0xec, 0x3e, 0x93, 0x30, 0x08, 0xa6, 0xeb,
+	0x74, 0x0f, 0x51, 0xf8, 0x77, 0x12, 0xce, 0x57, 0xa9, 0xa0, 0xa6, 0xa8, 0xcb, 0xb3, 0x61, 0xba,
+	0x17, 0x50, 0x2e, 0xd0, 0x03, 0x98, 0xd6, 0xdb, 0xcf, 0x27, 0xae, 0x26, 0x96, 0x67, 0x56, 0xdf,
+	0xfd, 0xb2, 0x7c, 0x1d, 0xae, 0xc5, 0xd2, 0x43, 0x21, 0x92, 0x8e, 0xc3, 0x8b, 0x26, 0x6b, 0x97,
+	0x9a, 0x4a, 0x1b, 0x47, 0x66, 0xa8, 0x09, 0xd9, 0xbd, 0x80, 0xfa, 0x87, 0x46, 0x87, 0xf8, 0xa4,
+	0xcd, 0xf3, 0xc9, 0xab, 0x89, 0xe5, 0xcc, 0xca, 0xad, 0xe2, 0x88, 0x74, 0x2b, 0x3e, 0x0e, 0x8d,
+	0xb6, 0x42, 0x1b, 0x2a, 0xa8, 0xcf, 0x71, 0x66, 0xaf, 0x2b, 0xe0, 0xa8, 0x01, 0x6a, 0x68, 0x38,
+	0x5e, 0x27, 0x10, 0xf9, 0x94, 0xc4, 0xfc, 0x60, 0x3c, 0xcc, 0x7a, 0x68, 0x82, 0x61, 0xaf, 0xfb,
+	0x1b, 0xed, 0xc0, 0x79, 0x16, 0x88, 0x4e, 0x20, 0x8c, 0x78, 0xee, 0xe4, 0x27, 0x24, 0xea, 0xca,
+	0x48, 0xd4, 0x4d, 0x69, 0x5b, 0x0e, 0x4d, 0x2b, 0xd2, 0x12, 0x9f, 0x63, 0xfd, 0x22, 0x74, 0x05,
+	0x32, 0x72, 0xaf, 0x6a, 0x89, 0xfc, 0xe4, 0xd5, 0xc4, 0x72, 0x16, 0x83, 0x14, 0x49, 0xb5, 0xc2,
+	0x9f, 0x52, 0x30, 0x7f, 0x34, 0x02, 0xbc, 0xc3, 0x3c, 0x4e, 0x43, 0x4b, 0x5f, 0xff, 0x36, 0x1c,
+	0x4b, 0x85, 0x01, 0x43, 0x24, 0xaa, 0x5b, 0x68, 0x33, 0xf2, 0xb0, 0x4f, 0x79, 0xe0, 0x0a, 0xed,
+	0xe1, 0x9b, 0xe3, 0x79, 0x03, 0x4b, 0x1b, 0xed, 0x5d, 0x35, 0x40, 0xbb, 0xb0, 0x40, 0x5c, 0x41,
+	0x7d, 0x8f, 0x08, 0x67, 0x9f, 0x1a, 0x71, 0x70, 0x9e, 0x9f, 0xbc, 0x9a, 0x3a, 0x35, 0xfa, 0x85,
+	0x18, 0x5c, 0x4c, 0xce, 0xd1, 0xc7, 0x30, 0x7b, 0x40, 0x77, 0x76, 0x19, 0x7b, 0x65, 0xa8, 0x0c,
+	0xd6, 0xa1, 0x44, 0x11, 0xbc, 0xdf, 0x31, 0x8b, 0x4d, 0x39, 0x83, 0xcf, 0x6a, 0x4d, 0x35, 0x44,
+	0xd7, 0x20, 0x1b, 0x0f, 0x9a, 0x8c, 0x56, 0x16, 0x67, 0x62, 0x9e, 0x1f, 0x16, 0xd7, 0xa9, 0xff,
+	0x61, 0x5c, 0x0b, 0x7f, 0x9c, 0x80, 0xb9, 0xbe, 0x54, 0x45, 0x17, 0x61, 0x46, 0x38, 0x6d, 0x6a,
+	0x7c, 0xc6, 0x3c, 0xaa, 0xe3, 0x95, 0x0e, 0x05, 0x2f, 0x98, 0x47, 0xd1, 0xf7, 0x20, 0x6b, 0x53,
+	0x66, 0xb8, 0xcc, 0x94, 0x37, 0x5d, 0x47, 0xeb, 0x7c, 0xb4, 0x1b, 0xc9, 0x0e, 0x0d, 0x22, 0x1a,
+	0x9e, 0x8d, 0x33, 0x36, 0x65, 0x0d, 0xad, 0x87, 0xaa, 0x90, 0xd6, 0x2c, 0x15, 0x3a, 0x29, 0x8c,
+	0xc1, 0xf2, 0xc8, 0x13, 0x54, 0x94, 0x01, 0xee, 0x5a, 0xa2, 0x6f, 0xc1, 0xac, 0x4f, 0x39, 0x15,
+	0x46, 0x17, 0x2b, 0xf4, 0x5b, 0x1a, 0x9f, 0x95, 0xd2, 0x4a, 0xa4, 0x66, 0xc1, 0xfc, 0x00, 0xd6,
+	0x8a, 0x82, 0x3f, 0xda, 0x75, 0x9a, 0x05, 0x6a, 0xd2, 0x76, 0xfb, 0xb0, 0x43, 0x31, 0xe2, 0xfd,
+	0x22, 0x8e, 0x6e, 0xc3, 0x74, 0x87, 0x1c, 0xba, 0x8c, 0x58, 0x3a, 0x26, 0x17, 0x22, 0xe0, 0x88,
+	0xf0, 0x8a, 0x4d, 0x49, 0x78, 0x38, 0xd2, 0x43, 0xb7, 0x60, 0xfe, 0x95, 0xc7, 0x0e, 0x5c, 0x6a,
+	0xd9, 0xd4, 0xd8, 0x21, 0x9c, 0x1a, 0x1e, 0x69, 0x53, 0x9e, 0xcf, 0x5e, 0x4d, 0x2d, 0xcf, 0x60,
+	0xd4, 0x9d, 0x5b, 0x25, 0x9c, 0x6e, 0x84, 0x33, 0xe8, 0x57, 0x09, 0xb8, 0xc6, 0xc3, 0x43, 0xb4,
+	0xa9, 0x27, 0x0c, 0xe2, 0x11, 0xf7, 0x90, 0x3b, 0xdc, 0xf0, 0x15, 0xc1, 0x45, 0x39, 0x01, 0x72,
+	0xfd, 0xfb, 0x63, 0x1c, 0x4c, 0x23, 0x95, 0x35, 0x90, 0x26, 0x4a, 0x9d, 0x20, 0x97, 0xf9, 0x89,
+	0xf3, 0x85, 0x7f, 0x24, 0x00, 0x7a, 0x24, 0x84, 0x9e, 0x42, 0xf6, 0x48, 0x66, 0x26, 0xe4, 0x2e,
+	0x6e, 0x8f, 0xdc, 0x45, 0xdd, 0x3b, 0x9a, 0x85, 0x8f, 0xce, 0xe0, 0x0c, 0x89, 0x91, 0xcd, 0x03,
+	0x98, 0x08, 0xe3, 0xa8, 0x73, 0xeb, 0xc6, 0x48, 0xbc, 0x6d, 0xfa, 0x5a, 0x48, 0xcc, 0x47, 0x67,
+	0xb0, 0xb4, 0x44, 0x15, 0x98, 0xa4, 0xfb, 0xd4, 0x1b, 0x9f, 0x5a, 0x6b, 0xa1, 0x76, 0x84, 0xa1,
+	0x6c, 0x57, 0xa7, 0x61, 0x52, 0x12, 0x5c, 0xe1, 0x97, 0x69, 0xc8, 0xc4, 0xee, 0x3d, 0xba, 0x04,
+	0x8a, 0x7e, 0x0d, 0xb9, 0x4b, 0x75, 0x43, 0x66, 0xa4, 0x24, 0xdc, 0x09, 0xba, 0x0e, 0x67, 0x5d,
+	0xe2, 0xd9, 0x01, 0xb1, 0xa9, 0x61, 0x32, 0x8b, 0xe6, 0xe7, 0xa4, 0x46, 0x36, 0x12, 0x56, 0x98,
+	0x45, 0xd1, 0x2a, 0x5c, 0xe2, 0x1d, 0x4a, 0xcd, 0x5d, 0xc3, 0xa7, 0x26, 0xb3, 0x3d, 0x27, 0xbc,
+	0x25, 0xca, 0x91, 0x16, 0xf5, 0x4c, 0x2a, 0x0f, 0x9f, 0xc4, 0x17, 0x95, 0x12, 0xee, 0xe9, 0x54,
+	0xba, 0x2a, 0xe8, 0x1d, 0x98, 0x22, 0xa6, 0xbc, 0x85, 0x29, 0xb9, 0x82, 0x1e, 0xa1, 0xef, 0x03,
+	0x74, 0xba, 0xd7, 0x59, 0xbf, 0x03, 0x43, 0x73, 0x33, 0xa6, 0x8a, 0xee, 0xc1, 0x45, 0xe2, 0xba,
+	0x32, 0xb9, 0x1c, 0x9f, 0x5a, 0xfa, 0xcd, 0x33, 0x3a, 0xe1, 0xed, 0xf2, 0x84, 0x64, 0xfd, 0x34,
+	0xce, 0x13, 0xd7, 0xc5, 0x5a, 0x43, 0xbd, 0x67, 0x5b, 0x6a, 0x1e, 0xbd, 0x0f, 0xb9, 0x56, 0xe0,
+	0xb6, 0x1c, 0xd7, 0x95, 0xc9, 0x2a, 0xbd, 0x33, 0x25, 0x77, 0x36, 0x17, 0x93, 0x4b, 0x1f, 0xed,
+	0xc0, 0x7c, 0x5c, 0xb5, 0x4d, 0x39, 0x27, 0x36, 0xe5, 0xf9, 0x69, 0x79, 0x43, 0x4b, 0x63, 0xa4,
+	0x90, 0x2c, 0x61, 0xd6, 0x95, 0x1d, 0x3e, 0x1f, 0x03, 0xd3, 0x32, 0x49, 0x16, 0x5d, 0x76, 0x96,
+	0xf5, 0x5a, 0x3e, 0x2d, 0x37, 0xd3, 0x65, 0x62, 0x29, 0x44, 0x0f, 0x60, 0x2e, 0x52, 0x8b, 0xae,
+	0xf3, 0xcc, 0xc9, 0x2e, 0x8b, 0x60, 0xb7, 0xf4, 0xad, 0x7e, 0x0c, 0x73, 0x9a, 0xa8, 0xbb, 0xb4,
+	0x04, 0xa7, 0xa4, 0xb8, 0x59, 0x05, 0xd0, 0x65, 0xb0, 0xfb, 0x30, 0xa5, 0xaa, 0xb4, 0x7c, 0x46,
+	0xee, 0xe5, 0xbd, 0x31, 0x3d, 0x82, 0xb5, 0x19, 0xfa, 0x04, 0x2e, 0xaa, 0x5f, 0x86, 0x25, 0x5f,
+	0xe5, 0xbe, 0xec, 0xca, 0xca, 0xec, 0x5a, 0x50, 0x2a, 0xd5, 0x48, 0x23, 0x96, 0x5b, 0x0f, 0x60,
+	0xce, 0x72, 0x88, 0xed, 0x31, 0x2e, 0x1c, 0xd3, 0x70, 0xbc, 0x16, 0xcb, 0xcf, 0x8e, 0xf0, 0x4a,
+	0x4f, 0xbf, 0xee, 0xb5, 0x18, 0x12, 0xb0, 0x30, 0x90, 0xb8, 0xe4, 0x23, 0x7f, 0x4e, 0x62, 0x7d,
+	0xf4, 0x26, 0x84, 0xa5, 0x9e, 0x64, 0x3e, 0x78, 0x02, 0x7d, 0x0a, 0xe7, 0x7a, 0x0c, 0x4b, 0x3c,
+	0x7e, 0x10, 0x5e, 0x01, 0x34, 0x26, 0x31, 0xfd, 0x20, 0xb2, 0x2c, 0x2b, 0x43, 0x9c, 0x7b, 0xd5,
+	0x27, 0x29, 0x7c, 0x95, 0x82, 0x5c, 0xbf, 0x1a, 0xc2, 0x30, 0x1d, 0x2d, 0x95, 0x90, 0x81, 0xff,
+	0xe8, 0xd4, 0x4b, 0x15, 0xd5, 0x5f, 0x1c, 0x01, 0x2d, 0xfe, 0x36, 0x05, 0x53, 0x4a, 0x16, 0x26,
+	0x83, 0x4e, 0x60, 0x55, 0xc4, 0xbe, 0xf7, 0x65, 0xf9, 0x9b, 0x50, 0x18, 0x5e, 0xc4, 0x56, 0x99,
+	0x19, 0xb4, 0x65, 0x32, 0x28, 0xb3, 0xb0, 0xd8, 0x68, 0x91, 0x3d, 0x43, 0x52, 0x79, 0xf4, 0x68,
+	0xcf, 0xe0, 0x4c, 0x8b, 0xec, 0x3d, 0xd6, 0x22, 0xc9, 0x25, 0x72, 0xb5, 0x2e, 0x97, 0xa8, 0xb5,
+	0x7f, 0x91, 0x80, 0x77, 0xda, 0x44, 0x98, 0xbb, 0xb1, 0xec, 0x31, 0x5c, 0xba, 0x4f, 0x5d, 0x49,
+	0x2c, 0xb3, 0x2b, 0xeb, 0x6f, 0x7a, 0xd4, 0xe2, 0x7a, 0x08, 0xdb, 0x4b, 0xb9, 0x46, 0x08, 0x8a,
+	0xe7, 0xdb, 0x03, 0xa4, 0x21, 0xb3, 0xf4, 0x6f, 0x42, 0xb2, 0x51, 0x12, 0xcf, 0xf5, 0xe9, 0x17,
+	0x7e, 0x0c, 0xf3, 0x83, 0x80, 0xd1, 0xbb, 0x50, 0x58, 0x2f, 0x6f, 0x57, 0x1e, 0x19, 0x95, 0xcd,
+	0x8d, 0x87, 0xf5, 0x6a, 0x6d, 0xa3, 0x52, 0x33, 0x1a, 0xb5, 0xa7, 0xb5, 0x86, 0xf1, 0x64, 0xa3,
+	0xb9, 0x55, 0xab, 0xd4, 0x1f, 0xd6, 0x6b, 0xd5, 0xdc, 0x19, 0x34, 0x0d, 0xa9, 0xc6, 0xe6, 0xb3,
+	0x5c, 0x02, 0x01, 0x4c, 0xad, 0xd7, 0xaa, 0xf5, 0x27, 0xeb, 0xb9, 0x24, 0x4a, 0xc3, 0xc4, 0xa3,
+	0xfa, 0xda, 0xa3, 0x5c, 0xaa, 0xf0, 0xeb, 0x14, 0x2c, 0x35, 0x85, 0x4f, 0x49, 0xdb, 0xf1, 0xec,
+	0x41, 0x2d, 0x47, 0xbe, 0xaf, 0xe5, 0xf8, 0x5a, 0xb5, 0x12, 0xef, 0x43, 0x8e, 0x3b, 0x9e, 0xed,
+	0x52, 0x23, 0x10, 0x82, 0xfa, 0x24, 0xf4, 0xb3, 0xaa, 0xb0, 0xe6, 0x94, 0xfc, 0x49, 0x24, 0x1e,
+	0x56, 0x9d, 0x4e, 0xbe, 0xc5, 0xae, 0x63, 0xea, 0x58, 0xd7, 0xf1, 0x87, 0x09, 0xb8, 0x34, 0x24,
+	0x1a, 0xe3, 0xb6, 0x1f, 0x2f, 0x01, 0xc5, 0x5f, 0xe0, 0x23, 0x4d, 0xc8, 0xdd, 0xd1, 0xfc, 0x14,
+	0x2d, 0x1e, 0x7b, 0xa1, 0x35, 0x45, 0x9d, 0xf3, 0xfb, 0x45, 0xc7, 0x5a, 0x9d, 0xd4, 0x5b, 0x6d,
+	0x75, 0xa6, 0xdf, 0x6e, 0xab, 0x33, 0xf1, 0xa6, 0xad, 0xce, 0xe4, 0xff, 0xa7, 0xd5, 0xf9, 0x2a,
+	0x05, 0x8b, 0xc3, 0xc3, 0x85, 0x5e, 0x42, 0x56, 0x57, 0x21, 0xb2, 0x59, 0x90, 0x99, 0x32, 0xbb,
+	0xb2, 0xf6, 0x5f, 0x64, 0x40, 0x54, 0x9d, 0xc8, 0x06, 0x22, 0xd3, 0xee, 0x0d, 0xd0, 0x65, 0x00,
+	0xe1, 0x13, 0x8f, 0x9b, 0xbe, 0xd3, 0x11, 0x9a, 0x8d, 0x63, 0x12, 0xb4, 0x00, 0x69, 0x87, 0x1b,
+	0x2d, 0xc7, 0x23, 0xae, 0xcc, 0x91, 0x34, 0x9e, 0x76, 0xf8, 0xc3, 0x70, 0x18, 0x9a, 0xc6, 0x38,
+	0x70, 0x42, 0x72, 0x60, 0x4c, 0x82, 0x96, 0x60, 0x86, 0x0b, 0xb2, 0xe3, 0xb8, 0x8e, 0x38, 0x94,
+	0xfe, 0x4b, 0xe2, 0x9e, 0x00, 0x3d, 0x87, 0x9c, 0xae, 0x3a, 0x0f, 0x98, 0x6f, 0xa9, 0x67, 0x7d,
+	0xdc, 0x92, 0xab, 0x29, 0x0d, 0x9f, 0x31, 0xdf, 0x0a, 0x9f, 0x77, 0x3c, 0xcb, 0x8f, 0x8c, 0x51,
+	0x0d, 0xce, 0x69, 0x68, 0xea, 0x59, 0x06, 0x6b, 0xb5, 0x38, 0x15, 0xb2, 0xe0, 0xca, 0xac, 0x2c,
+	0x1c, 0x2b, 0x19, 0xaa, 0xfa, 0x43, 0x11, 0x9e, 0x53, 0x36, 0x35, 0xcf, 0xda, 0x94, 0x16, 0x85,
+	0x1f, 0x42, 0x26, 0xe6, 0x36, 0xb4, 0x04, 0xf9, 0xf5, 0x5a, 0xb3, 0x59, 0x5e, 0xab, 0x19, 0xdb,
+	0xcf, 0xb7, 0x6a, 0x7d, 0x5c, 0x3d, 0x0b, 0xb0, 0x8d, 0xcb, 0x1b, 0xcd, 0x0a, 0xae, 0x6f, 0x6d,
+	0xe7, 0x12, 0xe8, 0x22, 0x5c, 0xa8, 0x6d, 0x54, 0x8d, 0xcd, 0x87, 0x46, 0xb3, 0xbe, 0xb1, 0xd6,
+	0xa8, 0x19, 0x4f, 0xb6, 0xb7, 0x6b, 0xb8, 0xbc, 0x51, 0xa9, 0xe5, 0x92, 0x85, 0x2a, 0xcc, 0x74,
+	0x1b, 0x05, 0x84, 0x74, 0x8b, 0xa1, 0xf8, 0x40, 0x35, 0x0d, 0xc7, 0xea, 0xf6, 0xe4, 0xf1, 0xba,
+	0xbd, 0xf0, 0x33, 0x80, 0x5e, 0xaf, 0x10, 0xc2, 0x84, 0x0d, 0x5c, 0x04, 0x13, 0xfe, 0xee, 0xab,
+	0xbe, 0x93, 0xe3, 0x57, 0xdf, 0xc7, 0xd6, 0x4f, 0x0d, 0x58, 0x9f, 0xc0, 0xe5, 0x93, 0x9b, 0x38,
+	0x74, 0x1f, 0x96, 0x64, 0xb5, 0xf5, 0x59, 0xc4, 0x07, 0xe1, 0xe1, 0x8c, 0x6e, 0xbd, 0x24, 0xf7,
+	0x9a, 0xc6, 0x0b, 0x5a, 0xe7, 0x71, 0xd4, 0xb6, 0x74, 0x51, 0x0b, 0x07, 0x70, 0x61, 0x48, 0xd9,
+	0x85, 0x7e, 0x04, 0xf3, 0x43, 0x31, 0xc7, 0xe9, 0xd4, 0xba, 0xb8, 0x18, 0xed, 0x1d, 0x5f, 0xf8,
+	0x3e, 0xcc, 0x74, 0x07, 0x68, 0x1e, 0x26, 0xb9, 0xc9, 0x7c, 0xe5, 0xdb, 0x24, 0x56, 0x83, 0x30,
+	0xbd, 0xdb, 0x24, 0xbc, 0x65, 0x81, 0x15, 0xb5, 0x48, 0x3d, 0xc1, 0xca, 0x3f, 0x27, 0x21, 0xad,
+	0x7b, 0x77, 0x8e, 0xfe, 0x9a, 0x82, 0x6c, 0xfc, 0x49, 0x40, 0xdf, 0x19, 0xb9, 0xbd, 0x01, 0xef,
+	0xf9, 0xe2, 0x77, 0x4f, 0x69, 0xa5, 0x1e, 0x96, 0xc2, 0x17, 0xc9, 0x9f, 0x7f, 0xf1, 0xf7, 0xdf,
+	0x24, 0xff, 0x92, 0x2c, 0xdc, 0xed, 0x7e, 0x49, 0xfd, 0x89, 0xae, 0x04, 0xee, 0x75, 0x7c, 0xf6,
+	0x92, 0x9a, 0x82, 0x97, 0x6e, 0xa8, 0x6f, 0xc3, 0xd1, 0x37, 0x56, 0x5e, 0xba, 0xf1, 0xd3, 0x3b,
+	0x56, 0x0c, 0xee, 0x4e, 0xe2, 0xc6, 0x8b, 0x67, 0x05, 0x3c, 0x06, 0x02, 0xf5, 0xf6, 0x1d, 0x9f,
+	0x79, 0xa1, 0xeb, 0x42, 0x61, 0xc0, 0xa9, 0x1f, 0xfe, 0x3d, 0x09, 0xb8, 0x51, 0x58, 0x3b, 0x11,
+	0x38, 0xfa, 0xc6, 0x33, 0xde, 0x36, 0xcd, 0xc2, 0xa7, 0xa7, 0x44, 0x3b, 0xfd, 0x96, 0xd1, 0xef,
+	0x12, 0xf0, 0x8d, 0x81, 0xef, 0x3d, 0xba, 0x37, 0x3e, 0x51, 0x0f, 0x8a, 0xf2, 0x27, 0x6f, 0x6a,
+	0xae, 0xc3, 0x7d, 0x66, 0x39, 0x71, 0x2b, 0xb1, 0xf8, 0xfa, 0xcf, 0xe5, 0x85, 0xa1, 0x65, 0xf9,
+	0xdf, 0xca, 0xcf, 0x77, 0x85, 0xe8, 0xf0, 0x3b, 0xa5, 0xd2, 0xc1, 0xc1, 0xb1, 0x9a, 0x9d, 0x04,
+	0x62, 0x57, 0x7d, 0x83, 0xff, 0xb0, 0xe3, 0x12, 0xd1, 0x62, 0x7e, 0xfb, 0xe6, 0x28, 0xf5, 0xde,
+	0x52, 0xab, 0x9f, 0x27, 0xe0, 0xba, 0xc9, 0xda, 0xa3, 0x4e, 0xb1, 0x9a, 0xd5, 0xd7, 0x63, 0x2b,
+	0xe4, 0xa1, 0xad, 0xc4, 0x8b, 0xba, 0x36, 0xb0, 0x59, 0xc8, 0x32, 0x45, 0xe6, 0xdb, 0x25, 0x9b,
+	0x7a, 0x92, 0xa5, 0x4a, 0xbd, 0x25, 0x87, 0xfe, 0x73, 0xe0, 0x6e, 0x4f, 0xf4, 0xaf, 0x44, 0xe2,
+	0xf7, 0xc9, 0x64, 0xf5, 0xe1, 0xe7, 0xc9, 0x2b, 0x6b, 0x0a, 0xb3, 0x22, 0x37, 0x51, 0xed, 0x6d,
+	0xe2, 0xa9, 0x32, 0xda, 0x99, 0x92, 0xf8, 0xdf, 0xfe, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x56,
+	0x3b, 0xcc, 0x6d, 0xe3, 0x19, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -997,8 +1712,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for Sessions service
-
+// SessionsClient is the client API for Sessions service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type SessionsClient interface {
 	// Processes a natural language query and returns structured, actionable data
 	// as a result. This method is not idempotent, because it may cause contexts
@@ -1021,7 +1737,7 @@ func NewSessionsClient(cc *grpc.ClientConn) SessionsClient {
 
 func (c *sessionsClient) DetectIntent(ctx context.Context, in *DetectIntentRequest, opts ...grpc.CallOption) (*DetectIntentResponse, error) {
 	out := new(DetectIntentResponse)
-	err := grpc.Invoke(ctx, "/google.cloud.dialogflow.v2beta1.Sessions/DetectIntent", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/google.cloud.dialogflow.v2beta1.Sessions/DetectIntent", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1029,7 +1745,7 @@ func (c *sessionsClient) DetectIntent(ctx context.Context, in *DetectIntentReque
 }
 
 func (c *sessionsClient) StreamingDetectIntent(ctx context.Context, opts ...grpc.CallOption) (Sessions_StreamingDetectIntentClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_Sessions_serviceDesc.Streams[0], c.cc, "/google.cloud.dialogflow.v2beta1.Sessions/StreamingDetectIntent", opts...)
+	stream, err := c.cc.NewStream(ctx, &_Sessions_serviceDesc.Streams[0], "/google.cloud.dialogflow.v2beta1.Sessions/StreamingDetectIntent", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1059,8 +1775,7 @@ func (x *sessionsStreamingDetectIntentClient) Recv() (*StreamingDetectIntentResp
 	return m, nil
 }
 
-// Server API for Sessions service
-
+// SessionsServer is the server API for Sessions service.
 type SessionsServer interface {
 	// Processes a natural language query and returns structured, actionable data
 	// as a result. This method is not idempotent, because it may cause contexts
@@ -1071,6 +1786,17 @@ type SessionsServer interface {
 	// and returns structured, actionable data as a result. This method is only
 	// available via the gRPC API (not REST).
 	StreamingDetectIntent(Sessions_StreamingDetectIntentServer) error
+}
+
+// UnimplementedSessionsServer can be embedded to have forward compatible implementations.
+type UnimplementedSessionsServer struct {
+}
+
+func (*UnimplementedSessionsServer) DetectIntent(ctx context.Context, req *DetectIntentRequest) (*DetectIntentResponse, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method DetectIntent not implemented")
+}
+func (*UnimplementedSessionsServer) StreamingDetectIntent(srv Sessions_StreamingDetectIntentServer) error {
+	return status1.Errorf(codes.Unimplemented, "method StreamingDetectIntent not implemented")
 }
 
 func RegisterSessionsServer(s *grpc.Server, srv SessionsServer) {
@@ -1139,109 +1865,4 @@ var _Sessions_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Metadata: "google/cloud/dialogflow/v2beta1/session.proto",
-}
-
-func init() { proto.RegisterFile("google/cloud/dialogflow/v2beta1/session.proto", fileDescriptor4) }
-
-var fileDescriptor4 = []byte{
-	// 1580 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x57, 0x3f, 0x73, 0x1b, 0xc7,
-	0x15, 0xd7, 0x81, 0xff, 0x1f, 0x40, 0x12, 0x5e, 0xc9, 0xd6, 0x89, 0x94, 0x2c, 0x05, 0x1e, 0x4f,
-	0x28, 0xc6, 0x01, 0x2c, 0x26, 0x71, 0xc6, 0xd6, 0xc8, 0x11, 0x08, 0x1c, 0x49, 0xcc, 0x80, 0x20,
-	0xbc, 0x00, 0x2d, 0xdb, 0xcd, 0xce, 0xf2, 0xb0, 0x38, 0x9e, 0x72, 0xd8, 0x3d, 0xde, 0x2e, 0x6c,
-	0xd3, 0x99, 0xa4, 0xc8, 0x57, 0x48, 0x97, 0x32, 0x4d, 0x66, 0xdc, 0xa6, 0x49, 0x93, 0xca, 0x1f,
-	0x21, 0x75, 0xba, 0x94, 0x49, 0x95, 0x14, 0x99, 0x49, 0x93, 0xb9, 0xdd, 0x3d, 0x00, 0x02, 0x29,
-	0x03, 0x4a, 0x52, 0xb9, 0xc3, 0xbe, 0xf7, 0x7b, 0x6f, 0xdf, 0x7b, 0xf7, 0x7b, 0xef, 0x2d, 0xe0,
-	0x87, 0x81, 0x10, 0x41, 0xc4, 0x2a, 0x7e, 0x24, 0x86, 0xbd, 0x4a, 0x2f, 0xa4, 0x91, 0x08, 0xfa,
-	0x91, 0xf8, 0xa2, 0xf2, 0xf9, 0xde, 0x19, 0x53, 0xf4, 0x51, 0x45, 0x32, 0x29, 0x43, 0xc1, 0xcb,
-	0x71, 0x22, 0x94, 0x40, 0xf7, 0x0d, 0xbc, 0xac, 0xe1, 0xe5, 0x31, 0xbc, 0x6c, 0xe1, 0x5b, 0x77,
-	0xad, 0x3f, 0x1a, 0x87, 0x15, 0xca, 0xb9, 0x50, 0x54, 0x85, 0x82, 0x4b, 0x63, 0xbe, 0x35, 0xf3,
-	0x36, 0x5f, 0x70, 0xc5, 0xbe, 0x54, 0x16, 0xfe, 0xce, 0x2c, 0x78, 0xc8, 0x15, 0xe3, 0x19, 0xfa,
-	0xfd, 0x39, 0x53, 0x21, 0x8c, 0xab, 0x50, 0x5d, 0x12, 0x75, 0x19, 0x33, 0x6b, 0x9a, 0x45, 0xad,
-	0x4f, 0x67, 0xc3, 0x7e, 0x45, 0xaa, 0x64, 0xe8, 0x67, 0x8e, 0x6f, 0x5b, 0x6d, 0x12, 0xfb, 0x15,
-	0xa9, 0xa8, 0x1a, 0x66, 0xe9, 0xb8, 0x56, 0x91, 0x7a, 0xaa, 0x44, 0x54, 0x45, 0x3c, 0x30, 0x9a,
-	0xd2, 0x3f, 0x1c, 0xb8, 0x59, 0x67, 0x8a, 0xf9, 0xaa, 0xa1, 0x43, 0xc4, 0xec, 0x62, 0xc8, 0xa4,
-	0x42, 0x2e, 0xac, 0xd8, 0x28, 0x5c, 0xe7, 0x81, 0xb3, 0xb3, 0x86, 0xb3, 0x23, 0xea, 0x40, 0xe1,
-	0x62, 0xc8, 0x92, 0x4b, 0x12, 0xd3, 0x84, 0x0e, 0xa4, 0x9b, 0x7b, 0xe0, 0xec, 0xe4, 0xf7, 0xde,
-	0x2d, 0xcf, 0x28, 0x78, 0xf9, 0xa3, 0xd4, 0xa8, 0x9d, 0xda, 0x30, 0xc5, 0x12, 0x89, 0xf3, 0x17,
-	0x23, 0x81, 0x44, 0x4d, 0x30, 0x47, 0x12, 0xf2, 0x78, 0xa8, 0xdc, 0x05, 0xed, 0xf3, 0x07, 0xf3,
-	0xf9, 0x6c, 0xa4, 0x26, 0x18, 0x2e, 0x46, 0xbf, 0xd1, 0x7d, 0xc8, 0x6b, 0x3f, 0x84, 0x0e, 0x7b,
-	0xa1, 0x70, 0x97, 0x1e, 0x38, 0x3b, 0x05, 0x0c, 0x5a, 0x54, 0x4d, 0x25, 0xa5, 0x6f, 0x1c, 0xb8,
-	0xf5, 0x62, 0xd6, 0x32, 0x16, 0x5c, 0xb2, 0xd4, 0x32, 0xb1, 0xbf, 0x49, 0xd8, 0xb3, 0xa9, 0x43,
-	0x26, 0x6a, 0xf4, 0xd0, 0x49, 0x96, 0x7d, 0xc2, 0xe4, 0x30, 0x52, 0x36, 0xfb, 0x77, 0xe6, 0x8b,
-	0x14, 0x6b, 0x1b, 0x9b, 0xb9, 0x39, 0xa0, 0xf7, 0x61, 0xe3, 0x0b, 0x76, 0x76, 0x2e, 0xc4, 0xcf,
-	0x89, 0xf9, 0x64, 0x36, 0x79, 0x94, 0xb9, 0x4c, 0x62, 0xbf, 0xdc, 0xd1, 0x1a, 0xbc, 0x6e, 0x91,
-	0xe6, 0x58, 0xfa, 0x5b, 0x0e, 0x36, 0xa7, 0xaa, 0x8a, 0xb6, 0x61, 0x4d, 0x85, 0x03, 0x46, 0xbe,
-	0x12, 0x9c, 0xd9, 0xf0, 0x57, 0x53, 0xc1, 0x67, 0x82, 0x33, 0xf4, 0x1e, 0x14, 0x02, 0x26, 0x48,
-	0x24, 0x7c, 0x4d, 0x76, 0x1b, 0xfc, 0xcd, 0xec, 0x26, 0xcd, 0xb3, 0x26, 0x55, 0x4d, 0x1e, 0xe0,
-	0x7c, 0xc0, 0x44, 0xd3, 0xe2, 0x50, 0x1d, 0x56, 0x2d, 0xdf, 0xd3, 0xe8, 0x16, 0x76, 0xf2, 0x7b,
-	0x3b, 0x33, 0x13, 0xae, 0x19, 0x03, 0x3c, 0xb2, 0x44, 0x6f, 0xc3, 0x46, 0xc2, 0x24, 0x53, 0x64,
-	0xe4, 0x6b, 0xf1, 0x81, 0xb3, 0xb3, 0x8a, 0xd7, 0xb5, 0xb4, 0x96, 0xc1, 0x7a, 0x70, 0xeb, 0x1a,
-	0xfe, 0x4b, 0x77, 0x49, 0x5f, 0xbc, 0x37, 0xf3, 0xe2, 0x8e, 0x31, 0xf6, 0xb4, 0x6d, 0xf7, 0x32,
-	0x66, 0x18, 0xc9, 0x69, 0x91, 0x44, 0x8f, 0x60, 0x25, 0xa6, 0x97, 0x91, 0xa0, 0x3d, 0x77, 0x59,
-	0x57, 0xe1, 0x76, 0xe6, 0x38, 0x6b, 0xad, 0x72, 0x47, 0xb7, 0x16, 0xce, 0x70, 0xa5, 0x7f, 0x3a,
-	0x00, 0x63, 0xc2, 0xa1, 0x8f, 0xa1, 0xa0, 0xe9, 0x95, 0xa6, 0xd3, 0x0f, 0x03, 0x5d, 0xec, 0xfc,
-	0xde, 0xa3, 0x99, 0xf1, 0x35, 0x46, 0x34, 0xac, 0x69, 0xc3, 0xa3, 0x1b, 0x38, 0x4f, 0xc7, 0x47,
-	0xf4, 0x14, 0x16, 0xd3, 0x42, 0xd8, 0x8f, 0xb3, 0x3b, 0xd3, 0x5f, 0x97, 0x7d, 0xa9, 0xb4, 0xcf,
-	0xa3, 0x1b, 0x58, 0x5b, 0xa2, 0x1a, 0x2c, 0xb1, 0xcf, 0x19, 0x9f, 0xbf, 0x8d, 0xbc, 0x14, 0x9d,
-	0xf9, 0x30, 0xb6, 0xfb, 0x2b, 0xb0, 0xa4, 0x1b, 0xa6, 0xf4, 0x87, 0x65, 0xc8, 0x4f, 0xb0, 0x17,
-	0xdd, 0x03, 0xd3, 0x6a, 0x44, 0x47, 0x69, 0x28, 0xb6, 0xa6, 0x25, 0x69, 0x24, 0xe8, 0x2d, 0x58,
-	0x8f, 0x28, 0x0f, 0x86, 0x34, 0x60, 0xc4, 0x17, 0x3d, 0xe6, 0x6e, 0x6a, 0x44, 0x21, 0x13, 0xd6,
-	0x44, 0x8f, 0xa1, 0x7d, 0xb8, 0x27, 0x63, 0xc6, 0xfc, 0x73, 0x92, 0x30, 0x5f, 0x04, 0x3c, 0x4c,
-	0x69, 0x66, 0x0a, 0xd9, 0x63, 0xdc, 0x67, 0x3a, 0xf9, 0x1c, 0xde, 0x36, 0x20, 0x3c, 0xc6, 0xd4,
-	0x46, 0x10, 0xf4, 0x06, 0x2c, 0x53, 0x5f, 0xd3, 0x78, 0x41, 0xdf, 0x60, 0x4f, 0xe8, 0xa7, 0x00,
-	0xf1, 0xa8, 0x1f, 0x34, 0xc5, 0xbe, 0xe5, 0xe3, 0x4e, 0x40, 0xd1, 0x13, 0xd8, 0xa6, 0x51, 0x44,
-	0x12, 0x76, 0x31, 0x0c, 0x13, 0xd6, 0xb3, 0xf3, 0x8d, 0xc4, 0x29, 0x3d, 0xb9, 0xd2, 0x53, 0x64,
-	0x15, 0xbb, 0x34, 0x8a, 0xb0, 0x45, 0x98, 0xd9, 0xd5, 0x36, 0x7a, 0xf4, 0x10, 0x8a, 0xfd, 0x61,
-	0xd4, 0x0f, 0xa3, 0x68, 0xc0, 0xb8, 0x32, 0xd5, 0x59, 0xd6, 0x91, 0x6d, 0x4e, 0xc8, 0x75, 0x8d,
-	0xce, 0xe0, 0xd6, 0x24, 0x74, 0xc0, 0xa4, 0xa4, 0x01, 0x93, 0xee, 0x8a, 0xa6, 0x78, 0x65, 0x0e,
-	0x0a, 0xe9, 0x6d, 0x72, 0x6c, 0xec, 0xf0, 0xcd, 0x09, 0x67, 0x56, 0xa6, 0xbb, 0x6d, 0x34, 0x57,
-	0xc4, 0x30, 0xf1, 0x99, 0xbb, 0xaa, 0x83, 0x19, 0xcd, 0x10, 0x2d, 0x44, 0x4f, 0x61, 0x33, 0x83,
-	0x65, 0xfd, 0xb0, 0xf6, 0xed, 0x25, 0xcb, 0xdc, 0xb6, 0x0d, 0x1c, 0x7d, 0x04, 0x9b, 0x62, 0xa8,
-	0xd2, 0x69, 0x3b, 0xea, 0x6b, 0x78, 0xc5, 0x19, 0xb1, 0x61, 0x1c, 0x8c, 0x46, 0xc0, 0xcf, 0x60,
-	0xd9, 0x2c, 0x4c, 0x37, 0xaf, 0x63, 0xf9, 0xfe, 0x9c, 0x15, 0xc1, 0xd6, 0x0c, 0x7d, 0x08, 0xdb,
-	0xe6, 0x17, 0xe9, 0xe9, 0x29, 0x3f, 0xc5, 0xae, 0x82, 0x66, 0xd7, 0x1d, 0x03, 0xa9, 0x67, 0x88,
-	0x09, 0x6e, 0x3d, 0x85, 0xcd, 0x5e, 0x48, 0x03, 0x2e, 0xa4, 0x0a, 0x7d, 0x12, 0xf2, 0xbe, 0x70,
-	0x37, 0x66, 0x54, 0x65, 0x8c, 0x6f, 0xf0, 0xbe, 0x28, 0xfd, 0x3e, 0x07, 0x77, 0x3b, 0x2a, 0x61,
-	0x74, 0x10, 0xf2, 0xe0, 0x3b, 0xb7, 0x60, 0x1f, 0x42, 0x51, 0x86, 0x3c, 0x88, 0x18, 0x19, 0x2a,
-	0xc5, 0x12, 0x9a, 0x16, 0xd5, 0x0c, 0xf3, 0x4d, 0x23, 0x3f, 0xcd, 0xc4, 0xd3, 0xbb, 0x78, 0xf9,
-	0xca, 0x2e, 0xfe, 0x63, 0x0e, 0xee, 0xbd, 0xa4, 0x52, 0xf3, 0x2e, 0xe5, 0xe7, 0x80, 0x26, 0xe7,
-	0xc8, 0x0b, 0xab, 0xf9, 0xf1, 0xec, 0x85, 0x91, 0x5d, 0x3e, 0x31, 0x67, 0xec, 0xa6, 0x7e, 0x2d,
-	0x99, 0x16, 0x5d, 0x79, 0x00, 0x2c, 0xfc, 0xff, 0x1f, 0x00, 0x8b, 0xf3, 0x3e, 0x00, 0xfe, 0x94,
-	0x83, 0xad, 0x97, 0x47, 0x8f, 0x9e, 0x43, 0xc1, 0x8e, 0x16, 0xbd, 0x42, 0x75, 0xe1, 0x36, 0xf6,
-	0x0e, 0xff, 0x87, 0x82, 0x64, 0x23, 0x47, 0xaf, 0xd5, 0xfc, 0x60, 0x7c, 0x40, 0x6f, 0x02, 0xa8,
-	0x84, 0x72, 0xe9, 0x27, 0x61, 0x6c, 0x4a, 0xbf, 0x86, 0x27, 0x24, 0xe8, 0x0e, 0xac, 0x86, 0x92,
-	0xf4, 0x43, 0x4e, 0x23, 0x5d, 0xb2, 0x55, 0xbc, 0x12, 0xca, 0x83, 0xf4, 0x98, 0x9a, 0x4e, 0xf4,
-	0xe6, 0xa2, 0xee, 0xcd, 0x09, 0x49, 0xe9, 0x13, 0xc8, 0x4f, 0x5c, 0x8b, 0xee, 0x82, 0x7b, 0xec,
-	0x75, 0x3a, 0xd5, 0x43, 0x8f, 0x74, 0x3f, 0x6d, 0x7b, 0xe4, 0xb4, 0xd5, 0x69, 0x7b, 0xb5, 0xc6,
-	0x41, 0xc3, 0xab, 0x17, 0x6f, 0xa0, 0x0d, 0x80, 0x2e, 0xae, 0xb6, 0x3a, 0x35, 0xdc, 0x68, 0x77,
-	0x8b, 0x0e, 0xda, 0x86, 0xdb, 0x5e, 0xab, 0x4e, 0x4e, 0x0e, 0x48, 0xa7, 0xd1, 0x3a, 0x6c, 0x7a,
-	0xe4, 0xb4, 0xdb, 0xf5, 0x70, 0xb5, 0x55, 0xf3, 0x8a, 0xb9, 0xd2, 0x5f, 0x1c, 0x28, 0x4e, 0xaf,
-	0x63, 0x74, 0x0a, 0x1b, 0x66, 0xaf, 0x33, 0xee, 0x8b, 0x5e, 0xc8, 0x03, 0x5b, 0xb7, 0xf2, 0xcc,
-	0xba, 0x69, 0x2f, 0x9e, 0xb5, 0xc2, 0xeb, 0x74, 0xf2, 0x88, 0x76, 0xe1, 0x35, 0x49, 0x07, 0x71,
-	0xc4, 0x48, 0x42, 0x15, 0x23, 0xe7, 0x2c, 0x51, 0x5f, 0xe9, 0x3a, 0x2d, 0xe1, 0x4d, 0xa3, 0xc0,
-	0x54, 0xb1, 0xa3, 0x54, 0x7c, 0x75, 0x87, 0x2e, 0x5c, 0xb3, 0x43, 0xbf, 0x07, 0x85, 0xf8, 0x3c,
-	0xa1, 0x92, 0x91, 0xf3, 0x90, 0xeb, 0xc7, 0xd4, 0xc2, 0xce, 0x1a, 0xce, 0x1b, 0xd9, 0x51, 0x2a,
-	0x2a, 0xd5, 0x61, 0x6d, 0xf4, 0x3a, 0x40, 0xc8, 0xbe, 0x2b, 0x4c, 0xfb, 0x98, 0x97, 0xc2, 0x95,
-	0x8b, 0x72, 0x57, 0x2f, 0x2a, 0xfd, 0x0a, 0x60, 0xfc, 0x40, 0x48, 0xdd, 0x70, 0x3a, 0xc8, 0xde,
-	0x96, 0xfa, 0xf7, 0xd4, 0xca, 0xcd, 0xcd, 0xbf, 0x72, 0xe7, 0x49, 0x74, 0xf7, 0xdf, 0x0e, 0xac,
-	0xbf, 0x50, 0x5a, 0xf4, 0x26, 0x6c, 0x55, 0x4f, 0xeb, 0x8d, 0x13, 0xe2, 0xb5, 0x6a, 0x27, 0xf5,
-	0x46, 0xeb, 0x70, 0x8a, 0x04, 0x77, 0xc1, 0x9d, 0xd2, 0x37, 0x1b, 0x2d, 0xaf, 0x8a, 0xc9, 0xa3,
-	0xf7, 0x8a, 0x0e, 0xba, 0x0d, 0x37, 0xa7, 0xb4, 0x07, 0xcd, 0x6a, 0xad, 0x98, 0x43, 0x2e, 0xdc,
-	0x9a, 0x52, 0x1c, 0x9f, 0x36, 0xab, 0xcf, 0x8a, 0x0b, 0xe8, 0x0d, 0x40, 0x53, 0x9a, 0xea, 0x31,
-	0x2e, 0x2e, 0xa2, 0x3b, 0xf0, 0xfa, 0x55, 0x39, 0x79, 0xb6, 0x5f, 0x5c, 0x4a, 0x89, 0x37, 0xa5,
-	0x3a, 0x39, 0x3c, 0x24, 0x27, 0xed, 0xd3, 0x4e, 0x71, 0x19, 0x3d, 0x84, 0xb7, 0xa7, 0x94, 0x9d,
-	0xb6, 0xe7, 0x7d, 0x42, 0x9e, 0x35, 0xba, 0x47, 0xe4, 0xc8, 0xab, 0xd6, 0x3d, 0x4c, 0xf6, 0x3f,
-	0xed, 0x7a, 0xc5, 0x95, 0xbd, 0xbf, 0xe7, 0x60, 0xd5, 0x3e, 0x69, 0x25, 0xfa, 0xc6, 0x81, 0xc2,
-	0xe4, 0x88, 0x44, 0x3f, 0x9e, 0x49, 0xca, 0x6b, 0x76, 0xcf, 0xd6, 0x4f, 0x5e, 0xd1, 0xca, 0x0c,
-	0xda, 0xd2, 0xc1, 0xaf, 0xff, 0xfc, 0xd7, 0xdf, 0xe4, 0x9e, 0x96, 0x1e, 0x8f, 0xfe, 0xa8, 0xfe,
-	0xc2, 0xee, 0xac, 0x27, 0x71, 0x22, 0x9e, 0x33, 0x5f, 0xc9, 0xca, 0x6e, 0x85, 0x06, 0x8c, 0xab,
-	0xec, 0x2f, 0xac, 0xac, 0xec, 0xfe, 0xf2, 0x83, 0xde, 0x84, 0xb3, 0x0f, 0x9c, 0x5d, 0xf4, 0x5b,
-	0x07, 0x5e, 0xbf, 0x76, 0xe2, 0xa3, 0x27, 0xf3, 0xcf, 0xa6, 0xeb, 0xf2, 0xfa, 0xf0, 0xbf, 0x35,
-	0x37, 0x09, 0xee, 0x38, 0xef, 0x3a, 0xfb, 0x5f, 0x3b, 0xf0, 0x96, 0x2f, 0x06, 0xb3, 0x3c, 0xed,
-	0x17, 0xec, 0x47, 0x69, 0xa7, 0xf4, 0x6e, 0x3b, 0x9f, 0x35, 0xac, 0x41, 0x20, 0x52, 0xf2, 0x96,
-	0x45, 0x12, 0x54, 0x02, 0xc6, 0x35, 0xf9, 0x2b, 0x46, 0x45, 0xe3, 0x50, 0xbe, 0xf4, 0x3f, 0xff,
-	0xe3, 0xb1, 0xe8, 0x5f, 0x8e, 0xf3, 0xbb, 0x5c, 0xae, 0x7e, 0xf0, 0x75, 0xee, 0xfe, 0xa1, 0xf1,
-	0x59, 0xd3, 0x41, 0xd4, 0xc7, 0x41, 0x7c, 0x6c, 0x8c, 0xce, 0x96, 0xb5, 0xff, 0x1f, 0xfd, 0x27,
-	0x00, 0x00, 0xff, 0xff, 0x78, 0xce, 0xe5, 0x99, 0x1d, 0x11, 0x00, 0x00,
 }

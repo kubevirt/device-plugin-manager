@@ -496,7 +496,6 @@ func TestStatefulSetControllerGetStatefulSetsForPod(t *testing.T) {
 
 func TestGetPodsForStatefulSetAdopt(t *testing.T) {
 	set := newStatefulSet(5)
-	ssc, spc := newFakeStatefulSetController(set)
 	pod1 := newStatefulSetPod(set, 1)
 	// pod2 is an orphan with matching labels and name.
 	pod2 := newStatefulSetPod(set, 2)
@@ -509,6 +508,8 @@ func TestGetPodsForStatefulSetAdopt(t *testing.T) {
 	pod4 := newStatefulSetPod(set, 4)
 	pod4.OwnerReferences = nil
 	pod4.Name = "x" + pod4.Name
+
+	ssc, spc := newFakeStatefulSetController(set, pod1, pod2, pod3, pod4)
 
 	spc.podsIndexer.Add(pod1)
 	spc.podsIndexer.Add(pod2)
@@ -647,11 +648,11 @@ func scaleUpStatefulSetController(set *apps.StatefulSet, ssc *StatefulSetControl
 		if err := assertMonotonicInvariants(set, spc); err != nil {
 			return err
 		}
-		if obj, _, err := spc.setsIndexer.Get(set); err != nil {
+		obj, _, err := spc.setsIndexer.Get(set)
+		if err != nil {
 			return err
-		} else {
-			set = obj.(*apps.StatefulSet)
 		}
+		set = obj.(*apps.StatefulSet)
 
 	}
 	return assertMonotonicInvariants(set, spc)
@@ -700,11 +701,12 @@ func scaleDownStatefulSetController(set *apps.StatefulSet, ssc *StatefulSetContr
 		spc.DeleteStatefulPod(set, pod)
 		ssc.deletePod(pod)
 		fakeWorker(ssc)
-		if obj, _, err := spc.setsIndexer.Get(set); err != nil {
+		obj, _, err := spc.setsIndexer.Get(set)
+		if err != nil {
 			return err
-		} else {
-			set = obj.(*apps.StatefulSet)
 		}
+		set = obj.(*apps.StatefulSet)
+
 	}
 	return assertMonotonicInvariants(set, spc)
 }

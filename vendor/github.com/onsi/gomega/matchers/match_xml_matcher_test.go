@@ -22,7 +22,7 @@ var _ = Describe("MatchXMLMatcher", func() {
 		sample_11 = readFileContents("test_data/xml/sample_11.xml")
 	)
 
-	Context("When passed stringifiables", func() {
+	Context("when passed stringifiables", func() {
 		It("matches documents regardless of the attribute order", func() {
 			a := `<a foo="bar" ka="boom"></a>`
 			b := `<a ka="boom" foo="bar"></a>`
@@ -40,12 +40,6 @@ var _ = Describe("MatchXMLMatcher", func() {
 			Expect(sample_07).ShouldNot(MatchXML(sample_08)) // same structures with different values
 			Expect(sample_09).ShouldNot(MatchXML(sample_10)) // same structures with different attribute values
 			Expect(sample_11).Should(MatchXML(sample_11))    // with non UTF-8 encoding
-		})
-
-		It("should work with byte arrays", func() {
-			Expect([]byte(sample_01)).Should(MatchXML([]byte(sample_01)))
-			Expect([]byte(sample_01)).Should(MatchXML(sample_01))
-			Expect(sample_01).Should(MatchXML([]byte(sample_01)))
 		})
 	})
 
@@ -93,5 +87,19 @@ var _ = Describe("MatchXMLMatcher", func() {
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).Should(ContainSubstring("MatchXMLMatcher matcher requires a string, stringer, or []byte.  Got actual:\n    <nil>: nil"))
 		})
+	})
+
+	It("shows failure message", func() {
+		failuresMessages := InterceptGomegaFailures(func() {
+			Expect("<xml/>").To(MatchXML("<yml/>"))
+		})
+		Expect(failuresMessages).To(Equal([]string{"Expected\n<xml/>\nto match XML of\n<yml/>"}))
+	})
+
+	It("shows negated failure message", func() {
+		failuresMessages := InterceptGomegaFailures(func() {
+			Expect("<xml/>").ToNot(MatchXML("<xml/>"))
+		})
+		Expect(failuresMessages).To(Equal([]string{"Expected\n<xml/>\nnot to match XML of\n<xml/>"}))
 	})
 })

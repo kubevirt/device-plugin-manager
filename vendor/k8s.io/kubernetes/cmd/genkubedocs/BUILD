@@ -1,8 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
 load(
+    "//build:go.bzl",
+    go_binary = "go_binary_conditional_pure",
+)
+load(
     "@io_bazel_rules_go//go:def.bzl",
-    "go_binary",
     "go_library",
     "go_test",
 )
@@ -20,7 +23,6 @@ go_library(
     ],
     importpath = "k8s.io/kubernetes/cmd/genkubedocs",
     deps = [
-        "//cmd/cloud-controller-manager/app:go_default_library",
         "//cmd/genutils:go_default_library",
         "//cmd/kube-apiserver/app:go_default_library",
         "//cmd/kube-controller-manager/app:go_default_library",

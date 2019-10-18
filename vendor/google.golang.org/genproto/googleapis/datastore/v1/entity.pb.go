@@ -3,18 +3,27 @@
 
 package datastore
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import _ "google.golang.org/genproto/googleapis/api/annotations"
-import google_protobuf1 "github.com/golang/protobuf/ptypes/struct"
-import google_protobuf2 "github.com/golang/protobuf/ptypes/timestamp"
-import google_type "google.golang.org/genproto/googleapis/type/latlng"
+import (
+	fmt "fmt"
+	math "math"
+
+	proto "github.com/golang/protobuf/proto"
+	_struct "github.com/golang/protobuf/ptypes/struct"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
+	latlng "google.golang.org/genproto/googleapis/type/latlng"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the proto package it is being compiled against.
+// A compilation error at this line likely means your copy of the
+// proto package needs to be updated.
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // A partition ID identifies a grouping of entities. The grouping is always
 // by project and namespace, however the namespace ID may be empty.
@@ -34,18 +43,42 @@ var _ = math.Inf
 //
 // Foreign partition IDs (in which the project ID does
 // not match the context project ID ) are discouraged.
-// Reads and writes of foreign partition IDs may fail if the project is not in an active state.
+// Reads and writes of foreign partition IDs may fail if the project is not in
+// an active state.
 type PartitionId struct {
 	// The ID of the project to which the entities belong.
-	ProjectId string `protobuf:"bytes,2,opt,name=project_id,json=projectId" json:"project_id,omitempty"`
+	ProjectId string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	// If not empty, the ID of the namespace to which the entities belong.
-	NamespaceId string `protobuf:"bytes,4,opt,name=namespace_id,json=namespaceId" json:"namespace_id,omitempty"`
+	NamespaceId          string   `protobuf:"bytes,4,opt,name=namespace_id,json=namespaceId,proto3" json:"namespace_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *PartitionId) Reset()                    { *m = PartitionId{} }
-func (m *PartitionId) String() string            { return proto.CompactTextString(m) }
-func (*PartitionId) ProtoMessage()               {}
-func (*PartitionId) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
+func (m *PartitionId) Reset()         { *m = PartitionId{} }
+func (m *PartitionId) String() string { return proto.CompactTextString(m) }
+func (*PartitionId) ProtoMessage()    {}
+func (*PartitionId) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ecbfdafa45100300, []int{0}
+}
+
+func (m *PartitionId) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PartitionId.Unmarshal(m, b)
+}
+func (m *PartitionId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PartitionId.Marshal(b, m, deterministic)
+}
+func (m *PartitionId) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PartitionId.Merge(m, src)
+}
+func (m *PartitionId) XXX_Size() int {
+	return xxx_messageInfo_PartitionId.Size(m)
+}
+func (m *PartitionId) XXX_DiscardUnknown() {
+	xxx_messageInfo_PartitionId.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PartitionId proto.InternalMessageInfo
 
 func (m *PartitionId) GetProjectId() string {
 	if m != nil {
@@ -69,7 +102,7 @@ type Key struct {
 	// Entities are partitioned into subsets, currently identified by a project
 	// ID and namespace ID.
 	// Queries are scoped to a single partition.
-	PartitionId *PartitionId `protobuf:"bytes,1,opt,name=partition_id,json=partitionId" json:"partition_id,omitempty"`
+	PartitionId *PartitionId `protobuf:"bytes,1,opt,name=partition_id,json=partitionId,proto3" json:"partition_id,omitempty"`
 	// The entity path.
 	// An entity path consists of one or more elements composed of a kind and a
 	// string or numerical identifier, which identify entities. The first
@@ -86,13 +119,36 @@ type Key struct {
 	// identifier.
 	//
 	// A path can never be empty, and a path can have at most 100 elements.
-	Path []*Key_PathElement `protobuf:"bytes,2,rep,name=path" json:"path,omitempty"`
+	Path                 []*Key_PathElement `protobuf:"bytes,2,rep,name=path,proto3" json:"path,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
 }
 
-func (m *Key) Reset()                    { *m = Key{} }
-func (m *Key) String() string            { return proto.CompactTextString(m) }
-func (*Key) ProtoMessage()               {}
-func (*Key) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{1} }
+func (m *Key) Reset()         { *m = Key{} }
+func (m *Key) String() string { return proto.CompactTextString(m) }
+func (*Key) ProtoMessage()    {}
+func (*Key) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ecbfdafa45100300, []int{1}
+}
+
+func (m *Key) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Key.Unmarshal(m, b)
+}
+func (m *Key) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Key.Marshal(b, m, deterministic)
+}
+func (m *Key) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Key.Merge(m, src)
+}
+func (m *Key) XXX_Size() int {
+	return xxx_messageInfo_Key.Size(m)
+}
+func (m *Key) XXX_DiscardUnknown() {
+	xxx_messageInfo_Key.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Key proto.InternalMessageInfo
 
 func (m *Key) GetPartitionId() *PartitionId {
 	if m != nil {
@@ -117,32 +173,64 @@ type Key_PathElement struct {
 	// A kind matching regex `__.*__` is reserved/read-only.
 	// A kind must not contain more than 1500 bytes when UTF-8 encoded.
 	// Cannot be `""`.
-	Kind string `protobuf:"bytes,1,opt,name=kind" json:"kind,omitempty"`
+	Kind string `protobuf:"bytes,1,opt,name=kind,proto3" json:"kind,omitempty"`
 	// The type of ID.
 	//
 	// Types that are valid to be assigned to IdType:
 	//	*Key_PathElement_Id
 	//	*Key_PathElement_Name
-	IdType isKey_PathElement_IdType `protobuf_oneof:"id_type"`
+	IdType               isKey_PathElement_IdType `protobuf_oneof:"id_type"`
+	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
+	XXX_unrecognized     []byte                   `json:"-"`
+	XXX_sizecache        int32                    `json:"-"`
 }
 
-func (m *Key_PathElement) Reset()                    { *m = Key_PathElement{} }
-func (m *Key_PathElement) String() string            { return proto.CompactTextString(m) }
-func (*Key_PathElement) ProtoMessage()               {}
-func (*Key_PathElement) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{1, 0} }
+func (m *Key_PathElement) Reset()         { *m = Key_PathElement{} }
+func (m *Key_PathElement) String() string { return proto.CompactTextString(m) }
+func (*Key_PathElement) ProtoMessage()    {}
+func (*Key_PathElement) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ecbfdafa45100300, []int{1, 0}
+}
+
+func (m *Key_PathElement) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Key_PathElement.Unmarshal(m, b)
+}
+func (m *Key_PathElement) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Key_PathElement.Marshal(b, m, deterministic)
+}
+func (m *Key_PathElement) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Key_PathElement.Merge(m, src)
+}
+func (m *Key_PathElement) XXX_Size() int {
+	return xxx_messageInfo_Key_PathElement.Size(m)
+}
+func (m *Key_PathElement) XXX_DiscardUnknown() {
+	xxx_messageInfo_Key_PathElement.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Key_PathElement proto.InternalMessageInfo
+
+func (m *Key_PathElement) GetKind() string {
+	if m != nil {
+		return m.Kind
+	}
+	return ""
+}
 
 type isKey_PathElement_IdType interface {
 	isKey_PathElement_IdType()
 }
 
 type Key_PathElement_Id struct {
-	Id int64 `protobuf:"varint,2,opt,name=id,oneof"`
-}
-type Key_PathElement_Name struct {
-	Name string `protobuf:"bytes,3,opt,name=name,oneof"`
+	Id int64 `protobuf:"varint,2,opt,name=id,proto3,oneof"`
 }
 
-func (*Key_PathElement_Id) isKey_PathElement_IdType()   {}
+type Key_PathElement_Name struct {
+	Name string `protobuf:"bytes,3,opt,name=name,proto3,oneof"`
+}
+
+func (*Key_PathElement_Id) isKey_PathElement_IdType() {}
+
 func (*Key_PathElement_Name) isKey_PathElement_IdType() {}
 
 func (m *Key_PathElement) GetIdType() isKey_PathElement_IdType {
@@ -150,13 +238,6 @@ func (m *Key_PathElement) GetIdType() isKey_PathElement_IdType {
 		return m.IdType
 	}
 	return nil
-}
-
-func (m *Key_PathElement) GetKind() string {
-	if m != nil {
-		return m.Kind
-	}
-	return ""
 }
 
 func (m *Key_PathElement) GetId() int64 {
@@ -173,69 +254,12 @@ func (m *Key_PathElement) GetName() string {
 	return ""
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*Key_PathElement) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Key_PathElement_OneofMarshaler, _Key_PathElement_OneofUnmarshaler, _Key_PathElement_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Key_PathElement) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*Key_PathElement_Id)(nil),
 		(*Key_PathElement_Name)(nil),
 	}
-}
-
-func _Key_PathElement_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Key_PathElement)
-	// id_type
-	switch x := m.IdType.(type) {
-	case *Key_PathElement_Id:
-		b.EncodeVarint(2<<3 | proto.WireVarint)
-		b.EncodeVarint(uint64(x.Id))
-	case *Key_PathElement_Name:
-		b.EncodeVarint(3<<3 | proto.WireBytes)
-		b.EncodeStringBytes(x.Name)
-	case nil:
-	default:
-		return fmt.Errorf("Key_PathElement.IdType has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _Key_PathElement_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Key_PathElement)
-	switch tag {
-	case 2: // id_type.id
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.IdType = &Key_PathElement_Id{int64(x)}
-		return true, err
-	case 3: // id_type.name
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeStringBytes()
-		m.IdType = &Key_PathElement_Name{x}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _Key_PathElement_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Key_PathElement)
-	// id_type
-	switch x := m.IdType.(type) {
-	case *Key_PathElement_Id:
-		n += proto.SizeVarint(2<<3 | proto.WireVarint)
-		n += proto.SizeVarint(uint64(x.Id))
-	case *Key_PathElement_Name:
-		n += proto.SizeVarint(3<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.Name)))
-		n += len(x.Name)
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // An array value.
@@ -243,13 +267,36 @@ type ArrayValue struct {
 	// Values in the array.
 	// The order of this array may not be preserved if it contains a mix of
 	// indexed and unindexed values.
-	Values []*Value `protobuf:"bytes,1,rep,name=values" json:"values,omitempty"`
+	Values               []*Value `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ArrayValue) Reset()                    { *m = ArrayValue{} }
-func (m *ArrayValue) String() string            { return proto.CompactTextString(m) }
-func (*ArrayValue) ProtoMessage()               {}
-func (*ArrayValue) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{2} }
+func (m *ArrayValue) Reset()         { *m = ArrayValue{} }
+func (m *ArrayValue) String() string { return proto.CompactTextString(m) }
+func (*ArrayValue) ProtoMessage()    {}
+func (*ArrayValue) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ecbfdafa45100300, []int{2}
+}
+
+func (m *ArrayValue) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ArrayValue.Unmarshal(m, b)
+}
+func (m *ArrayValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ArrayValue.Marshal(b, m, deterministic)
+}
+func (m *ArrayValue) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ArrayValue.Merge(m, src)
+}
+func (m *ArrayValue) XXX_Size() int {
+	return xxx_messageInfo_ArrayValue.Size(m)
+}
+func (m *ArrayValue) XXX_DiscardUnknown() {
+	xxx_messageInfo_ArrayValue.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ArrayValue proto.InternalMessageInfo
 
 func (m *ArrayValue) GetValues() []*Value {
 	if m != nil {
@@ -277,66 +324,109 @@ type Value struct {
 	//	*Value_ArrayValue
 	ValueType isValue_ValueType `protobuf_oneof:"value_type"`
 	// The `meaning` field should only be populated for backwards compatibility.
-	Meaning int32 `protobuf:"varint,14,opt,name=meaning" json:"meaning,omitempty"`
+	Meaning int32 `protobuf:"varint,14,opt,name=meaning,proto3" json:"meaning,omitempty"`
 	// If the value should be excluded from all indexes including those defined
 	// explicitly.
-	ExcludeFromIndexes bool `protobuf:"varint,19,opt,name=exclude_from_indexes,json=excludeFromIndexes" json:"exclude_from_indexes,omitempty"`
+	ExcludeFromIndexes   bool     `protobuf:"varint,19,opt,name=exclude_from_indexes,json=excludeFromIndexes,proto3" json:"exclude_from_indexes,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Value) Reset()                    { *m = Value{} }
-func (m *Value) String() string            { return proto.CompactTextString(m) }
-func (*Value) ProtoMessage()               {}
-func (*Value) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{3} }
+func (m *Value) Reset()         { *m = Value{} }
+func (m *Value) String() string { return proto.CompactTextString(m) }
+func (*Value) ProtoMessage()    {}
+func (*Value) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ecbfdafa45100300, []int{3}
+}
+
+func (m *Value) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Value.Unmarshal(m, b)
+}
+func (m *Value) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Value.Marshal(b, m, deterministic)
+}
+func (m *Value) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Value.Merge(m, src)
+}
+func (m *Value) XXX_Size() int {
+	return xxx_messageInfo_Value.Size(m)
+}
+func (m *Value) XXX_DiscardUnknown() {
+	xxx_messageInfo_Value.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Value proto.InternalMessageInfo
 
 type isValue_ValueType interface {
 	isValue_ValueType()
 }
 
 type Value_NullValue struct {
-	NullValue google_protobuf1.NullValue `protobuf:"varint,11,opt,name=null_value,json=nullValue,enum=google.protobuf.NullValue,oneof"`
+	NullValue _struct.NullValue `protobuf:"varint,11,opt,name=null_value,json=nullValue,proto3,enum=google.protobuf.NullValue,oneof"`
 }
+
 type Value_BooleanValue struct {
-	BooleanValue bool `protobuf:"varint,1,opt,name=boolean_value,json=booleanValue,oneof"`
+	BooleanValue bool `protobuf:"varint,1,opt,name=boolean_value,json=booleanValue,proto3,oneof"`
 }
+
 type Value_IntegerValue struct {
-	IntegerValue int64 `protobuf:"varint,2,opt,name=integer_value,json=integerValue,oneof"`
+	IntegerValue int64 `protobuf:"varint,2,opt,name=integer_value,json=integerValue,proto3,oneof"`
 }
+
 type Value_DoubleValue struct {
-	DoubleValue float64 `protobuf:"fixed64,3,opt,name=double_value,json=doubleValue,oneof"`
+	DoubleValue float64 `protobuf:"fixed64,3,opt,name=double_value,json=doubleValue,proto3,oneof"`
 }
+
 type Value_TimestampValue struct {
-	TimestampValue *google_protobuf2.Timestamp `protobuf:"bytes,10,opt,name=timestamp_value,json=timestampValue,oneof"`
+	TimestampValue *timestamp.Timestamp `protobuf:"bytes,10,opt,name=timestamp_value,json=timestampValue,proto3,oneof"`
 }
+
 type Value_KeyValue struct {
-	KeyValue *Key `protobuf:"bytes,5,opt,name=key_value,json=keyValue,oneof"`
+	KeyValue *Key `protobuf:"bytes,5,opt,name=key_value,json=keyValue,proto3,oneof"`
 }
+
 type Value_StringValue struct {
-	StringValue string `protobuf:"bytes,17,opt,name=string_value,json=stringValue,oneof"`
+	StringValue string `protobuf:"bytes,17,opt,name=string_value,json=stringValue,proto3,oneof"`
 }
+
 type Value_BlobValue struct {
 	BlobValue []byte `protobuf:"bytes,18,opt,name=blob_value,json=blobValue,proto3,oneof"`
 }
+
 type Value_GeoPointValue struct {
-	GeoPointValue *google_type.LatLng `protobuf:"bytes,8,opt,name=geo_point_value,json=geoPointValue,oneof"`
-}
-type Value_EntityValue struct {
-	EntityValue *Entity `protobuf:"bytes,6,opt,name=entity_value,json=entityValue,oneof"`
-}
-type Value_ArrayValue struct {
-	ArrayValue *ArrayValue `protobuf:"bytes,9,opt,name=array_value,json=arrayValue,oneof"`
+	GeoPointValue *latlng.LatLng `protobuf:"bytes,8,opt,name=geo_point_value,json=geoPointValue,proto3,oneof"`
 }
 
-func (*Value_NullValue) isValue_ValueType()      {}
-func (*Value_BooleanValue) isValue_ValueType()   {}
-func (*Value_IntegerValue) isValue_ValueType()   {}
-func (*Value_DoubleValue) isValue_ValueType()    {}
+type Value_EntityValue struct {
+	EntityValue *Entity `protobuf:"bytes,6,opt,name=entity_value,json=entityValue,proto3,oneof"`
+}
+
+type Value_ArrayValue struct {
+	ArrayValue *ArrayValue `protobuf:"bytes,9,opt,name=array_value,json=arrayValue,proto3,oneof"`
+}
+
+func (*Value_NullValue) isValue_ValueType() {}
+
+func (*Value_BooleanValue) isValue_ValueType() {}
+
+func (*Value_IntegerValue) isValue_ValueType() {}
+
+func (*Value_DoubleValue) isValue_ValueType() {}
+
 func (*Value_TimestampValue) isValue_ValueType() {}
-func (*Value_KeyValue) isValue_ValueType()       {}
-func (*Value_StringValue) isValue_ValueType()    {}
-func (*Value_BlobValue) isValue_ValueType()      {}
-func (*Value_GeoPointValue) isValue_ValueType()  {}
-func (*Value_EntityValue) isValue_ValueType()    {}
-func (*Value_ArrayValue) isValue_ValueType()     {}
+
+func (*Value_KeyValue) isValue_ValueType() {}
+
+func (*Value_StringValue) isValue_ValueType() {}
+
+func (*Value_BlobValue) isValue_ValueType() {}
+
+func (*Value_GeoPointValue) isValue_ValueType() {}
+
+func (*Value_EntityValue) isValue_ValueType() {}
+
+func (*Value_ArrayValue) isValue_ValueType() {}
 
 func (m *Value) GetValueType() isValue_ValueType {
 	if m != nil {
@@ -345,11 +435,11 @@ func (m *Value) GetValueType() isValue_ValueType {
 	return nil
 }
 
-func (m *Value) GetNullValue() google_protobuf1.NullValue {
+func (m *Value) GetNullValue() _struct.NullValue {
 	if x, ok := m.GetValueType().(*Value_NullValue); ok {
 		return x.NullValue
 	}
-	return google_protobuf1.NullValue_NULL_VALUE
+	return _struct.NullValue_NULL_VALUE
 }
 
 func (m *Value) GetBooleanValue() bool {
@@ -373,7 +463,7 @@ func (m *Value) GetDoubleValue() float64 {
 	return 0
 }
 
-func (m *Value) GetTimestampValue() *google_protobuf2.Timestamp {
+func (m *Value) GetTimestampValue() *timestamp.Timestamp {
 	if x, ok := m.GetValueType().(*Value_TimestampValue); ok {
 		return x.TimestampValue
 	}
@@ -401,7 +491,7 @@ func (m *Value) GetBlobValue() []byte {
 	return nil
 }
 
-func (m *Value) GetGeoPointValue() *google_type.LatLng {
+func (m *Value) GetGeoPointValue() *latlng.LatLng {
 	if x, ok := m.GetValueType().(*Value_GeoPointValue); ok {
 		return x.GeoPointValue
 	}
@@ -436,9 +526,9 @@ func (m *Value) GetExcludeFromIndexes() bool {
 	return false
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*Value) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Value_OneofMarshaler, _Value_OneofUnmarshaler, _Value_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Value) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*Value_NullValue)(nil),
 		(*Value_BooleanValue)(nil),
 		(*Value_IntegerValue)(nil),
@@ -453,210 +543,6 @@ func (*Value) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, 
 	}
 }
 
-func _Value_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Value)
-	// value_type
-	switch x := m.ValueType.(type) {
-	case *Value_NullValue:
-		b.EncodeVarint(11<<3 | proto.WireVarint)
-		b.EncodeVarint(uint64(x.NullValue))
-	case *Value_BooleanValue:
-		t := uint64(0)
-		if x.BooleanValue {
-			t = 1
-		}
-		b.EncodeVarint(1<<3 | proto.WireVarint)
-		b.EncodeVarint(t)
-	case *Value_IntegerValue:
-		b.EncodeVarint(2<<3 | proto.WireVarint)
-		b.EncodeVarint(uint64(x.IntegerValue))
-	case *Value_DoubleValue:
-		b.EncodeVarint(3<<3 | proto.WireFixed64)
-		b.EncodeFixed64(math.Float64bits(x.DoubleValue))
-	case *Value_TimestampValue:
-		b.EncodeVarint(10<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.TimestampValue); err != nil {
-			return err
-		}
-	case *Value_KeyValue:
-		b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.KeyValue); err != nil {
-			return err
-		}
-	case *Value_StringValue:
-		b.EncodeVarint(17<<3 | proto.WireBytes)
-		b.EncodeStringBytes(x.StringValue)
-	case *Value_BlobValue:
-		b.EncodeVarint(18<<3 | proto.WireBytes)
-		b.EncodeRawBytes(x.BlobValue)
-	case *Value_GeoPointValue:
-		b.EncodeVarint(8<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.GeoPointValue); err != nil {
-			return err
-		}
-	case *Value_EntityValue:
-		b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.EntityValue); err != nil {
-			return err
-		}
-	case *Value_ArrayValue:
-		b.EncodeVarint(9<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ArrayValue); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("Value.ValueType has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _Value_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Value)
-	switch tag {
-	case 11: // value_type.null_value
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.ValueType = &Value_NullValue{google_protobuf1.NullValue(x)}
-		return true, err
-	case 1: // value_type.boolean_value
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.ValueType = &Value_BooleanValue{x != 0}
-		return true, err
-	case 2: // value_type.integer_value
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.ValueType = &Value_IntegerValue{int64(x)}
-		return true, err
-	case 3: // value_type.double_value
-		if wire != proto.WireFixed64 {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeFixed64()
-		m.ValueType = &Value_DoubleValue{math.Float64frombits(x)}
-		return true, err
-	case 10: // value_type.timestamp_value
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(google_protobuf2.Timestamp)
-		err := b.DecodeMessage(msg)
-		m.ValueType = &Value_TimestampValue{msg}
-		return true, err
-	case 5: // value_type.key_value
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(Key)
-		err := b.DecodeMessage(msg)
-		m.ValueType = &Value_KeyValue{msg}
-		return true, err
-	case 17: // value_type.string_value
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeStringBytes()
-		m.ValueType = &Value_StringValue{x}
-		return true, err
-	case 18: // value_type.blob_value
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeRawBytes(true)
-		m.ValueType = &Value_BlobValue{x}
-		return true, err
-	case 8: // value_type.geo_point_value
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(google_type.LatLng)
-		err := b.DecodeMessage(msg)
-		m.ValueType = &Value_GeoPointValue{msg}
-		return true, err
-	case 6: // value_type.entity_value
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(Entity)
-		err := b.DecodeMessage(msg)
-		m.ValueType = &Value_EntityValue{msg}
-		return true, err
-	case 9: // value_type.array_value
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ArrayValue)
-		err := b.DecodeMessage(msg)
-		m.ValueType = &Value_ArrayValue{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _Value_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Value)
-	// value_type
-	switch x := m.ValueType.(type) {
-	case *Value_NullValue:
-		n += proto.SizeVarint(11<<3 | proto.WireVarint)
-		n += proto.SizeVarint(uint64(x.NullValue))
-	case *Value_BooleanValue:
-		n += proto.SizeVarint(1<<3 | proto.WireVarint)
-		n += 1
-	case *Value_IntegerValue:
-		n += proto.SizeVarint(2<<3 | proto.WireVarint)
-		n += proto.SizeVarint(uint64(x.IntegerValue))
-	case *Value_DoubleValue:
-		n += proto.SizeVarint(3<<3 | proto.WireFixed64)
-		n += 8
-	case *Value_TimestampValue:
-		s := proto.Size(x.TimestampValue)
-		n += proto.SizeVarint(10<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Value_KeyValue:
-		s := proto.Size(x.KeyValue)
-		n += proto.SizeVarint(5<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Value_StringValue:
-		n += proto.SizeVarint(17<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.StringValue)))
-		n += len(x.StringValue)
-	case *Value_BlobValue:
-		n += proto.SizeVarint(18<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.BlobValue)))
-		n += len(x.BlobValue)
-	case *Value_GeoPointValue:
-		s := proto.Size(x.GeoPointValue)
-		n += proto.SizeVarint(8<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Value_EntityValue:
-		s := proto.Size(x.EntityValue)
-		n += proto.SizeVarint(6<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Value_ArrayValue:
-		s := proto.Size(x.ArrayValue)
-		n += proto.SizeVarint(9<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
-}
-
 // A Datastore data object.
 //
 // An entity is limited to 1 megabyte when stored. That _roughly_
@@ -669,20 +555,43 @@ type Entity struct {
 	// an entity in `Value.entity_value` may have no key).
 	// An entity's kind is its key path's last element's kind,
 	// or null if it has no key.
-	Key *Key `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
+	Key *Key `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// The entity's properties.
 	// The map's keys are property names.
 	// A property name matching regex `__.*__` is reserved.
 	// A reserved property name is forbidden in certain documented contexts.
 	// The name must not contain more than 500 characters.
 	// The name cannot be `""`.
-	Properties map[string]*Value `protobuf:"bytes,3,rep,name=properties" json:"properties,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Properties           map[string]*Value `protobuf:"bytes,3,rep,name=properties,proto3" json:"properties,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
 }
 
-func (m *Entity) Reset()                    { *m = Entity{} }
-func (m *Entity) String() string            { return proto.CompactTextString(m) }
-func (*Entity) ProtoMessage()               {}
-func (*Entity) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{4} }
+func (m *Entity) Reset()         { *m = Entity{} }
+func (m *Entity) String() string { return proto.CompactTextString(m) }
+func (*Entity) ProtoMessage()    {}
+func (*Entity) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ecbfdafa45100300, []int{4}
+}
+
+func (m *Entity) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Entity.Unmarshal(m, b)
+}
+func (m *Entity) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Entity.Marshal(b, m, deterministic)
+}
+func (m *Entity) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Entity.Merge(m, src)
+}
+func (m *Entity) XXX_Size() int {
+	return xxx_messageInfo_Entity.Size(m)
+}
+func (m *Entity) XXX_DiscardUnknown() {
+	xxx_messageInfo_Entity.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Entity proto.InternalMessageInfo
 
 func (m *Entity) GetKey() *Key {
 	if m != nil {
@@ -705,11 +614,12 @@ func init() {
 	proto.RegisterType((*ArrayValue)(nil), "google.datastore.v1.ArrayValue")
 	proto.RegisterType((*Value)(nil), "google.datastore.v1.Value")
 	proto.RegisterType((*Entity)(nil), "google.datastore.v1.Entity")
+	proto.RegisterMapType((map[string]*Value)(nil), "google.datastore.v1.Entity.PropertiesEntry")
 }
 
-func init() { proto.RegisterFile("google/datastore/v1/entity.proto", fileDescriptor1) }
+func init() { proto.RegisterFile("google/datastore/v1/entity.proto", fileDescriptor_ecbfdafa45100300) }
 
-var fileDescriptor1 = []byte{
+var fileDescriptor_ecbfdafa45100300 = []byte{
 	// 780 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x94, 0xff, 0x6e, 0xdc, 0x44,
 	0x10, 0xc7, 0xed, 0xbb, 0x5c, 0x1a, 0x8f, 0xdd, 0xa4, 0x6c, 0x2a, 0x61, 0x02, 0x28, 0x26, 0x80,

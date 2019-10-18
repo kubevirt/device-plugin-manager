@@ -20,22 +20,44 @@ import (
 	"fmt"
 	"time"
 
-	"k8s.io/kubernetes/pkg/kubectl"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/wait"
+	scaleclient "k8s.io/client-go/scale"
+	"k8s.io/kubectl/pkg/scale"
 )
 
 const (
 	// Parameters for retrying updates/waits with linear backoff.
-	// TODO: Try to move this to exponential backoff by modifying kubectl.Scale().
+	// TODO: Try to move this to exponential backoff by modifying scale.Scale().
 	updateRetryInterval = 5 * time.Second
 	updateRetryTimeout  = 1 * time.Minute
 	waitRetryInterval   = 5 * time.Second
-	waitRetryTImeout    = 5 * time.Minute
+	waitRetryTimeout    = 5 * time.Minute
 )
 
-func ScaleResourceWithRetries(scaler kubectl.Scaler, namespace, name string, size uint) error {
-	waitForScale := kubectl.NewRetryParams(updateRetryInterval, updateRetryTimeout)
-	waitForReplicas := kubectl.NewRetryParams(waitRetryInterval, waitRetryTImeout)
-	if err := scaler.Scale(namespace, name, size, nil, waitForScale, waitForReplicas); err != nil {
+func RetryErrorCondition(condition wait.ConditionFunc) wait.ConditionFunc {
+	return func() (bool, error) {
+		done, err := condition()
+		if err != nil && IsRetryableAPIError(err) {
+			return false, nil
+		}
+		return done, err
+	}
+}
+
+func ScaleResourceWithRetries(scalesGetter scaleclient.ScalesGetter, namespace, name string, size uint, gvr schema.GroupVersionResource) error {
+	scaler := scale.NewScaler(scalesGetter)
+	preconditions := &scale.ScalePrecondition{
+		Size:            -1,
+		ResourceVersion: "",
+	}
+	waitForReplicas := scale.NewRetryParams(waitRetryInterval, waitRetryTimeout)
+	cond := RetryErrorCondition(scale.ScaleCondition(scaler, preconditions, namespace, name, size, nil, gvr))
+	err := wait.PollImmediate(updateRetryInterval, updateRetryTimeout, cond)
+	if err == nil {
+		err = scale.WaitForScaleHasDesiredReplicas(scalesGetter, gvr.GroupResource(), name, namespace, size, waitForReplicas)
+	}
+	if err != nil {
 		return fmt.Errorf("Error while scaling %s to %d replicas: %v", name, size, err)
 	}
 	return nil

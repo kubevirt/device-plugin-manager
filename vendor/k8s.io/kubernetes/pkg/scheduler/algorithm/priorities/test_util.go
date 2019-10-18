@@ -20,9 +20,8 @@ import (
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/kubernetes/pkg/scheduler/algorithm"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
-	"k8s.io/kubernetes/pkg/scheduler/schedulercache"
+	schedulernodeinfo "k8s.io/kubernetes/pkg/scheduler/nodeinfo"
 )
 
 func makeNode(node string, milliCPU, memory int64) *v1.Node {
@@ -41,18 +40,34 @@ func makeNode(node string, milliCPU, memory int64) *v1.Node {
 	}
 }
 
-func priorityFunction(mapFn algorithm.PriorityMapFunction, reduceFn algorithm.PriorityReduceFunction, mataData interface{}) algorithm.PriorityFunction {
-	return func(pod *v1.Pod, nodeNameToInfo map[string]*schedulercache.NodeInfo, nodes []*v1.Node) (schedulerapi.HostPriorityList, error) {
+func makeNodeWithExtendedResource(node string, milliCPU, memory int64, extendedResource map[string]int64) *v1.Node {
+	resourceList := make(map[v1.ResourceName]resource.Quantity)
+	for res, quantity := range extendedResource {
+		resourceList[v1.ResourceName(res)] = *resource.NewQuantity(quantity, resource.DecimalSI)
+	}
+	resourceList[v1.ResourceCPU] = *resource.NewMilliQuantity(milliCPU, resource.DecimalSI)
+	resourceList[v1.ResourceMemory] = *resource.NewQuantity(memory, resource.BinarySI)
+	return &v1.Node{
+		ObjectMeta: metav1.ObjectMeta{Name: node},
+		Status: v1.NodeStatus{
+			Capacity:    resourceList,
+			Allocatable: resourceList,
+		},
+	}
+}
+
+func priorityFunction(mapFn PriorityMapFunction, reduceFn PriorityReduceFunction, metaData interface{}) PriorityFunction {
+	return func(pod *v1.Pod, nodeNameToInfo map[string]*schedulernodeinfo.NodeInfo, nodes []*v1.Node) (schedulerapi.HostPriorityList, error) {
 		result := make(schedulerapi.HostPriorityList, 0, len(nodes))
 		for i := range nodes {
-			hostResult, err := mapFn(pod, mataData, nodeNameToInfo[nodes[i].Name])
+			hostResult, err := mapFn(pod, metaData, nodeNameToInfo[nodes[i].Name])
 			if err != nil {
 				return nil, err
 			}
 			result = append(result, hostResult)
 		}
 		if reduceFn != nil {
-			if err := reduceFn(pod, mataData, nodeNameToInfo, result); err != nil {
+			if err := reduceFn(pod, metaData, nodeNameToInfo, result); err != nil {
 				return nil, err
 			}
 		}
