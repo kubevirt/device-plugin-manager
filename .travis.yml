@@ -1,9 +1,11 @@
 language: go
 
-go: 1.11.x
+go: 1.14.x
 go_import_path: github.com/kubevirt/device-plugin-manager
 
 before_install:
+  - sudo mkdir -p /var/lib/kubelet/device-plugins
+  - sudo chown $USER /var/lib/kubelet/device-plugins
   - go get github.com/onsi/gomega
   - go get github.com/onsi/ginkgo/ginkgo
 

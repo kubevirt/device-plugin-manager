@@ -4,15 +4,13 @@ build:
 	go fmt ./pkg/...
 	go vet ./pkg/...
 	go install -v ./pkg/...
+	go mod tidy
 
 test:
 	ginkgo ./pkg/...
 
 dep:
-	dep ensure -v
+	go get -t -u ./...
+	go mod vendor
 
-clean-dep:
-	rm -f ./Gopkg.lock
-	rm -rf ./vendor
-
-.PHONY: build test dep clean-dep
+.PHONY: build test dep
