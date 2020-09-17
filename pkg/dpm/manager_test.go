@@ -36,6 +36,10 @@ func (FakeDevicePlugin) PreStartContainer(context.Context, *pluginapi.PreStartCo
 	return nil, nil
 }
 
+func (dp *FakeDevicePlugin) GetPreferredAllocation(ctx context.Context, request *pluginapi.PreferredAllocationRequest) (*pluginapi.PreferredAllocationResponse, error) {
+	return nil, nil
+}
+
 // define a fake lister
 type FakeLister struct {
 	Plugins []string
