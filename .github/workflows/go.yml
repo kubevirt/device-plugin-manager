@@ -21,5 +21,8 @@ jobs:
     - name: Build
       run: go build -v ./...
 
+    - name: Format
+      run: if [ "$(gofmt -s -l ./pkg | wc -l)" -gt 0 ]; then exit 1; fi
+
     - name: Test
       run: go test -v ./...
