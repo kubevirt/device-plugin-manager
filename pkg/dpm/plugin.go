@@ -79,13 +79,12 @@ func (dpi *devicePlugin) StartServer() error {
 		return err
 	}
 
-	dpi.Running = true
-
 	err = dpi.register()
 	if err != nil {
 		dpi.StopServer()
 		return err
 	}
+	dpi.Running = true
 
 	return nil
 }
