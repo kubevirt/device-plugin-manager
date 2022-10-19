@@ -73,8 +73,10 @@ var _ = Describe("DPM", func() {
 
 	BeforeEach(func() {
 		callsToStart = 0
-		plugins = append(plugins, "hello", "world")
-		manager = dpm.NewManager(FakeLister{Plugins: plugins})
+		plugins = append(plugins, "hello")
+		plugins = append(plugins, "world")
+		lister := FakeLister{Plugins: plugins}
+		manager = dpm.NewManager(lister)
 	})
 	Describe("When DPM start", func() {
 		Context("With lister containing multiple plugins", func() {
