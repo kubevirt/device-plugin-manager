@@ -56,7 +56,7 @@ github.com/onsi/gomega/matchers/support/goraph/edge
 github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
-# golang.org/x/net v0.0.0-20200904194848-62affa334b73
+# golang.org/x/net v0.17.0
 ## explicit
 golang.org/x/net/context
 golang.org/x/net/html
@@ -68,11 +68,9 @@ golang.org/x/net/http2/hpack
 golang.org/x/net/idna
 golang.org/x/net/internal/timeseries
 golang.org/x/net/trace
-# golang.org/x/sys v0.0.0-20200917073148-efd3b9a0ff20
-## explicit
-golang.org/x/sys/internal/unsafeheader
+# golang.org/x/sys v0.13.0
 golang.org/x/sys/unix
-# golang.org/x/text v0.3.3
+# golang.org/x/text v0.13.0
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
 golang.org/x/text/encoding/htmlindex
